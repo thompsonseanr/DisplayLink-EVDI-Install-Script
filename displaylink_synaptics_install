@@ -1,0 +1,118 @@
+#!/bin/bash
+
+#Color variables:
+# https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124
+RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+BLUE='\e[34m'
+WHITE='\e[37m'
+PURPLE='\e[35m'
+BOLD='\e[1m'
+RESET='\e[0m'
+
+printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+printf "${BLUE}::${RESET} ${WHITE}DisplayLink Installer${RESET}\n"
+printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+
+locUser="$USER"
+
+evdiGitPath="$(find /home/$USER -type d -name "evdi")"
+evdiTarPath="$(find /home/$USER -type d -name "evdi" -printf "%h\n")"
+evdiGitMain=""
+evdiGitTag=""
+
+displayLinkFullName="$(find /home/$locUser -type f -name "DisplayLink*.zip")"
+displayLinkPath="$(find /home/$locUser -type f -name "DisplayLink*.zip" -printf "%h\n")"
+displayLinkName="$(find /home/$locUser -type f -name "DisplayLink*.zip" -printf "%f\n")"
+displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
+displayLinkVer="$(grep -Eo "[0-9]+\.[0-9]+" <<< $displayLinkNameFix)"
+displayLinkTarget="displaylink_${displayLinkVer}"
+displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
+displayLinkInstallDir="/opt/${displayLinkTarget}"
+
+# To-Do: Filesystem, files, and variable checks.
+# To-Do: Provide interface to choose which installation versions.
+
+if [[ -n "$evdiGitPath" ]]; then
+	cd $evdiGitPath
+	evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
+	evdiGitTag="$(git describe --tags $(git rev-list --tags --max-count=1))"
+	git pull
+	git fetch --tags && git checkout -b "$evdiGitTag"
+	tar -czvf ../evdi.tar.gz .
+	git checkout "$evdiGitMain"
+	git branch -d "$evdiGitTag"
+else
+	# To-Do: Write a function for handling missing repo
+	printf "${RED}>>>${RESET} ${WHITE}Please clone https://github.com/DisplayLink/evdi${RESET}\n"
+	exit 1
+fi
+
+if [[ ! -z $displayLinkFullName && ! -z $displayLinkFileDir ]]; then
+	unzip "$displayLinkFullName" -d "$displayLinkFileDir"
+else
+	printf "${RED}>>>${RESET} ${WHITE}Please download the Synaptics DisplayLink Driver and Manager: https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu{RESET}\n"
+	exit 1
+fi
+
+if [[ ! -z $displayLinkInstallDir ]]; then
+	sudo bash -s "$displayLinkFileDir" "$displayLinkInstallDir" "$locUser" <<'EOF'
+		mv "$1" "$2"
+		chown -R "$3":"$3" "$2"
+EOF
+else
+	printf "${RED}>>>${RESET} ${WHITE}Installation target directory is missing. Exiting.{RESET}\n"
+	exit 1
+fi
+
+cd "$displayLinkInstallDir"
+
+sudo bash -s "$displayLinkInstallDir" "$locUser" "$RED" "$WHITE" "$RESET" <<'EOF'
+	runFile="$(find "$1" -type f -name "*.run")"
+	if [[ ! -z $runFile ]]; then
+		chmod +x "$runFile"
+		"$runFile" --noexec --keep
+		chown -R "$2":"$2" "$1"
+	else
+		printf "${3}>>>${5} ${4}No DisplayLink run file exists. Exiting.{5}\n"
+		exit 1
+	fi
+EOF
+
+extractDir="$(find "$displayLinkInstallDir" -maxdepth 1 -type d -name "displaylink-*")"
+
+if [[ ! -z $extractDir ]]; then
+	cd "$extractDir"
+else
+	printf "${RED}>>>${RESET} ${WHITE}No extracted installation directory exists. Exiting.{RESET}\n"
+	exit 1
+fi
+
+sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$RED" "$WHITE" "$RESET" <<'EOF'
+	if [ -f "$1/evdi.tar.gz" ]; then
+		mv "$1/evdi.tar.gz" "$1/evdi.tar.gz.bak.$(date +%Y%m%d)"
+	else
+		printf "${5}>>>${7} ${6}${1}/evdi.tar.gz does not exist. Exiting.{7}\n"
+		exit 1
+	fi	
+	if [ -f "$2/evdi.tar.gz" ]; then
+		mv "$2/evdi.tar.gz" "$1/"
+		chown -R "$3":"$3" "$4"
+		chmod +x "$1/displaylink-installer.sh"
+		./displaylink-installer.sh
+	else
+		printf "${5}>>>${7} ${6}${2}/evdi.tar.gz does not exist. Exiting.{7}\n"
+		exit 1
+	fi
+EOF
+
+printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+printf "${BLUE}::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
+printf "${BLUE}::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
+printf "${BLUE}::${RESET} ${WHITE}Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
+printf "${BLUE}::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
+printf "${BLUE}::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
+printf "${BLUE}::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
+printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+
