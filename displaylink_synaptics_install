@@ -17,8 +17,8 @@ printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
 locUser="$USER"
 
-evdiGitPath="$(find /home/$USER -type d -name "evdi")"
-evdiTarPath="$(find /home/$USER -type d -name "evdi" -printf "%h\n")"
+evdiGitPath="$(find /home/$locUser -type d -name "evdi")"
+evdiTarPath="$(find /home/$locUser -type d -name "evdi" -printf "%h\n")"
 evdiGitMain=""
 evdiGitTag=""
 
@@ -34,29 +34,35 @@ displayLinkInstallDir="/opt/${displayLinkTarget}"
 # To-Do: Filesystem, files, and variable checks.
 # To-Do: Provide interface to choose which installation versions.
 
-if [[ -n "$evdiGitPath" ]]; then
+if [[ -n $evdiGitPath ]]; then
 	cd $evdiGitPath
+	git pull
 	evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
 	evdiGitTag="$(git describe --tags $(git rev-list --tags --max-count=1))"
-	git pull
-	git fetch --tags && git checkout -b "$evdiGitTag"
-	tar -czvf ../evdi.tar.gz .
-	git checkout "$evdiGitMain"
-	git branch -d "$evdiGitTag"
+	if [[ -n $evdiGitTag ]]; then
+		git fetch --tags && git checkout -b "$evdiGitTag"
+		tar -czvf ../evdi.tar.gz .
+		git checkout "$evdiGitMain"
+		git branch -d "$evdiGitTag"
+	else
+		printf "${RED}>>>${RESET} ${WHITE}There are no tags for this repo. Exiting.${RESET}\n"
+		exit 1
+	fi
+
 else
 	# To-Do: Write a function for handling missing repo
 	printf "${RED}>>>${RESET} ${WHITE}Please clone https://github.com/DisplayLink/evdi${RESET}\n"
 	exit 1
 fi
 
-if [[ ! -z $displayLinkFullName && ! -z $displayLinkFileDir ]]; then
+if [[ -n $displayLinkFullName && -n $displayLinkFileDir ]]; then
 	unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 else
 	printf "${RED}>>>${RESET} ${WHITE}Please download the Synaptics DisplayLink Driver and Manager: https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu{RESET}\n"
 	exit 1
 fi
 
-if [[ ! -z $displayLinkInstallDir ]]; then
+if [[ -n $displayLinkInstallDir ]]; then
 	sudo bash -s "$displayLinkFileDir" "$displayLinkInstallDir" "$locUser" <<'EOF'
 		mv "$1" "$2"
 		chown -R "$3":"$3" "$2"
@@ -70,7 +76,7 @@ cd "$displayLinkInstallDir"
 
 sudo bash -s "$displayLinkInstallDir" "$locUser" "$RED" "$WHITE" "$RESET" <<'EOF'
 	runFile="$(find "$1" -type f -name "*.run")"
-	if [[ ! -z $runFile ]]; then
+	if [[ -n $runFile ]]; then
 		chmod +x "$runFile"
 		"$runFile" --noexec --keep
 		chown -R "$2":"$2" "$1"
@@ -82,7 +88,7 @@ EOF
 
 extractDir="$(find "$displayLinkInstallDir" -maxdepth 1 -type d -name "displaylink-*")"
 
-if [[ ! -z $extractDir ]]; then
+if [[ -n $extractDir ]]; then
 	cd "$extractDir"
 else
 	printf "${RED}>>>${RESET} ${WHITE}No extracted installation directory exists. Exiting.{RESET}\n"
