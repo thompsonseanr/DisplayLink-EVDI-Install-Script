@@ -33,6 +33,7 @@ displayLinkInstallDir="/opt/${displayLinkTarget}"
 
 # To-Do: Filesystem, files, and variable checks.
 # To-Do: Provide interface to choose which installation versions.
+# To-Do: output result of `lsmod | grep -Ei evdi`
 
 if [[ -n $evdiGitPath ]]; then
 	cd $evdiGitPath
@@ -59,11 +60,15 @@ if [[ -n $displayLinkFullName && -n $displayLinkFileDir ]]; then
 	unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 else
 	printf "${RED}>>>${RESET} ${WHITE}Please download the Synaptics DisplayLink Driver and Manager: https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu{RESET}\n"
+	rm -f "${evdiTarPath}/evdi.tar.gz"
 	exit 1
 fi
 
 if [[ -n $displayLinkInstallDir ]]; then
 	sudo bash -s "$displayLinkFileDir" "$displayLinkInstallDir" "$locUser" <<'EOF'
+		if [ -d "$2" ]; then
+			rm -rf "$2"
+		fi
 		mv "$1" "$2"
 		chown -R "$3":"$3" "$2"
 EOF
