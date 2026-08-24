@@ -31,7 +31,9 @@ Due to an issue encountered with an older version of `EVDI 14.5.0` and the lates
     ```
     chmod +x displaylink_synaptics_install
     ```
-4) Reload your terminal environment and run. You will need to make sure your build dependencies are installed. Thank you: [Synaptics DisplayLink with evdi DKMS Module - Works!](https://voidforums.com/viewtopic.php?t=1781) 
+4) Reload your terminal environment and run. You will need to make sure your build dependencies are installed. 
+
+    Thank you: [Synaptics DisplayLink with evdi DKMS Module - Works!](https://voidforums.com/viewtopic.php?t=1781) 
 
     ```
     xbps-install -S dkms libdrm libdrm-devel zstd elgoind sddm kde-plasma xorg-minimal xf86-video-intel pkg-config
