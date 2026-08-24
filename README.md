@@ -37,6 +37,11 @@ Due to an issue encountered with an older version of `EVDI 14.5.0` and the lates
     xbps-install -S dkms libdrm libdrm-devel zstd elgoind sddm kde-plasma xorg-minimal xf86-video-intel pkg-config
     ```
 
+### To uninstall DisplayLink:
+
+```
+sudo displaylink-installer uninstall
+```
 
 # Personal Notes Section:  
 
