@@ -121,7 +121,7 @@ EOF
 printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 printf "${BLUE}::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
 printf "${BLUE}::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
-printf "${BLUE}::${RESET} ${WHITE}Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
+printf "${BLUE}::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
 printf "${BLUE}::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
 printf "${BLUE}::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
 printf "${BLUE}::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
