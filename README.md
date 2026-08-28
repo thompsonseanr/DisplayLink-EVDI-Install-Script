@@ -14,9 +14,9 @@
 
 2) Download: [Synaptics DisplayLink Driver and Manager Downloads](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu)  
 
-3) **Void Linux**: Install dependencies:
+3) **Void Linux**: Install dependencies (UPDATED LIST):
     ```
-    xbps-install -S dkms libdrm libdrm-devel zstd elgoind sddm kde-plasma xorg-minimal xf86-video-intel pkg-config
+    xbps-install -S xbps-install -S dkms libdrm libdrm-devel zstd pkg-config
     ```
 
 ### Run the `displaylink_synaptics_install` script:
@@ -36,113 +36,11 @@ Due to an issue encountered with an older version of `EVDI 14.5.0` and the lates
     Thank you: [Synaptics DisplayLink with evdi DKMS Module - Works!](https://voidforums.com/viewtopic.php?t=1781) 
 
     ```
-    xbps-install -S dkms libdrm libdrm-devel zstd elgoind sddm kde-plasma xorg-minimal xf86-video-intel pkg-config
+    xbps-install -S dkms libdrm libdrm-devel zstd pkg-config
     ```
 
 ### To uninstall DisplayLink:
 
 ```
 sudo displaylink-installer uninstall
-```
-
-# Personal Notes Section:  
-
-### Git Commands for EVDI Repo:
-
-- Git pull latest tag:  
-
-```
-git fetch --tags
-```
-```
-git describe --tags $(git rev-list --tags --max-count=1)
-```
-
-- Create branch from latest tag:  
-
-```
-git fetch --tags && git checkout -b $(git describe --tags $(git rev-list --tags --max-count=1))
-```
-
-- Tar.gz latest tag:  
-
-```
-tar -czvf evdi.tar.gz -C /path/to/<EVDI_REPO> .
-```
-
-```
-tar -czvf ../evdi.tar.gz .
-```
-
-### Tar.gz Commands for EVDI:  
-
-- To tar a directory's contents:  
-
-```
-tar -czvf <ARCHIVE_NAME>.tar.gz -C /path/to/folder .
-```
-
-- To untar an archive:  
-
-```
-tar -xf <ARCHIVE_NAME>.tar.gz -C /path/to/<TARGET_FOLDER>
-```
-
-### Unzip Commands for DisplayLink (/opt/):  
-
-```
-sudo unzip <DisplayLink_VERSION>.zip -d displaylink_<VERSION>
-```
-```
-sudo unzip DisplayLink\ USB\ Graphics\ Software\ for\ Ubuntu6.3-EXE.zip -d displaylink_6.3
-```
-
-### Extract DisplayLink Installer from Run Script:  
-
-```
-sudo ./displaylink-driver-6.3.0-48.run --noexec --keep
-```
-
-### Move into Extracted Directory  
-
-```
-sudo chown -R $USER:$USER <EXTRACTED_DISPLAYLINK_INSTALLER_DIRECTORY>
-```
-
-```
-cd <EXTRACTED_DISPLAYLINK_INSTALLER_DIRECTORY>
-```
-
-### Copy Created `evdi.tar.gz` to Extracted Directory  
-
-```
-mv evdi.tar.gz evdi.tar.gz.bak.$(date +%Y%m%d)
-```
-
-```
-mv /path/to/git/evdi.tar.gz .
-```
-
-```
-rm -f evdi.tar.gz.bak.*
-```
-
-### Run `displaylink-installer.sh`  
-
-```
-sudo ./displaylink-installer.sh
-```
-
-## Post-installation for `runit` hipsters:
-
-Disable the `down` service file in `/var/service/displaylink-driver`  
-
-```
-cd /var/service/displaylink-driver
-```
-```
-sudo mv down down.bak.$(date +%Y%m%d)
-```
-```
-sudo sv restart displaylink-driver
 ```
