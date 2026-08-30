@@ -141,7 +141,7 @@ if [[ -n $displayLinkInstallDir ]]; then
 		chown -R "$3":"$3" "$2"
 EOF
 else
-	printf "${RED}>>>${RESET} ${WHITE}Installation target directory is missing. Exiting.{RESET}\n" >&2
+	printf "${RED}>>>${RESET} ${WHITE}Installation target directory is missing. Exiting.${RESET}\n" >&2
 	exit 1
 fi
 
