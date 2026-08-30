@@ -8,7 +8,7 @@
 
 ## Quickstart:
 
-**Important**:
+**UPDATE:** If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you. 
 
 1) Clone: [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi)  
 
