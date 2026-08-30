@@ -40,6 +40,8 @@ evdiTest="$(lsmod | grep -Eio "evdi" | head -1)"
 displayInstallerTest="/usr/bin/displaylink-installer"
 installDec=""
 
+downloadFile="n"
+
 clear
 
 printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
@@ -66,6 +68,7 @@ evdi_git_tag_util() {
 		git clone "${evdiRepo}" /tmp/evdi 
 		evdiGitPath=$(find /tmp -maxdepth 1 -type d -name "evdi")
 		evdiTarPath="${evdiGitPath%/*}"
+		downloadFile="y"
 	fi
 	
 	if [[ -n $evdiGitPath ]]; then
@@ -96,6 +99,7 @@ unzip_displaylink() {
 			printf "${BLUE}::${RESET} ${WHITE}Downloading DisplayLink 6.3 for you.${RESET}\n"
 			displayFile="$(wget -q -P /tmp/ ${displayLinkDl})"
 			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip")"
+			downloadFile="y"
 		else
 			printf "${RED}>>> Error:${RESET} ${WHITE}Please install wget. Exiting.${RESET}\n" >&2
 			exit 1
@@ -114,8 +118,8 @@ unzip_displaylink() {
 			printf "${RED}>>> Error:${RESET} ${WHITE}Could not download DisplayLink.${RESET}\n" >&2
 			printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
 			rm -f "${evdiTarPath}/evdi.tar.gz"
-			rm -rf /tmp/evdi
-			rm -f /tmp/DisplayLink*.zip
+			rm -rf "$$evdiGitPath"
+			rm -f "$displayLinkFullName"
 			exit 1
 		fi
 	else 
@@ -172,7 +176,7 @@ else
 	exit 1
 fi
 
-sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$RED" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" <<'EOF'
+sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$RED" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" "$downloadFile" <<'EOF'
 	if [ -f "$1/evdi.tar.gz" ]; then
 		mv "$1/evdi.tar.gz" "$1/evdi.tar.gz.bak.$(date +%Y%m%d)"
 	else
@@ -184,14 +188,18 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 		chown -R "$3":"$3" "$4"
 		chmod +x "$1/displaylink-installer.sh"
 		./displaylink-installer.sh
-		rm -rf "$4"
-		rm -f "$8"
-		rm -rf "$9"
+		if [ "$10" == "y" ]; then 
+			rm -rf "$4"
+			rm -f "$8"
+			rm -rf "$9"
+		fi
 	else
 		printf "${5}>>>${7} ${6}${2}/evdi.tar.gz does not exist. Exiting.${7}\n" >&2
-		rm -rf "$4"
-		rm -f "$8"
-		rm -rf "$9"
+		if [ "$10" == "y" ]; then 
+			rm -rf "$4"
+			rm -f "$8"
+			rm -rf "$9"
+		fi
 		exit 1
 	fi
 EOF
