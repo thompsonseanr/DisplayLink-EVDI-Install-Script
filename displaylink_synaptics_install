@@ -224,8 +224,6 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 	fi
 EOF
 
-
-
 printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 printf "${BLUE}::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
 printf "${BLUE}::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
