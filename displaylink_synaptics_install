@@ -13,10 +13,6 @@ PURPLE='\e[35m'
 BOLD='\e[1m'
 RESET='\e[0m'
 
-printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-printf "${BLUE}::${RESET} ${WHITE}DisplayLink Installer${RESET}\n"
-printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-
 locUser="$USER"
 voidTest="$(cat /etc/os-release | grep -Eo "void" | head -1)"
 
@@ -43,6 +39,12 @@ displayLinkInstallDir="/opt/${displayLinkTarget}"
 evdiTest="$(lsmod | grep -Eio "evdi" | head -1)"
 displayInstallerTest="/usr/bin/displaylink-installer"
 installDec=""
+
+clear
+
+printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+printf "${BLUE}::${RESET} ${WHITE}DisplayLink Installer${RESET}\n"
+printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
 if [[ -n $evdiTest && -f $displayInstallerTest ]]; then 
 	printf "${RED}>>> WARNING:${RESET} ${WHITE}DisplayLink and EVDI kernel modules are already installed on your system.${RESET}\n"
@@ -123,7 +125,9 @@ unzip_displaylink() {
 
 
 if [[ $installDec != "y" ]]; then
-	printf "${RED}>>>${RESET} ${WHITE}DisplayLink install is closing. Exiting.${RESET}\n" >&2
+	printf "${RED}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${RESET}\n" >&2
+	printf "${RED}>>>${RESET} ${WHITE}DisplayLink install is exiting.${RESET}\n" >&2
+	printf "${RED}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${RESET}\n" >&2
 	exit 1
 else
 # Heredoc hates your \tab
