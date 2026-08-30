@@ -20,7 +20,7 @@ The script, by default, will look for `DisplayLink Manager` and the `EVDI` anywh
 
 1) **Optional** Clone: [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi)  
 
-2) **Optional** Download: [Synaptics DisplayLink Driver and Manager Downloads](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu)  
+2) **Optional** Download: [Synaptics DisplayLink Driver and Manager Downloads - Latest Official Driver - DisplayLink USB Graphics Software for Ubuntu](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu)  
 
 3) Install dependencies:  
 
