@@ -57,7 +57,6 @@ else
 	installDec="y"
 fi
 
-# for later:
 evdi_git_tag_util() {
 	if [[ -z $evdiGitPath ]]; then
 		rm -rf /tmp/evdi
@@ -65,9 +64,9 @@ evdi_git_tag_util() {
 		evdiGitPath=$(find /tmp -maxdepth 1 -type d -name "evdi")
 		evdiTarPath="$(find /tmp -maxdepth 1 -type d -name "evdi" -printf "%h\n")"
 	fi
-
+	
 	if [[ -n $evdiGitPath ]]; then
-		cd $evdiGitPath
+		cd "$evdiGitPath"
 		git pull
 		evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
 		evdiGitTag="$(git describe --tags $(git rev-list --tags --max-count=1))"
@@ -81,14 +80,14 @@ evdi_git_tag_util() {
 			exit 1
 		fi
 	else
-		printf "${RED}>>> Error: ${RESET} ${WHITE}Could not clone https://github.com/DisplayLink/evdi${RESET}\n" >&2
+		printf "${RED}>>> Error:${RESET} ${WHITE}Could not clone https://github.com/DisplayLink/evdi${RESET}\n" >&2
 		exit 1
 	fi	
 }
 
 unzip_displaylink() {
-	if [[ -z $displayLinkFullName && -z $displayLinkFileDir ]]; then
-		wget -P /tmp/ "${displayLinkDl}"
+	if [[ -z $displayLinkFullName ]]; then
+		curl -f -s -L "${displayLinkDl}" -o /tmp/.
 
 		if [ $? -ne 0 ]; then
 			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip")"
@@ -100,11 +99,13 @@ unzip_displaylink() {
 			displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
 			displayLinkInstallDir="/opt/${displayLinkTarget}"
 		else
-			printf "${RED}>>> Error: ${RESET} ${WHITE}Could not clone https://github.com/DisplayLink/evdi${RESET}\n" >&2
+			printf "${RED}>>> Error:${RESET} ${WHITE}Could not download ${displayLinkDl}{RESET}\n" >&2
 			rm -f "${evdiTarPath}/evdi.tar.gz"
+			rm -rf /tmp/evdi
+			rm -f /tmp/DisplayLink*.zip
 			exit 1
 		fi
-
+	fi
 }
 
 
@@ -168,7 +169,7 @@ sudo bash -s "$displayLinkInstallDir" "$locUser" "$RED" "$WHITE" "$RESET" <<'EOF
 		"$runFile" --noexec --keep
 		chown -R "$2":"$2" "$1"
 	else
-		printf "${3}>>>${5} ${4}No DisplayLink run file exists. Exiting.{5}\n" >&2
+		printf "${3}>>>${5} ${4}No DisplayLink run file exists. Exiting.${5}\n" >&2
 		exit 1
 	fi
 EOF
@@ -186,7 +187,7 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 	if [ -f "$1/evdi.tar.gz" ]; then
 		mv "$1/evdi.tar.gz" "$1/evdi.tar.gz.bak.$(date +%Y%m%d)"
 	else
-		printf "${5}>>>${7} ${6}${1}/evdi.tar.gz does not exist. Exiting.{7}\n" >&2
+		printf "${5}>>>${7} ${6}${1}/evdi.tar.gz does not exist. Exiting.${7}\n" >&2
 		exit 1
 	fi	
 	if [ -f "$2/evdi.tar.gz" ]; then
@@ -195,7 +196,7 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 		chmod +x "$1/displaylink-installer.sh"
 		./displaylink-installer.sh
 	else
-		printf "${5}>>>${7} ${6}${2}/evdi.tar.gz does not exist. Exiting.{7}\n" >&2
+		printf "${5}>>>${7} ${6}${2}/evdi.tar.gz does not exist. Exiting.${7}\n" >&2
 		exit 1
 	fi
 EOF
