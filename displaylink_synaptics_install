@@ -125,9 +125,9 @@ unzip_displaylink() {
 
 
 if [[ $installDec != "y" ]]; then
-	printf "${RED}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${RESET}\n" >&2
+	printf "${RED}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n" >&2
 	printf "${RED}>>>${RESET} ${WHITE}DisplayLink install is exiting.${RESET}\n" >&2
-	printf "${RED}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${RESET}\n" >&2
+	printf "${RED}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n" >&2
 	exit 1
 else
 # Heredoc hates your \tab
