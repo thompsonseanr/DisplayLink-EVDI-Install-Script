@@ -18,6 +18,7 @@ printf "${BLUE}::${RESET} ${WHITE}DisplayLink Installer${RESET}\n"
 printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
 locUser="$USER"
+voidTest="$(cat /etc/os-release | grep -Eo "void" | head -1)"
 
 evdiRepo="https://github.com/DisplayLink/evdi.git"
 evdiGitPath="$(find /home/$locUser -type d -name "evdi")"
@@ -25,6 +26,7 @@ evdiTarPath="${evdiGitPath%/*}"
 evdiGitMain=""
 evdiGitTag=""
 
+# Note: Will pull DisplayLink 6.3 if not downloaded already to /Downloads
 displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
 displayLinkFullName="$(find /home/$locUser -type f -name "DisplayLink*.zip")"
 displayLinkPath="${displayLinkFullName%/*}"
@@ -36,8 +38,6 @@ displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
 displayLinkInstallDir="/opt/${displayLinkTarget}"
 
 # To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
-# To-Do: Clone evdi repo for the lazies
-# To-Do: Possibly wget DisplayLink driver for the lazies
 # DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 
 evdiTest="$(lsmod | grep -Eio "evdi" | head -1)"
@@ -59,6 +59,7 @@ fi
 
 evdi_git_tag_util() {
 	if [[ -z $evdiGitPath ]]; then
+		printf "${BLUE}::${RESET} ${WHITE}Cloning ${evdiRepo} for you.${RESET}\n"
 		rm -rf /tmp/evdi
 		git clone "${evdiRepo}" /tmp/evdi 
 		evdiGitPath=$(find /tmp -maxdepth 1 -type d -name "evdi")
@@ -87,10 +88,18 @@ evdi_git_tag_util() {
 
 unzip_displaylink() {
 	if [[ -z $displayLinkFullName ]]; then
-		curl -f -s -L "${displayLinkDl}" -o /tmp/.
-
-		if [ $? -ne 0 ]; then
+		wgetTest="$(which wget)"
+		displayFile=""
+		if [[ -n $wgetTest ]]; then
+			printf "${BLUE}::${RESET} ${WHITE}Downloading DisplayLink 6.3 for you.${RESET}\n"
+			displayFile="$(wget -q -P /tmp/ ${displayLinkDl})"
 			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip")"
+		else
+			printf "${RED}>>> Error:${RESET} ${WHITE}Please install wget. Exiting.${RESET}\n" >&2
+			exit 1
+		fi
+
+		if [[ -f  $displayLinkFullName ]]; then
 			displayLinkPath="${displayLinkFullName%/*}"
 			displayLinkName="${displayLinkFullName##*/}"
 			displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
@@ -100,8 +109,8 @@ unzip_displaylink() {
 			displayLinkInstallDir="/opt/${displayLinkTarget}"
 			unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 		else
-			printf "${RED}>>> Error:${RESET} ${WHITE}Could not download ${displayLinkDl}{RESET}\n" >&2
-			printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.{RESET}\n" >&2
+			printf "${RED}>>> Error:${RESET} ${WHITE}Could not download DisplayLink.${RESET}\n" >&2
+			printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
 			rm -f "${evdiTarPath}/evdi.tar.gz"
 			rm -rf /tmp/evdi
 			rm -f /tmp/DisplayLink*.zip
@@ -117,37 +126,9 @@ if [[ $installDec != "y" ]]; then
 	printf "${RED}>>>${RESET} ${WHITE}DisplayLink install is closing. Exiting.${RESET}\n" >&2
 	exit 1
 else
-# Heredoc hates your \t
+# Heredoc hates your \tab
 
 evdi_git_tag_util
-
-# if [[ -n $evdiGitPath ]]; then
-# 	cd $evdiGitPath
-# 	git pull
-# 	evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
-# 	evdiGitTag="$(git describe --tags $(git rev-list --tags --max-count=1))"
-# 	if [[ -n $evdiGitTag ]]; then
-# 		git fetch --tags && git checkout -b "$evdiGitTag"
-# 		tar -czvf ../evdi.tar.gz .
-# 		git checkout "$evdiGitMain"
-# 		git branch -d "$evdiGitTag"
-# 	else
-# 		printf "${RED}>>>${RESET} ${WHITE}There are no tags for this repo. Exiting.${RESET}\n" >&2
-# 		exit 1
-# 	fi
-# else
-# 	# To-Do: Write a function for handling missing repo
-# 	printf "${RED}>>>${RESET} ${WHITE}Please clone https://github.com/DisplayLink/evdi${RESET}\n" >&2
-# 	exit 1
-# fi
-
-# if [[ -n $displayLinkFullName && -n $displayLinkFileDir ]]; then
-# 	unzip "$displayLinkFullName" -d "$displayLinkFileDir"
-# else
-# 	printf "${RED}>>>${RESET} ${WHITE}Please download the Synaptics DisplayLink Driver and Manager: https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu{RESET}\n" >&2
-# 	rm -f "${evdiTarPath}/evdi.tar.gz"
-# 	exit 1
-# fi
 
 unzip_displaylink
 
@@ -183,11 +164,11 @@ extractDir="$(find "$displayLinkInstallDir" -maxdepth 1 -type d -name "displayli
 if [[ -n $extractDir ]]; then
 	cd "$extractDir"
 else
-	printf "${RED}>>>${RESET} ${WHITE}No extracted installation directory exists. Exiting.{RESET}\n" >&2
+	printf "${RED}>>>${RESET} ${WHITE}No extracted installation directory exists. Exiting.${RESET}\n" >&2
 	exit 1
 fi
 
-sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$RED" "$WHITE" "$RESET" <<'EOF'
+sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$RED" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" <<'EOF'
 	if [ -f "$1/evdi.tar.gz" ]; then
 		mv "$1/evdi.tar.gz" "$1/evdi.tar.gz.bak.$(date +%Y%m%d)"
 	else
@@ -199,20 +180,30 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 		chown -R "$3":"$3" "$4"
 		chmod +x "$1/displaylink-installer.sh"
 		./displaylink-installer.sh
+		rm -rf "$4"
+		rm -f "$8"
+		rm -rf "$9"
 	else
 		printf "${5}>>>${7} ${6}${2}/evdi.tar.gz does not exist. Exiting.${7}\n" >&2
+		rm -rf "$4"
+		rm -f "$8"
+		rm -rf "$9"
 		exit 1
 	fi
 EOF
 
-printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+
+
+printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 printf "${BLUE}::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
 printf "${BLUE}::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
-printf "${BLUE}::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
-printf "${BLUE}::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
-printf "${BLUE}::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
-printf "${BLUE}::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
-printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+if [[ -n $voidTest ]]; then
+	printf "${BLUE}::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
+	printf "${BLUE}::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
+	printf "${BLUE}::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
+	printf "${BLUE}::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
+fi
+printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
-# Heredoc still hates your \t
+# Heredoc still hates your \tab
 fi
