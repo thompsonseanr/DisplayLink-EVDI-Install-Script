@@ -40,7 +40,8 @@ evdiTest="$(lsmod | grep -Eio "evdi" | head -1)"
 displayInstallerTest="/usr/bin/displaylink-installer"
 installDec=""
 
-downloadFile="n"
+downloadEvdiFile="n"
+downloadDisplayFile="n"
 
 clear
 
@@ -68,7 +69,7 @@ evdi_git_tag_util() {
 		git clone "${evdiRepo}" /tmp/evdi 
 		evdiGitPath=$(find /tmp -maxdepth 1 -type d -name "evdi")
 		evdiTarPath="${evdiGitPath%/*}"
-		downloadFile="y"
+		downloadEvdiFile="y"
 	fi
 	
 	if [[ -n $evdiGitPath ]]; then
@@ -99,7 +100,7 @@ unzip_displaylink() {
 			printf "${BLUE}::${RESET} ${WHITE}Downloading DisplayLink 6.3 for you.${RESET}\n"
 			displayFile="$(wget -q -P /tmp/ ${displayLinkDl})"
 			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip")"
-			downloadFile="y"
+			downloadDisplayFile="y"
 		else
 			printf "${RED}>>> Error:${RESET} ${WHITE}Please install wget. Exiting.${RESET}\n" >&2
 			exit 1
@@ -176,7 +177,7 @@ else
 	exit 1
 fi
 
-sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$RED" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" "$downloadFile" <<'EOF'
+sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$RED" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" "$downloadEvdiFile" "$downloadDisplayFile" <<'EOF'
 	if [ -f "$1/evdi.tar.gz" ]; then
 		mv "$1/evdi.tar.gz" "$1/evdi.tar.gz.bak.$(date +%Y%m%d)"
 	else
@@ -191,16 +192,20 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 
 		rm -rf "$4"
 		if [ "$10" == "y" ]; then 
-			rm -f "$8"
 			rm -rf "$9"
 		fi
+		if [ "$11" == "y" ]; then 
+			rm -f "$8"
+		fi 
 	else
 		printf "${5}>>>${7} ${6}${2}/evdi.tar.gz does not exist. Exiting.${7}\n" >&2
 		rm -rf "$4"
 		if [ "$10" == "y" ]; then 
-			rm -f "$8"
 			rm -rf "$9"
 		fi
+		if [ "$11" == "y" ]; then 
+			rm -f "$8"
+		fi 
 		exit 1
 	fi
 EOF
