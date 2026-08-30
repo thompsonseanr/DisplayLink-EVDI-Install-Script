@@ -120,9 +120,18 @@ unzip_displaylink() {
 		else
 			printf "${RED}>>> Error:${RESET} ${WHITE}Could not download DisplayLink.${RESET}\n" >&2
 			printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
-			rm -f "${evdiTarPath}/evdi.tar.gz"
-			rm -rf "$$evdiGitPath"
-			rm -f "$displayLinkFullName"
+
+			if [ "$downloadEvdiFile" == "y" ]; then 
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
+				rm -f "${evdiTarPath}/evdi.tar.gz"
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
+				rm -rf "$evdiGitPath"
+			fi
+			if [ "$downloadDisplayFile" == "y" ]; then 
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName)${RESET}\n" >&2
+				rm -f "$displayLinkFullName"
+			fi 
+
 			exit 1
 		fi
 	else 
@@ -192,26 +201,26 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 		chmod +x "$1/displaylink-installer.sh"
 		./displaylink-installer.sh
 		
-		printf "${5}>>>${7} ${6}${1}Removing: ${4}${7}\n" >&2
+		printf "${5}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n" >&2
 		rm -rf "$4"
 		if [ "$10" == "y" ]; then 
-			printf "${5}>>>${7} ${6}${1}Removing: ${9}${7}\n" >&2
+			printf "${5}>>>${7} ${6}Removing: ${9}${7}\n" >&2
 			rm -rf "$9"
 		fi
 		if [ "$11" == "y" ]; then 
-			printf "${5}>>>${7} ${6}${1}Removing: ${8}${7}\n" >&2
+			printf "${5}>>>${7} ${6}Removing: ${8}${7}\n" >&2
 			rm -f "$8"
 		fi 
 	else
 		printf "${5}>>>${7} ${6}${2}/evdi.tar.gz does not exist. Exiting.${7}\n" >&2
-		printf "${5}>>>${7} ${6}${1}Removing: ${4}${7}\n" >&2
+		printf "${5}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n" >&2
 		rm -rf "$4"
 		if [ "$10" == "y" ]; then 
-			printf "${5}>>>${7} ${6}${1}Removing: ${9}${7}\n" >&2
+			printf "${5}>>>${7} ${6}Removing: ${9}${7}\n" >&2
 			rm -rf "$9"
 		fi
 		if [ "$11" == "y" ]; then 
-			printf "${5}>>>${7} ${6}${1}Removing: ${8}${7}\n" >&2
+			printf "${5}>>>${7} ${6}Removing: ${8}${7}\n" >&2
 			rm -f "$8"
 		fi 
 
