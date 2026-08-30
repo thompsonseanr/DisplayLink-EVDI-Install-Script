@@ -21,14 +21,14 @@ locUser="$USER"
 
 evdiRepo="https://github.com/DisplayLink/evdi.git"
 evdiGitPath="$(find /home/$locUser -type d -name "evdi")"
-evdiTarPath="$(find /home/$locUser -type d -name "evdi" -printf "%h\n")"
+evdiTarPath="${evdiGitPath%/*}"
 evdiGitMain=""
 evdiGitTag=""
 
 displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
 displayLinkFullName="$(find /home/$locUser -type f -name "DisplayLink*.zip")"
-displayLinkPath="$(find /home/$locUser -type f -name "DisplayLink*.zip" -printf "%h\n")"
-displayLinkName="$(find /home/$locUser -type f -name "DisplayLink*.zip" -printf "%f\n")"
+displayLinkPath="${displayLinkFullName%/*}"
+displayLinkName="${displayLinkFullName##*/}"
 displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
 displayLinkVer="$(grep -Eo "[0-9]+\.[0-9]+" <<< $displayLinkNameFix)"
 displayLinkTarget="displaylink_${displayLinkVer}"
@@ -62,7 +62,7 @@ evdi_git_tag_util() {
 		rm -rf /tmp/evdi
 		git clone "${evdiRepo}" /tmp/evdi 
 		evdiGitPath=$(find /tmp -maxdepth 1 -type d -name "evdi")
-		evdiTarPath="$(find /tmp -maxdepth 1 -type d -name "evdi" -printf "%h\n")"
+		evdiTarPath="${evdiGitPath%/*}"
 	fi
 	
 	if [[ -n $evdiGitPath ]]; then
@@ -91,20 +91,24 @@ unzip_displaylink() {
 
 		if [ $? -ne 0 ]; then
 			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip")"
-			displayLinkPath="$(find /tmp -type f -name "DisplayLink*.zip" -printf "%h\n")"
-			displayLinkName="$(find /tmp -type f -name "DisplayLink*.zip" -printf "%f\n")"
+			displayLinkPath="${displayLinkFullName%/*}"
+			displayLinkName="${displayLinkFullName##*/}"
 			displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
 			displayLinkVer="$(grep -Eo "[0-9]+\.[0-9]+" <<< $displayLinkNameFix)"
 			displayLinkTarget="displaylink_${displayLinkVer}"
 			displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
 			displayLinkInstallDir="/opt/${displayLinkTarget}"
+			unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 		else
 			printf "${RED}>>> Error:${RESET} ${WHITE}Could not download ${displayLinkDl}{RESET}\n" >&2
+			printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.{RESET}\n" >&2
 			rm -f "${evdiTarPath}/evdi.tar.gz"
 			rm -rf /tmp/evdi
 			rm -f /tmp/DisplayLink*.zip
 			exit 1
 		fi
+	else 
+		unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 	fi
 }
 
