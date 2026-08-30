@@ -39,7 +39,7 @@ The script, by default, will look for `DisplayLink Manager` and the `EVDI` anywh
     ```
     **Arch (May need more):**  
     ```
-    pacman -S --needed base-devel linux-headers wget zstd libdrm 
+    pacman -S --needed base-devel linux-headers wget zstd libdrm dkms
     ```
 
 ## Run the `displaylink_synaptics_install` script:
