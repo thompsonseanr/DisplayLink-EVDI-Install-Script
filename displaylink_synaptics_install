@@ -51,7 +51,8 @@ printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
 if [[ -n $evdiTest && -f $displayInstallerTest ]]; then 
 	printf "${RED}>>> WARNING:${RESET} ${WHITE}DisplayLink and EVDI kernel modules are already installed on your system.${RESET}\n"
-	printf "${RED}>>> WARNING:${RESET} ${WHITE}If you want to first uninstall, run: sudo displaylink-installer uninstall${RESET}\n"
+	printf "${RED}>>>${RESET} ${WHITE}If you want to first uninstall (RECOMMENDED), please run this command:${RESET}\n"
+	printf "${RED}>>>${RESET} ${WHITE}sudo displaylink-installer uninstall${RESET}\n"
 	read -p "$(printf "${BLUE}:::${RESET} ${WHITE}Proceed with installing? [Y/n]: ${RESET}")" installDec
 	if [[ -z $installDec ]]; then 
 		installDec="y"
