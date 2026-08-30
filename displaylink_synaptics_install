@@ -128,7 +128,7 @@ unzip_displaylink() {
 				rm -rf "$evdiGitPath"
 			fi
 			if [ "$downloadDisplayFile" == "y" ]; then 
-				printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName)${RESET}\n" >&2
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n" >&2
 				rm -f "$displayLinkFullName"
 			fi 
 
