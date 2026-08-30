@@ -100,7 +100,7 @@ unzip_displaylink() {
 		displayFile=""
 		if [[ -n $wgetTest ]]; then
 			printf "${BLUE}::${RESET} ${WHITE}Downloading DisplayLink 6.3 for you.${RESET}\n"
-			displayFile="$(wget -q -P /tmp/ ${displayLinkDl})"
+			wget -q -P /tmp/ "$displayLinkDl"
 			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip")"
 			downloadDisplayFile="y"
 		else
@@ -127,10 +127,6 @@ unzip_displaylink() {
 				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
 				rm -rf "$evdiGitPath"
 			fi
-			if [ "$downloadDisplayFile" == "y" ]; then 
-				printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n" >&2
-				rm -f "$displayLinkFullName"
-			fi 
 
 			exit 1
 		fi
