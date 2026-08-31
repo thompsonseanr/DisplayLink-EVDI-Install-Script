@@ -97,7 +97,7 @@ evdi_git_tag_util() {
 unzip_displaylink() {
 	if [[ -z $displayLinkFullName ]]; then
 		wgetTest="$(which wget)"
-		displayFile=""
+		
 		if [[ -n $wgetTest ]]; then
 			printf "${BLUE}::${RESET} ${WHITE}Downloading DisplayLink 6.3 for you.${RESET}\n"
 			wget -q -P /tmp/ "$displayLinkDl"
@@ -108,7 +108,7 @@ unzip_displaylink() {
 			exit 1
 		fi
 
-		if [[ -f  $displayLinkFullName ]]; then
+		if [[ -f $displayLinkFullName ]]; then
 			displayLinkPath="${displayLinkFullName%/*}"
 			displayLinkName="${displayLinkFullName##*/}"
 			displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
