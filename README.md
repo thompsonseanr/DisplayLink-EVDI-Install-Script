@@ -1,4 +1,4 @@
-# DisplayLink Manager and EVDI Install
+# DisplayLink Driver and EVDI Install
 
 > **Links:**  
 > - [Fix DisplayLink on Kernel 6.0 and up](https://mrk.sh/fix-displaylink-kernel6.0/)  
