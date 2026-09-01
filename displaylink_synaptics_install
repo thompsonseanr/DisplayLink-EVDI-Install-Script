@@ -14,7 +14,7 @@ BOLD='\e[1m'
 RESET='\e[0m'
 
 locUser="$USER"
-voidTest="$(cat /etc/os-release | grep -Eo "void" | head -1)"
+runitTest="$(ps -p 1 -o comm=)"
 
 evdiRepo="https://github.com/DisplayLink/evdi.git"
 evdiGitPath="$(find /home/$locUser -type d -name "evdi")"
@@ -33,6 +33,8 @@ displayLinkTarget="displaylink_${displayLinkVer}"
 displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
 displayLinkInstallDir="/opt/${displayLinkTarget}"
 
+# To-Do: Create xbps package
+# To-Do: Create option to choose specific EVDI tag version for testing the version that works for your system
 # To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 
@@ -228,11 +230,18 @@ EOF
 printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
 printf "${BLUE}:::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
-if [[ -n $voidTest ]]; then
+if [ "$runitTest" == "runit" ]; then
 	printf "${BLUE}:::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
 	printf "${BLUE}:::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
 	printf "${BLUE}:::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
 	printf "${BLUE}:::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
+else
+	printf "${BLUE}:::${RESET} ${WHITE}Systemd -based distro users: Remember to check the status of the 'displaylink' service by running:${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink.service${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}or${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink-driver.service${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}And starting the service if not running: ${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl restart <DISPLAYLINK_SERVICE_NAME> ${RESET}\n"
 fi
 printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
