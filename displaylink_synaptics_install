@@ -59,7 +59,7 @@ if [[ -n $evdiTest && -f $displayInstallerTest ]]; then
 	fi
 	firstChar="${installDec:0:1}"
 	installDec="${firstChar,}"
-	printf "${BLUE}:::${RESET} ${WHITE}Choice: ${$installDec}${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}Choice: ${installDec}${RESET}\n"
 else 
 	installDec="y"
 fi
