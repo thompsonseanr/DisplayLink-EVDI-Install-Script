@@ -17,6 +17,7 @@ While this script is targeted towards `Void`, it can be used with most other dis
 ## Quickstart:
 
 **FEATURE UPDATE:** If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you.   
+**FEATURE UPDATE 2:** Menu to choose which version of `EVDI` you want to install.   
 
 The script, by default, will look for `DisplayLink Manager` and the `EVDI` anywhere in the `$USER` home.
 
