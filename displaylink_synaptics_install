@@ -46,7 +46,7 @@ downloadDisplayFile="n"
 clear
 
 printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-printf "${BLUE}::${RESET} ${WHITE}DisplayLink Installer${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer${RESET}\n"
 printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
 if [[ -n $evdiTest && -f $displayInstallerTest ]]; then 
@@ -59,14 +59,14 @@ if [[ -n $evdiTest && -f $displayInstallerTest ]]; then
 	fi
 	firstChar="${installDec:0:1}"
 	installDec="${firstChar,}"
-	echo "$installDec"
+	printf "${BLUE}:::${RESET} ${WHITE}Choice: ${$installDec}${RESET}\n"
 else 
 	installDec="y"
 fi
 
 evdi_git_tag_util() {
 	if [[ -z $evdiGitPath ]]; then
-		printf "${BLUE}::${RESET} ${WHITE}Cloning ${evdiRepo} for you.${RESET}\n"
+		printf "${BLUE}:::${RESET} ${WHITE}Cloning ${evdiRepo} for you.${RESET}\n"
 		rm -rf /tmp/evdi
 		git clone "${evdiRepo}" /tmp/evdi 
 		evdiGitPath=$(find /tmp -maxdepth 1 -type d -name "evdi")
@@ -100,7 +100,7 @@ unzip_displaylink() {
 		wgetTest="$(which wget)"
 
 		if [[ -n $wgetTest ]]; then
-			printf "${BLUE}::${RESET} ${WHITE}Downloading DisplayLink 6.3 for you.${RESET}\n"
+			printf "${BLUE}:::${RESET} ${WHITE}Downloading DisplayLink 6.3 for you.${RESET}\n"
 			wget -q -P /tmp/ "$displayLinkDl"
 			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip")"
 			downloadDisplayFile="y"
@@ -226,13 +226,13 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 EOF
 
 printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-printf "${BLUE}::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
-printf "${BLUE}::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
 if [[ -n $voidTest ]]; then
-	printf "${BLUE}::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
-	printf "${BLUE}::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
-	printf "${BLUE}::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
-	printf "${BLUE}::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
 fi
 printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
