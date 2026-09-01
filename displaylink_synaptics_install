@@ -1,5 +1,7 @@
 #!/bin/bash
 
+shopt -s extglob
+
 #Color variables:
 # https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124
 # `read -p` printf workaround:
@@ -33,10 +35,7 @@ displayLinkTarget="displaylink_${displayLinkVer}"
 displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
 displayLinkInstallDir="/opt/${displayLinkTarget}"
 
-# To-Do: Create xbps package
-# To-Do: Create option to choose specific EVDI tag version for testing the version that works for your system
-# git describe --tags $(git rev-list --tags --max-count=200) | grep -Eow '^v?[0-9]+\.[0-9]+\.[0-9]+($)'
-# Similar to the menu in: https://github.com/thompsonseanr/llama_cpp-run-menu/blob/main/llama.cpp-cli
+# To-Do: Create xbps package?
 # To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 
@@ -63,7 +62,7 @@ if [[ -n $evdiTest && -f $displayInstallerTest ]]; then
 	fi
 	firstChar="${installDec:0:1}"
 	installDec="${firstChar,}"
-	printf "${BLUE}:::${RESET} ${WHITE}Choice: ${installDec}${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}Installation choice: ${installDec}${RESET}\n"
 else 
 	installDec="y"
 fi
@@ -72,7 +71,7 @@ evdi_git_tag_util() {
 	if [[ -z $evdiGitPath ]]; then
 		printf "${BLUE}:::${RESET} ${WHITE}Cloning ${evdiRepo} for you.${RESET}\n"
 		rm -rf /tmp/evdi
-		git clone "${evdiRepo}" /tmp/evdi 
+		git clone -q "${evdiRepo}" /tmp/evdi 
 		evdiGitPath=$(find /tmp -maxdepth 1 -type d -name "evdi")
 		evdiTarPath="${evdiGitPath%/*}"
 		downloadEvdiFile="y"
@@ -82,14 +81,58 @@ evdi_git_tag_util() {
 		cd "$evdiGitPath"
 		git pull
 		evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
-		evdiGitTag="$(git describe --tags $(git rev-list --tags --max-count=1))"
+
+		read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version? To choose a specific version, answer with 'n' [Y/n]: ${RESET}")" evdiLatest
+		firstChoice="${evdiLatest:0:1}"
+		evdiLatest="${firstChoice,}"
+
+		if [[ $evdiLatest == 'n' ]]; then
+			runSel=''
+			readarray -t evdiArr < <(echo "$(git describe --tags $(git rev-list --tags --max-count=100) | grep -Eow '^v?[0-9]+\.[0-9]+\.[0-9]+($)')")
+			while [[ -z $evdiGitTag ]]; do
+				for ind in "${!evdiArr[@]}"; do
+					(( runInd = ind + 1 ))
+					printf "${BLUE}::: ${runInd})${RESET} ${WHITE}${evdiArr[$ind]}${RESET}\n"
+
+					if [[ -z $runPat ]]; then
+							runPat="${runInd}"
+					else
+							runPat="${runPat}|${runInd}"
+					fi
+				done
+		
+				if (( "${#evdiArr[@]}" > 1 )); then
+					read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1-${runInd}]: ${RESET}")" runSel
+				else
+					read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1]: ${RESET}")" runSel
+				fi
+				case $runSel in
+					@($runPat))
+						(( arrInd = runSel - 1 ))
+						read -ra runPart <<< "${evdiArr[$arrInd]}"
+						evdiGitTag="${runPart[0]}"
+				;;
+					*)
+						printf "${RED}>>>${RESET} ${WHITE}Please choose an EVDI version to install.${RESET}\n"
+						evdiGitTag=''
+				;;
+				esac
+			done
+		else 
+			evdiGitTag="$(git describe --tags $(git rev-list --tags --max-count=1))"
+		fi
+
 		if [[ -n $evdiGitTag ]]; then
-			git fetch --tags && git checkout -b "$evdiGitTag"
-			tar -czvf ../evdi.tar.gz .
-			git checkout "$evdiGitMain"
-			git branch -d "$evdiGitTag"
+			git fetch -q --tags && git checkout -q -b "$evdiGitTag"
+			tar -czf ../evdi.tar.gz .
+			git checkout -q "$evdiGitMain"
+			git branch -q -d "$evdiGitTag"
 		else
 			printf "${RED}>>>${RESET} ${WHITE}There are no tags for this repo. Exiting.${RESET}\n" >&2
+			if [ "$downloadEvdiFile" == "y" ]; then 
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
+				rm -rf "$evdiGitPath"
+			fi			
 			exit 1
 		fi
 	else
@@ -232,7 +275,7 @@ EOF
 printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
 printf "${BLUE}:::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
-if [ "$runitTest" == "runit" ]; then
+if [[ $runitTest == "runit" ]]; then
 	printf "${BLUE}:::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
 	printf "${BLUE}:::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
 	printf "${BLUE}:::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
