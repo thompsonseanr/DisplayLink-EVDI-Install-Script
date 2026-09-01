@@ -10,16 +10,16 @@
 ## Preface:  
 DisplayLink and EVDI have long plagued us.  
 
-Due to an issue encountered with an older version of `EVDI 14.5.0` and the latest `Linux 7.xx` kernel, this script was written to update the version of `EVDI` from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) and to use that version for the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu).  
+Due to an issue encountered with an older version of `EVDI 14.5.0` and the latest `Linux 7.xx` kernel, this script was written to update the version of `EVDI` from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) and to use that version for the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) install.  
 
 While this script is targeted towards `Void`, it can be used with most other distros and is agnostic.  
 
-## Quickstart:
+**FEATURE UPDATE 1:** If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you.   
+**FEATURE UPDATE 2:** Menu to choose which version of `EVDI` you want to install. 
 
-**FEATURE UPDATE:** If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you.   
-**FEATURE UPDATE 2:** Menu to choose which version of `EVDI` you want to install.   
+## Quickstart:  
 
-The script, by default, will look for `DisplayLink Manager` and the `EVDI` anywhere in the `$USER` home.
+The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere in the `$USER` home directory.
 
 1) **[Optional]** Clone: [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi)  
 
