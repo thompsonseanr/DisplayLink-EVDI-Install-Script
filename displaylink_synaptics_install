@@ -35,6 +35,8 @@ displayLinkInstallDir="/opt/${displayLinkTarget}"
 
 # To-Do: Create xbps package
 # To-Do: Create option to choose specific EVDI tag version for testing the version that works for your system
+# git describe --tags $(git rev-list --tags --max-count=200) | grep -Eow '^v?[0-9]+\.[0-9]+\.[0-9]+($)'
+# Similar to the menu in: https://github.com/thompsonseanr/llama_cpp-run-menu/blob/main/llama.cpp-cli
 # To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 
