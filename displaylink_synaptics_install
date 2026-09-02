@@ -19,14 +19,14 @@ locUser="$USER"
 runitTest="$(ps -p 1 -o comm=)"
 
 evdiRepo="https://github.com/DisplayLink/evdi.git"
-evdiGitPath="$(find /home/$locUser -type d -name "evdi")"
+evdiGitPath="$(find /home/$locUser -type d -name "evdi" 2>/dev/null)"
 evdiTarPath="${evdiGitPath%/*}"
 evdiGitMain=""
 evdiGitTag=""
 
 # Note: Will pull DisplayLink if not downloaded already to /home/$USER/Downloads
 displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
-displayLinkFullName="$(find /home/$locUser -type f -name "DisplayLink*.zip")"
+displayLinkFullName="$(find /home/$locUser -type f -name "DisplayLink*.zip" 2>/dev/null)"
 displayLinkPath="${displayLinkFullName%/*}"
 displayLinkName="${displayLinkFullName##*/}"
 displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
@@ -212,7 +212,7 @@ fi
 cd "$displayLinkInstallDir"
 
 sudo bash -s "$displayLinkInstallDir" "$locUser" "$RED" "$WHITE" "$RESET" <<'EOF'
-	runFile="$(find "$1" -type f -name "*.run")"
+	runFile="$(find "$1" -type f -name "*.run" 2>/dev/null)"
 	if [[ -n $runFile ]]; then
 		chmod +x "$runFile"
 		"$runFile" --noexec --keep
@@ -223,7 +223,7 @@ sudo bash -s "$displayLinkInstallDir" "$locUser" "$RED" "$WHITE" "$RESET" <<'EOF
 	fi
 EOF
 
-extractDir="$(find "$displayLinkInstallDir" -maxdepth 1 -type d -name "displaylink-*")"
+extractDir="$(find "$displayLinkInstallDir" -maxdepth 1 -type d -name "displaylink-*" 2>/dev/null)"
 
 if [[ -n $extractDir ]]; then
 	cd "$extractDir"
