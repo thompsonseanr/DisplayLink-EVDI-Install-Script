@@ -1,4 +1,4 @@
-# DisplayLink Driver and EVDI Install
+# DisplayLink Driver and EVDI Install Shell Script
 
 > **Links:**  
 > - [Fix DisplayLink on Kernel 6.0 and up](https://mrk.sh/fix-displaylink-kernel6.0/)  
@@ -12,7 +12,7 @@
 
 Due to an issue encountered with an older version of `EVDI 14.5.0` and the latest `Linux 7.xx` kernel, this script was written to update the version of `EVDI` from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) and to use that version for the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) install.  
 
-While this script is targeted towards `Void`, it can be used with most other distros and is agnostic.  
+While this script is targeted towards `Void`, it can be used with most other distros. Successfully tested in `Void` and `Fedora 44`.  
 
 **FEATURE UPDATE 1:** If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you.   
 **FEATURE UPDATE 2:** Menu to choose which version of `EVDI` you want to install. 
@@ -33,21 +33,21 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
     ```
     xbps-install -S xbps-install -S dkms libdrm libdrm-devel zstd pkg-config wget 
     ```
-    **Fedora 44 (May need more):**    
+    **Fedora 44:**    
     ```
     dnf install dkms libdrm libdrm-devel kernel-devel kernel-headers wget zstd
     ```
     ```
     dnf group install development-tools
     ```
-    **Arch (May need more):**  
+    **Arch:**  
     ```
     pacman -S --needed base-devel linux-headers wget zstd libdrm dkms
     ```
 
 ## Run the `displaylink_synaptics_install` script:
 
-**Note:** I have not yet personally tested with other distros yet (`Fedora 44`, `Arch`).
+**Note:** I have not yet personally tested with `Arch`.
 
 **Instructions:**
 
