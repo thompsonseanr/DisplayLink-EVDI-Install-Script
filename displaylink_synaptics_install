@@ -82,7 +82,7 @@ evdi_git_tag_util() {
 		git pull
 		evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
 
-		read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version? To choose a specific version, enter ${RED}'n'${RESET} ${WHITE} [Y/n]: ${RESET}")" evdiLatest
+		read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version? To choose a specific version, enter ${RED}'n'${RESET} ${WHITE}[Y/n]: ${RESET}")" evdiLatest
 		firstChoice="${evdiLatest:0:1}"
 		evdiLatest="${firstChoice,}"
 
