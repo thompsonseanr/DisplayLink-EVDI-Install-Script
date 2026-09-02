@@ -72,7 +72,7 @@ evdi_git_tag_util() {
 		printf "${BLUE}:::${RESET} ${WHITE}Cloning ${evdiRepo} for you.${RESET}\n"
 		rm -rf /tmp/evdi
 		git clone -q "${evdiRepo}" /tmp/evdi 
-		evdiGitPath=$(find /tmp -maxdepth 1 -type d -name "evdi")
+		evdiGitPath=$(find /tmp -maxdepth 1 -type d -name "evdi" 2>/dev/null)
 		evdiTarPath="${evdiGitPath%/*}"
 		downloadEvdiFile="y"
 	fi
@@ -82,13 +82,13 @@ evdi_git_tag_util() {
 		git pull
 		evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
 
-		read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version? To choose a specific version, answer with 'n' [Y/n]: ${RESET}")" evdiLatest
+		read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version? To choose a specific version, enter ${RED}'n'${RESET} ${WHITE} [Y/n]: ${RESET}")" evdiLatest
 		firstChoice="${evdiLatest:0:1}"
 		evdiLatest="${firstChoice,}"
 
 		if [[ $evdiLatest == 'n' ]]; then
 			runSel=''
-			readarray -t evdiArr < <(echo "$(git describe --tags $(git rev-list --tags --max-count=100) | grep -Eow '^v?[0-9]+\.[0-9]+\.[0-9]+($)')")
+			readarray -t evdiArr < <(echo "$(git describe --tags $(git rev-list --tags --max-count=200) | grep -Eow '^v?[0-9]+\.[0-9]+\.[0-9]+($)')")
 			while [[ -z $evdiGitTag ]]; do
 				for ind in "${!evdiArr[@]}"; do
 					(( runInd = ind + 1 ))
@@ -149,7 +149,7 @@ unzip_displaylink() {
 		if [[ -n $wgetTest ]]; then
 			printf "${BLUE}:::${RESET} ${WHITE}Downloading DisplayLink 6.3 for you.${RESET}\n"
 			wget -q -P /tmp/ "$displayLinkDl"
-			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip")"
+			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip" 2>/dev/null)"
 			downloadDisplayFile="y"
 		else
 			printf "${RED}>>> Error:${RESET} ${WHITE}Please install wget. Exiting.${RESET}\n" >&2
@@ -247,11 +247,11 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 		
 		printf "${5}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n" >&2
 		rm -rf "$4"
-		if [ "$10" == "y" ]; then 
+		if [ "${10}" == "y" ]; then 
 			printf "${5}>>>${7} ${6}Removing: ${9}${7}\n" >&2
 			rm -rf "$9"
 		fi
-		if [ "$11" == "y" ]; then 
+		if [ "${11}" == "y" ]; then 
 			printf "${5}>>>${7} ${6}Removing: ${8}${7}\n" >&2
 			rm -f "$8"
 		fi 
@@ -259,11 +259,11 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 		printf "${5}>>>${7} ${6}${2}/evdi.tar.gz does not exist. Exiting.${7}\n" >&2
 		printf "${5}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n" >&2
 		rm -rf "$4"
-		if [ "$10" == "y" ]; then 
+		if [ "${10}" == "y" ]; then 
 			printf "${5}>>>${7} ${6}Removing: ${9}${7}\n" >&2
 			rm -rf "$9"
 		fi
-		if [ "$11" == "y" ]; then 
+		if [ "${11}" == "y" ]; then 
 			printf "${5}>>>${7} ${6}Removing: ${8}${7}\n" >&2
 			rm -f "$8"
 		fi 
