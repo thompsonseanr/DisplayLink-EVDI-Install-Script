@@ -123,7 +123,7 @@ evdi_git_tag_util() {
 		fi
 
 		if [[ -n $evdiGitTag ]]; then
-			git fetch -q --tags && git checkout -q -b "$evdiGitTag"
+			git fetch -q --tags && git checkout -b "$evdiGitTag" "$evdiGitTag" 2>/dev/null
 			tar -czf ../evdi.tar.gz .
 			git checkout -q "$evdiGitMain"
 			git branch -q -d "$evdiGitTag"
@@ -232,7 +232,7 @@ else
 	exit 1
 fi
 
-sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$RED" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" "$downloadEvdiFile" "$downloadDisplayFile" <<'EOF'
+sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$RED" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" "$downloadEvdiFile" "$downloadDisplayFile" "$BLUE" <<'EOF'
 	if [ -f "$1/evdi.tar.gz" ]; then
 		mv "$1/evdi.tar.gz" "$1/evdi.tar.gz.bak.$(date +%Y%m%d)"
 	else
@@ -243,16 +243,16 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 		mv "$2/evdi.tar.gz" "$1/"
 		chown -R "$3":"$3" "$4"
 		chmod +x "$1/displaylink-installer.sh"
-		./displaylink-installer.sh
+		./displaylink-installer.sh noreboot
 		
-		printf "${5}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n" >&2
+		printf "${12}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n" >&2
 		rm -rf "$4"
 		if [ "${10}" == "y" ]; then 
-			printf "${5}>>>${7} ${6}Removing: ${9}${7}\n" >&2
+			printf "${12}>>>${7} ${6}Removing: ${9}${7}\n" >&2
 			rm -rf "$9"
 		fi
 		if [ "${11}" == "y" ]; then 
-			printf "${5}>>>${7} ${6}Removing: ${8}${7}\n" >&2
+			printf "${12}>>>${7} ${6}Removing: ${8}${7}\n" >&2
 			rm -f "$8"
 		fi 
 	else
