@@ -221,6 +221,11 @@ unzip_displaylink() {
 			exit 1
 		fi
 	else 
+		echo ""
+		echo ""
+		echo "DisplayLink Array Length in function: ${#dispArr[@]}"
+		echo ""
+		echo ""
 		if (( "${#dispArr[@]}" > 1 )); then
 			runSelDisp=""
 			displayLinkFullName=""
