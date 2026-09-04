@@ -15,7 +15,8 @@ Due to an issue encountered with an older version of `EVDI 14.5.0` and the lates
 While this script was originally targeted towards `Void`, it can be used with most other distros. Successfully tested in `Void`, `Fedora 44`, and `Arch`.  
 
 **FEATURE UPDATE 1:** If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you.   
-**FEATURE UPDATE 2:** Menu to choose which version of `EVDI` you want to install. 
+**FEATURE UPDATE 2:** Menu to choose which version of `EVDI` you want to install.  
+**FEATURE UPDATE 3:** Menu to choose which local version of `DisplayLink` you want to install if you decided to live the `BYOS` lifestyle.  
 
 ## Quickstart:  
 
