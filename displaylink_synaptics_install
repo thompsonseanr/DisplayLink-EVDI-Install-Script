@@ -221,7 +221,7 @@ unzip_displaylink() {
 			exit 1
 		fi
 	else 
-		if (( "${dispArr[@]}" > 1 )); then
+		if (( "${#dispArr[@]}" > 1 )); then
 			runSelDisp=""
 			displayLinkFullName=""
 			while [[ -z $displayLinkFullName ]]; do
