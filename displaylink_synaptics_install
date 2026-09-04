@@ -224,7 +224,8 @@ unzip_displaylink() {
 	else 
 		echo ""
 		echo ""
-		echo "DisplayLink Array Length in function: ${#dispArr[@]}"
+		echo "DisplayLink Array inside function: ${dispArr[@]}"
+		echo "DisplayLink Array Length inside function: ${#dispArr[@]}"
 		echo ""
 		echo ""
 		if (( "${#dispArr[@]}" > 1 )); then
@@ -242,12 +243,12 @@ unzip_displaylink() {
 					fi
 				done
 		
-				if (( "${#dispArr[@]}" > 1 )); then
-					read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1-${runIndDisp}]: ${RESET}")" runSel
-				else
-					read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1]: ${RESET}")" runSel
-				fi
-				case $runSel in
+				#if (( "${#dispArr[@]}" > 1 )); then
+					read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1-${runIndDisp}]: ${RESET}")" runSelDisp
+				#else
+				#	read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1]: ${RESET}")" runSelDisp
+				#fi
+				case $runSelDisp in
 					@($runPatDisp))
 						(( arrIndDisp = runSelDisp - 1 ))
 						read -ra runPatDisp <<< "${dispArr[$arrIndDisp]}"
