@@ -26,7 +26,7 @@ I want to give a huge shoutout and thanks to the developers and maintainers of t
 | Fedora | [Negativo17](https://negativo17.org/repos/fedora-multimedia) |
 
 
-Ultimately, I did not like having to rely on the workarounds and wrote straightforward solution. While this script was originally targeted towards `Void`, it can be used with most other distros.  
+I just wanted to write a fun, straightforward, and old-school ([no vibes](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee)) solution. While this script was originally targeted towards `Void`, it can be used with most other distros.  
 
 Successfully tested in:  
     - `Void`   
