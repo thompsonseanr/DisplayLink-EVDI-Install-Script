@@ -82,7 +82,7 @@ evdi_git_tag_util() {
 		git pull
 		evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
 
-		read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version? To choose a specific version, enter ${RED}'n'${RESET} ${WHITE}[Y/n]: ${RESET}")" evdiLatest
+		read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version? To choose a specific version, enter ${RESET}${RED}'n'${RESET} ${WHITE}[Y/n]: ${RESET}")" evdiLatest
 		firstChoice="${evdiLatest:0:1}"
 		evdiLatest="${firstChoice,}"
 
@@ -153,7 +153,7 @@ unzip_displaylink() {
 			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip" 2>/dev/null)"
 			downloadDisplayFile="y"
 		else
-			printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RED}'wget'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
+			printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RESET}${RED}'wget'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
 			exit 1
 		fi
 
@@ -168,7 +168,7 @@ unzip_displaylink() {
 			if [[ -n $unzipTest ]]; then
 				unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 			else
-				printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RED}'unzip'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
+				printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RESET}${RED}'unzip'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
 				printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
 				printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n" >&2
 				rm -f "$displayLinkFullName"
