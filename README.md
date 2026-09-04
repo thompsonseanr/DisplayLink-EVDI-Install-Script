@@ -3,7 +3,8 @@
 > **Download Links:**  
 > - [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi)  
 > - [Synaptics DisplayLink Driver and Manager Downloads](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu)  
-
+>
+> 
 > **References and Attribution:**  
 > - [Fix DisplayLink on Kernel 6.0 and up](https://mrk.sh/fix-displaylink-kernel6.0/)  
 > - [Fixing DisplayLink (EVDI) drivers for Linux kernel 6.x](https://code.berrydejager.com/Fix-DisplayLink_drivers-linux-kernel-6/)  
