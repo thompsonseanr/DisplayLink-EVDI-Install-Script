@@ -154,6 +154,12 @@ unzip_displaylink() {
 			downloadDisplayFile="y"
 		else
 			printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RESET}${RED}'wget'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
+			if [ "$downloadEvdiFile" == "y" ]; then 
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
+				rm -f "${evdiTarPath}/evdi.tar.gz"
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
+				rm -rf "$evdiGitPath"
+			fi
 			exit 1
 		fi
 
