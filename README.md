@@ -12,7 +12,7 @@
 
 Due to an issue encountered with an older version of `EVDI 14.5.0` and the latest `Linux 7.X.X` kernel, this script was written to decouple the version of the `EVDI` module bundled with the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) installer and give users the option to choose the version of `EVDI` from [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) that works for their system.  
 
-While this script is targeted towards `Void`, it can be used with most other distros. Successfully tested in `Void`, `Fedora 44`, and `Arch` with .  
+While this script was originally targeted towards `Void`, it can be used with most other distros. Successfully tested in `Void`, `Fedora 44`, and `Arch`.  
 
 **FEATURE UPDATE 1:** If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you.   
 **FEATURE UPDATE 2:** Menu to choose which version of `EVDI` you want to install. 
@@ -37,12 +37,13 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
     ```
     dnf install dkms libdrm libdrm-devel kernel-devel kernel-headers wget zstd
     ```
+    **Potentially optional for `Fedora`.** This `group` always gets installed on my systems by default.
     ```
     dnf group install development-tools
     ```
     **Arch:**  
     ```
-    pacman -S --needed base-devel linux-headers wget zstd libdrm dkms unzip
+    pacman -S --needed base-devel linux-headers wget zstd libdrm dkms zip unzip
     ```
 
 ## Run the `displaylink_synaptics_install` script:
