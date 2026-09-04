@@ -196,7 +196,7 @@ unzip_displaylink() {
 		if [[ -n $unzipTest ]]; then
 			unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 		else
-			printf "${RED}>>> Error:${RESET} ${WHITE}Please install unzip. Exiting.${RESET}\n" >&2
+			printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RESET}${RED}'unzip'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
 			printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
 			printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n" >&2
 			rm -f "$displayLinkFullName"
