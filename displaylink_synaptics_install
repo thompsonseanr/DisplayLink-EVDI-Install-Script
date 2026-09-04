@@ -148,12 +148,12 @@ unzip_displaylink() {
 		unzipTest="$(which unzip)"
 
 		if [[ -n $wgetTest ]]; then
-			printf "${BLUE}:::${RESET} ${WHITE}Downloading DisplayLink 6.3 for you.${RESET}\n"
+			printf "${BLUE}:::${RESET} ${WHITE}Downloading DisplayLink for you.${RESET}\n"
 			wget -q -P /tmp/ "$displayLinkDl"
 			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip" 2>/dev/null)"
 			downloadDisplayFile="y"
 		else
-			printf "${RED}>>> Error:${RESET} ${WHITE}Please install wget. Exiting.${RESET}\n" >&2
+			printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RED}'wget'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
 			exit 1
 		fi
 
@@ -168,7 +168,7 @@ unzip_displaylink() {
 			if [[ -n $unzipTest ]]; then
 				unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 			else
-				printf "${RED}>>> Error:${RESET} ${WHITE}Please install unzip. Exiting.${RESET}\n" >&2
+				printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RED}'unzip'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
 				printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
 				printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n" >&2
 				rm -f "$displayLinkFullName"
