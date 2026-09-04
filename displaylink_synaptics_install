@@ -237,6 +237,7 @@ if [[ -n $displayLinkInstallDir ]]; then
 			rm -rf "$2"
 		fi
 		mv "$1" "$2"
+		chown -R "$3":"$3" "$2"
 EOF
 else
 	printf "${RED}>>>${RESET} ${WHITE}Installation target directory is missing. Exiting.${RESET}\n" >&2
@@ -250,6 +251,7 @@ sudo bash -s "$displayLinkInstallDir" "$locUser" "$RED" "$WHITE" "$RESET" <<'EOF
 	if [[ -n $runFile ]]; then
 		chmod +x "$runFile"
 		"$runFile" --noexec --keep
+		chown -R "$2":"$2" "$1"
 	else
 		printf "${3}>>>${5} ${4}No DisplayLink run file exists. Exiting.${5}\n" >&2
 		exit 1
@@ -274,6 +276,7 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 	fi	
 	if [ -f "$2/evdi.tar.gz" ]; then
 		mv "$2/evdi.tar.gz" "$1/"
+		chown -R "$3":"$3" "$4"
 		chmod +x "$1/displaylink-installer.sh"
 		./displaylink-installer.sh noreboot
 		
