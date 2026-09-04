@@ -28,7 +28,10 @@ I want to give a huge shoutout and thanks to the developers and maintainers of t
 
 Ultimately, I did not like having to rely on the workarounds and wrote straightforward solution. While this script was originally targeted towards `Void`, it can be used with most other distros.  
 
-Successfully tested in `Void`, `Fedora 44`, and `Arch`.  
+Successfully tested in:  
+    - `Void`   
+    - `Fedora 44`  
+    - `Arch`  
 
 | **Features** | |
 | :--- | :--- |
