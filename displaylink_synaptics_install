@@ -67,7 +67,7 @@ installDec=""
 downloadEvdiFile="n"
 downloadDisplayFile="n"
 
-clear
+#clear
 
 printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer${RESET}\n"
