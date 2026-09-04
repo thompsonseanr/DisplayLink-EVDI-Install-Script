@@ -26,14 +26,27 @@ evdiGitTag=""
 
 # Note: Will pull DisplayLink if not downloaded already to /home/$USER/Downloads
 displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
-displayLinkFullName="$(find /home/$locUser -type f -name "DisplayLink*.zip" 2>/dev/null)"
-displayLinkPath="${displayLinkFullName%/*}"
-displayLinkName="${displayLinkFullName##*/}"
-displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
-displayLinkVer="$(grep -Eo "[0-9]+\.[0-9]+" <<< $displayLinkNameFix)"
-displayLinkTarget="displaylink_${displayLinkVer}"
-displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
-displayLinkInstallDir="/opt/${displayLinkTarget}"
+displayLinkFullName=""
+displayLinkPath=""
+displayLinkName=""
+displayLinkNameFix=""
+displayLinkVer=""
+displayLinkTarget=""
+displayLinkFileDir=""
+displayLinkInstallDir=""
+readarray -t dispArr < <(echo "$(find /home/$locUser -type f -name "DisplayLink*.zip")")
+if [[ "${#dispArr[@]}" -eq 1 ]]; then 
+	displayLinkFullName="${dispArr[0]}"
+	displayLinkPath="${displayLinkFullName%/*}"
+	displayLinkName="${displayLinkFullName##*/}"
+	displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
+	displayLinkVer="$(grep -Eo "[0-9]+\.[0-9]+" <<< $displayLinkNameFix)"
+	displayLinkTarget="displaylink_${displayLinkVer}"
+	displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
+	displayLinkInstallDir="/opt/${displayLinkTarget}"
+fi
+#displayLinkFullName="$(find /home/$locUser -type f -name "DisplayLink*.zip" 2>/dev/null)"
+
 
 # To-Do: Handle instance where there are more than 1 version of DisplayLink downloaded. May make a menu like EVDI.
 # To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
@@ -144,7 +157,7 @@ evdi_git_tag_util() {
 
 unzip_displaylink() {
 	if [[ -z $displayLinkFullName ]]; then
-		
+
 		wgetTest="$(which wget)"
 		unzipTest="$(which unzip)"
 
@@ -200,6 +213,40 @@ unzip_displaylink() {
 			exit 1
 		fi
 	else 
+		if (( "${dispArr[@]}" > 1 )); then
+			runSelDisp=""
+			displayLinkFullName=""
+			while [[ -z $displayLinkFullName ]]; do
+				for indDisp in "${!dispArr[@]}"; do
+					(( runIndDisp = indDisp + 1 ))
+					printf "${BLUE}::: ${runIndDisp})${RESET} ${WHITE}${dispArr[$indDisp]}${RESET}\n"
+
+					if [[ -z $runPatDisp ]]; then
+							runPatDisp="${runIndDisp}"
+					else
+							runPatDisp="${runPatDisp}|${runIndDisp}"
+					fi
+				done
+		
+				if (( "${#dispArr[@]}" > 1 )); then
+					read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1-${runIndDisp}]: ${RESET}")" runSel
+				else
+					read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1]: ${RESET}")" runSel
+				fi
+				case $runSel in
+					@($runPatDisp))
+						(( arrIndDisp = runSelDisp - 1 ))
+						read -ra runPatDisp <<< "${dispArr[$arrIndDisp]}"
+						displayLinkFullName="${runPatDisp[0]}"
+				;;
+					*)
+						printf "${RED}>>>${RESET} ${WHITE}Please choose a DisplayLink version to install.${RESET}\n"
+						displayLinkFullName=""
+				;;
+				esac
+			done
+		fi
+
 		if [[ -n $unzipTest ]]; then
 			unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 		else
