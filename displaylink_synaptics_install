@@ -169,7 +169,8 @@ unzip_displaylink() {
 				unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 			else
 				printf "${RED}>>> Error:${RESET} ${WHITE}Please install unzip. Exiting.${RESET}\n" >&2
-				printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
+				printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n" >&2
 				rm -f "$displayLinkFullName"
 				if [ "$downloadEvdiFile" == "y" ]; then 
 					printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
@@ -181,7 +182,7 @@ unzip_displaylink() {
 			fi
 		else
 			printf "${RED}>>> Error:${RESET} ${WHITE}Could not download DisplayLink.${RESET}\n" >&2
-			printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
+			printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
 
 			if [ "$downloadEvdiFile" == "y" ]; then 
 				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
@@ -196,7 +197,8 @@ unzip_displaylink() {
 			unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 		else
 			printf "${RED}>>> Error:${RESET} ${WHITE}Please install unzip. Exiting.${RESET}\n" >&2
-			printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
+			printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n" >&2
 			rm -f "$displayLinkFullName"
 			if [ "$downloadEvdiFile" == "y" ]; then 
 				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
