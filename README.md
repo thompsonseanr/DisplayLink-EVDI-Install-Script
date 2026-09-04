@@ -1,4 +1,4 @@
-# DisplayLink Driver and EVDI Install Shell Script
+# Linux Multi-Monitor DisplayLink Driver and EVDI Install Shell Script
 
 > **Links and Attribution:**  
 > - [Fix DisplayLink on Kernel 6.0 and up](https://mrk.sh/fix-displaylink-kernel6.0/)
