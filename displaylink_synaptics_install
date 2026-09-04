@@ -35,6 +35,7 @@ displayLinkTarget=""
 displayLinkFileDir=""
 displayLinkInstallDir=""
 readarray -t dispArr < <(echo "$(find /home/$locUser -type f -name "DisplayLink*.zip")")
+echo "$dispArr"
 if [[ "${#dispArr[@]}" -eq 1 ]]; then 
 	displayLinkFullName="${dispArr[0]}"
 	displayLinkPath="${displayLinkFullName%/*}"
