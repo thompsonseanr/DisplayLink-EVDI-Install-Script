@@ -45,8 +45,6 @@ if (( "${#dispArr[@]}" > 1 )); then
 	displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
 	displayLinkInstallDir="/opt/${displayLinkTarget}"
 fi
-#displayLinkFullName="$(find /home/$locUser -type f -name "DisplayLink*.zip" 2>/dev/null)"
-
 
 # To-Do: Refactor
 # To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
@@ -59,7 +57,7 @@ installDec=""
 downloadEvdiFile="n"
 downloadDisplayFile="n"
 
-#clear
+clear
 
 printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer${RESET}\n"
@@ -213,6 +211,7 @@ unzip_displaylink() {
 		fi
 	else 
 		if (( "${#dispArr[@]}" > 1 )); then
+			printf "${GREEN}:::${RESET} ${WHITE}Loading user downloaded versions of the DisplayLink installer:${RESET}\n"
 			runSelDisp=""
 			displayLinkFullName=""
 			while [[ -z $displayLinkFullName ]]; do
@@ -226,13 +225,14 @@ unzip_displaylink() {
 							runPatDisp="${runPatDisp}|${runIndDisp}"
 					fi
 				done
+
 				read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice for the local version of DisplayLink to install [1-${runIndDisp}]: ${RESET}")" runSelDisp
 				
 				case $runSelDisp in
 					@($runPatDisp))
 						(( arrIndDisp = runSelDisp - 1 ))
 						read -ra runPatDisp <<< "${dispArr[$arrIndDisp]}"
-						displayLinkFullName="${runPatDisp[0]}"
+						displayLinkFullName="${runPatDisp[@]}"
 						displayLinkPath="${displayLinkFullName%/*}"
 						displayLinkName="${displayLinkFullName##*/}"
 						displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
