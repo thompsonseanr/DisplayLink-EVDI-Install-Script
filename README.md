@@ -16,6 +16,7 @@ While this script was originally targeted towards `Void`, it can be used with mo
 
 **FEATURE UPDATE 1:** If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you.   
 **FEATURE UPDATE 2:** Menu to choose which version of `EVDI` you want to install. 
+**FEATURE UPDATE 3:** Menu to choose which local version of `DisplayLink` you want to install if you decided to live the `BYOS` lifestyle.  
 
 ## Quickstart:  
 
