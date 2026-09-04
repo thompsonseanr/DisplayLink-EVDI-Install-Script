@@ -1,13 +1,16 @@
 # Linux Multi-Monitor DisplayLink Driver and EVDI Install Shell Script
 
-> **Links and Attribution:**  
-> - [Fix DisplayLink on Kernel 6.0 and up](https://mrk.sh/fix-displaylink-kernel6.0/)
-> - [Fixing DisplayLink (EVDI) drivers for Linux kernel 6.x](https://code.berrydejager.com/Fix-DisplayLink_drivers-linux-kernel-6/)  
+> **Download Links:**  
 > - [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi)  
 > - [Synaptics DisplayLink Driver and Manager Downloads](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu)  
+
+> **References and Attribution:**  
+> - [Fix DisplayLink on Kernel 6.0 and up](https://mrk.sh/fix-displaylink-kernel6.0/)  
+> - [Fixing DisplayLink (EVDI) drivers for Linux kernel 6.x](https://code.berrydejager.com/Fix-DisplayLink_drivers-linux-kernel-6/)  
 > - [Porting the DisplayLink Ubuntu driver to other Linux distributions](https://support.displaylink.com/knowledgebase/articles/679060)  
 > - [Synaptics DisplayLink with evdi DKMS Module - Works!](https://voidforums.com/viewtopic.php?t=1781)  
 > - [Reddit: DisplayLink Driver](https://www.reddit.com/r/voidlinux/comments/peq1se/displaylink_driver/)  
+
 
 ## Preface:  
 
@@ -15,10 +18,12 @@ Due to an issue encountered with an older version of `EVDI 14.5.0` and the lates
 
 While this script was originally targeted towards `Void`, it can be used with most other distros. Successfully tested in `Void`, `Fedora 44`, and `Arch`.  
 
-**Features:**  
-    1) If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you.   
-    2) Menu to choose which version of `EVDI` you want to install.  
-    3) Menu to choose which local version of `DisplayLink` you want to install if you decided to live the `BYOS` lifestyle.  
+| **Features** | |
+| :--- | :--- |
+| Software Downloads: | If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you. |
+| EVDI Version Tag Menu: | Menu to choose which version of `EVDI` you want to install. |
+| `BYOS` DisplayLink Install Menu: | Menu to choose which local version of `DisplayLink` you want to install if you decided to live the `BYOS` lifestyle. |
+ 
 
 ## Quickstart:  
 
