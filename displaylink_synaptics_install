@@ -145,6 +145,7 @@ unzip_displaylink() {
 	if [[ -z $displayLinkFullName ]]; then
 		
 		wgetTest="$(which wget)"
+		unzipTest="$(which unzip)"
 
 		if [[ -n $wgetTest ]]; then
 			printf "${BLUE}:::${RESET} ${WHITE}Downloading DisplayLink 6.3 for you.${RESET}\n"
@@ -164,7 +165,20 @@ unzip_displaylink() {
 			displayLinkTarget="displaylink_${displayLinkVer}"
 			displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
 			displayLinkInstallDir="/opt/${displayLinkTarget}"
-			unzip "$displayLinkFullName" -d "$displayLinkFileDir"
+			if [[ -n $unzipTest ]]; then
+				unzip "$displayLinkFullName" -d "$displayLinkFileDir"
+			else
+				printf "${RED}>>> Error:${RESET} ${WHITE}Please install unzip. Exiting.${RESET}\n" >&2
+				printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
+				rm -f "$displayLinkFullName"
+				if [ "$downloadEvdiFile" == "y" ]; then 
+					printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
+					rm -f "${evdiTarPath}/evdi.tar.gz"
+					printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
+					rm -rf "$evdiGitPath"
+				fi
+				exit 1
+			fi
 		else
 			printf "${RED}>>> Error:${RESET} ${WHITE}Could not download DisplayLink.${RESET}\n" >&2
 			printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
@@ -175,11 +189,23 @@ unzip_displaylink() {
 				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
 				rm -rf "$evdiGitPath"
 			fi
-
 			exit 1
 		fi
 	else 
-		unzip "$displayLinkFullName" -d "$displayLinkFileDir"
+		if [[ -n $unzipTest ]]; then
+			unzip "$displayLinkFullName" -d "$displayLinkFileDir"
+		else
+			printf "${RED}>>> Error:${RESET} ${WHITE}Please install unzip. Exiting.${RESET}\n" >&2
+			printf "${RED}>>>:${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
+			rm -f "$displayLinkFullName"
+			if [ "$downloadEvdiFile" == "y" ]; then 
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
+				rm -f "${evdiTarPath}/evdi.tar.gz"
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
+				rm -rf "$evdiGitPath"
+			fi
+			exit 1
+		fi
 	fi
 }
 
@@ -202,7 +228,6 @@ if [[ -n $displayLinkInstallDir ]]; then
 			rm -rf "$2"
 		fi
 		mv "$1" "$2"
-		chown -R "$3":"$3" "$2"
 EOF
 else
 	printf "${RED}>>>${RESET} ${WHITE}Installation target directory is missing. Exiting.${RESET}\n" >&2
@@ -216,7 +241,6 @@ sudo bash -s "$displayLinkInstallDir" "$locUser" "$RED" "$WHITE" "$RESET" <<'EOF
 	if [[ -n $runFile ]]; then
 		chmod +x "$runFile"
 		"$runFile" --noexec --keep
-		chown -R "$2":"$2" "$1"
 	else
 		printf "${3}>>>${5} ${4}No DisplayLink run file exists. Exiting.${5}\n" >&2
 		exit 1
@@ -241,7 +265,6 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 	fi	
 	if [ -f "$2/evdi.tar.gz" ]; then
 		mv "$2/evdi.tar.gz" "$1/"
-		chown -R "$3":"$3" "$4"
 		chmod +x "$1/displaylink-installer.sh"
 		./displaylink-installer.sh noreboot
 		
