@@ -35,16 +35,7 @@ displayLinkTarget=""
 displayLinkFileDir=""
 displayLinkInstallDir=""
 readarray -t dispArr < <(echo "$(find /home/$locUser -type f -name "DisplayLink*.zip")")
-echo ""
-echo ""
-echo ""
-echo "DisplayLink Array: ${dispArr[@]}"
-echo "DisplayLink Array Length: ${#dispArr[@]}"
-echo ""
-echo ""
-echo ""
-if [[ "${#dispArr[@]}" -eq 1 ]]; then 
-	echo "Hello inside eval"
+if (( "${#dispArr[@]}" > 1 )); then 
 	displayLinkFullName="${dispArr[0]}"
 	displayLinkPath="${displayLinkFullName%/*}"
 	displayLinkName="${displayLinkFullName##*/}"
@@ -222,12 +213,6 @@ unzip_displaylink() {
 			exit 1
 		fi
 	else 
-		echo ""
-		echo ""
-		echo "DisplayLink Array inside function: ${dispArr[@]}"
-		echo "DisplayLink Array Length inside function: ${#dispArr[@]}"
-		echo ""
-		echo ""
 		if (( "${#dispArr[@]}" > 1 )); then
 			runSelDisp=""
 			displayLinkFullName=""
@@ -242,12 +227,8 @@ unzip_displaylink() {
 							runPatDisp="${runPatDisp}|${runIndDisp}"
 					fi
 				done
-		
-				#if (( "${#dispArr[@]}" > 1 )); then
-					read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1-${runIndDisp}]: ${RESET}")" runSelDisp
-				#else
-				#	read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1]: ${RESET}")" runSelDisp
-				#fi
+				read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice for the local version of DisplayLink to install [1-${runIndDisp}]: ${RESET}")" runSelDisp
+				
 				case $runSelDisp in
 					@($runPatDisp))
 						(( arrIndDisp = runSelDisp - 1 ))
