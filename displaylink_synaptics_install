@@ -48,7 +48,7 @@ fi
 #displayLinkFullName="$(find /home/$locUser -type f -name "DisplayLink*.zip" 2>/dev/null)"
 
 
-# To-Do: Handle instance where there are more than 1 version of DisplayLink downloaded. May make a menu like EVDI.
+# To-Do: Refactor
 # To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 
@@ -238,6 +238,13 @@ unzip_displaylink() {
 						(( arrIndDisp = runSelDisp - 1 ))
 						read -ra runPatDisp <<< "${dispArr[$arrIndDisp]}"
 						displayLinkFullName="${runPatDisp[0]}"
+						displayLinkPath="${displayLinkFullName%/*}"
+						displayLinkName="${displayLinkFullName##*/}"
+						displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
+						displayLinkVer="$(grep -Eo "[0-9]+\.[0-9]+" <<< $displayLinkNameFix)"
+						displayLinkTarget="displaylink_${displayLinkVer}"
+						displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
+						displayLinkInstallDir="/opt/${displayLinkTarget}"
 				;;
 					*)
 						printf "${RED}>>>${RESET} ${WHITE}Please choose a DisplayLink version to install.${RESET}\n"
