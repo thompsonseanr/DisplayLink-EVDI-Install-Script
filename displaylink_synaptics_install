@@ -366,11 +366,11 @@ if [[ $runitTest == "runit" ]]; then
 	printf "${BLUE}:::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
 else
 	printf "${BLUE}:::${RESET} ${WHITE}Systemd -based distro users: Remember to check the status of the 'displaylink' service by running:${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink.service${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}or${RESET}\n"
 	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink-driver.service${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}or${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink.service${RESET}\n"
 	printf "${BLUE}:::${RESET} ${WHITE}And starting the service if not running: ${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl restart <DISPLAYLINK_SERVICE_NAME> ${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME> ${RESET}\n"
 fi
 printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
