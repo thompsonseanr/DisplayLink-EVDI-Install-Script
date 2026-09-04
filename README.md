@@ -15,9 +15,20 @@
 
 ## Preface:  
 
-Due to an issue encountered with an older version of `EVDI 14.5.0` and the latest `Linux 7.X.X` kernel, this script was written to decouple the version of the `EVDI` module bundled with the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) installer and give users the option to choose the version of `EVDI` from [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) that works for their system.  
+Due to an issue encountered with an older version of `EVDI 14.5.0` and the latest `Linux 7.X.X` kernel, this script was written to decouple the version of the `EVDI` module bundled with the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) installer and give users the option to choose the version of `EVDI` from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) that works for their system.  
 
-While this script was originally targeted towards `Void`, it can be used with most other distros. Successfully tested in `Void`, `Fedora 44`, and `Arch`.  
+I want to give a huge shoutout and thanks to the developers and maintainers of the following repos and packages:  
+| Distro | Repo/Package |
+| :--- | :--- |
+| Arch AUR | [evdi-dkms](https://aur.archlinux.org/packages/evdi-dkms) |
+| Arch AUR | [displaylink](https://aur.archlinux.org/packages/displaylink) |
+| Fedora | [displaylink-rpm](https://github.com/displaylink-rpm/displaylink-rpm) |  
+| Fedora | [Negativo17](https://negativo17.org/repos/fedora-multimedia) |
+
+
+Ultimately, I did not like having to rely on the workarounds and wrote straightforward solution. While this script was originally targeted towards `Void`, it can be used with most other distros.  
+
+Successfully tested in `Void`, `Fedora 44`, and `Arch`.  
 
 | **Features** | |
 | :--- | :--- |
