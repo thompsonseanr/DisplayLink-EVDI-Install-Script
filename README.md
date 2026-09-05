@@ -20,7 +20,7 @@ Due to an issue encountered with an older version of `EVDI 14.5.0` and the lates
 
 You will need to disable `Secure Boot` in your bios.
 
-I want to give a huge shoutout and thanks to the developers and maintainers of the following repos and packages:  
+I want to give a huge shout-out, thanks, and appreciation for the developers and maintainers of the following repos and packages:  
 | Distro | Repo/Package |
 | :--- | :--- |
 | Arch | [evdi-dkms](https://aur.archlinux.org/packages/evdi-dkms) |
