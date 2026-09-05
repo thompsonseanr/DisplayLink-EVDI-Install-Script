@@ -1,4 +1,4 @@
-# Linux Multi-Monitor DisplayLink Driver and EVDI Install Shell Script
+# Linux Multi-Monitor DisplayLink Driver and EVDI Install Utility Shell Script
 
 > **Download Links:**  
 > - [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi)  
