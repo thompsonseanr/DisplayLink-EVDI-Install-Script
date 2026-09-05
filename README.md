@@ -29,7 +29,7 @@ I want to give a huge shout-out, thanks, and appreciation for the developers and
 | Fedora | [Negativo17](https://negativo17.org/repos/fedora-multimedia) |
 
 
-This script is a fun, straightforward, and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution. While this script was originally targeted towards `Void`, it can be used with most other distros.  
+This script is a fun, straightforward, and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution. While originally targeted towards `Void`, it can be used with most other distros.  
 
 Successfully tested in:  
     - `Void`   
