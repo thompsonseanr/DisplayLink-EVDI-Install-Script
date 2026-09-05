@@ -18,6 +18,8 @@
 
 Due to an issue encountered with an older version of `EVDI 14.5.0` and the latest `Linux 7.X.X` kernel, this script was written to decouple the version of the `EVDI` module bundled with the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) installer and give users the option to choose the version of `EVDI` from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) that works for their system.  
 
+You will need to disable `Secure Boot` in your bios.
+
 I want to give a huge shoutout and thanks to the developers and maintainers of the following repos and packages:  
 | Distro | Repo/Package |
 | :--- | :--- |
@@ -27,7 +29,7 @@ I want to give a huge shoutout and thanks to the developers and maintainers of t
 | Fedora | [Negativo17](https://negativo17.org/repos/fedora-multimedia) |
 
 
-I just wanted to write a fun, straightforward, and old-school [no vibes](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution. While this script was originally targeted towards `Void`, it can be used with most other distros.  
+This script is a fun, straightforward, and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution. While this script was originally targeted towards `Void`, it can be used with most other distros.  
 
 Successfully tested in:  
     - `Void`   
