@@ -30,12 +30,14 @@ I want to give a huge shout-out, thanks, and appreciation for the developers and
 | Fedora | [Negativo17](https://negativo17.org/repos/fedora-multimedia) |
 
 
-This script is a fun, straightforward, and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution. While originally targeted towards `Void`, it can be used with most other distros.  
+This script is a straightforward and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution.  
 
-Successfully tested in:  
-    - `Void`   
-    - `Fedora 44`  
-    - `Arch`  
+| Successfully tested in: |
+| :--- | 
+| `Void` |   
+| `Fedora 44` |
+| `Arch` |  
+| `openSUSE Tumbleweed` |  
 
 | **Features** | |
 | :--- | :--- |
@@ -64,13 +66,19 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
     ```
     dnf install dkms libdrm libdrm-devel kernel-devel kernel-headers wget zstd
     ```
-    **Potentially optional for `Fedora`.** This `group` always gets installed on my systems by default.
     ```
     dnf group install development-tools
     ```
     **Arch:**  
     ```
     pacman -S --needed base-devel linux-headers wget zstd libdrm dkms zip unzip
+    ```
+    **openSUSE Tumbleweed:**
+    ```
+    zypper install -t pattern devel_basis
+    ```
+    ```
+    zypper install kernel-devel kernel-source libdrm-devel dkms
     ```
 
 ## Run the `displaylink_synaptics_install` script:
