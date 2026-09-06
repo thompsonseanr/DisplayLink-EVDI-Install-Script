@@ -60,7 +60,7 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
 
     **Void Linux**: 
     ```
-    xbps-install -S xbps-install -S dkms libdrm libdrm-devel zstd pkg-config wget 
+    xbps-install -S xbps-install -S dkms libdrm libdrm-devel zstd pkg-config wget zip unzip
     ```
     **Fedora 44:**    
     ```
