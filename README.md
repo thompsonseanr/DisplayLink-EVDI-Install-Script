@@ -32,12 +32,12 @@ I want to give a huge shout-out, thanks, and appreciation for the developers and
 
 This script is a straightforward and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution.  
 
-| Successfully tested in: | Notes: |
+| Successfully Tested: | Notes: |
 | :--- | :--- |
-| `Void` | Have to remove `down` service file from `/var/service/displaylink-driver/` |   
-| `Fedora 44` | Working without system modifications |
-| `Arch` |  Working without system modifications |
-| `openSUSE Tumbleweed` | May have to manually unplug and re-plugin docking station connection. The solution is most likely related to the `usb` device instantiation and the solution out of scope of this script. Tried blacklisting `udl` and `udlfb` drivers to no avail. Reference: [HowTo build Displaylink driver for OpenSuse Tumbleweed with latest kernel](https://0xcaffee.blog/posts/opensuse-tumbleweed-evdi/). For research purposes, the `udev` rule is: `/usr/lib/udev/rules.d/99-displaylink.rules`. Reference: [systemctl enable displaylink.service](https://github.com/displaylink-rpm/displaylink-rpm/issues/50) |
+| **Void** | Have to remove `down` service file from `/var/service/displaylink-driver/` |   
+| **Fedora 44** | Working without system modifications |
+| **Arch** |  Working without system modifications |
+| **openSUSE Tumbleweed** | May have to manually unplug and re-plugin docking station connection or restart the `displaylink-driver.service` service (I experienced this in `Arch` years ago. I think I ran a script that was essentially a service restart hook). The solution is most likely related to the `usb` device instantiation and the solution out of scope of this script. Tried blacklisting `udl` and `udlfb` drivers to no avail. Reference: [HowTo build Displaylink driver for OpenSuse Tumbleweed with latest kernel](https://0xcaffee.blog/posts/opensuse-tumbleweed-evdi/). For research purposes, the `udev` rule is: `/usr/lib/udev/rules.d/99-displaylink.rules`. Reference: [systemctl enable displaylink.service](https://github.com/displaylink-rpm/displaylink-rpm/issues/50) |
 
 | **Features** | |
 | :--- | :--- |
