@@ -37,7 +37,7 @@ This script is a straightforward and old-school [no vibes&trade;](https://shop.a
 | `Void` | Have to remove `down` service file from `/var/service/displaylink-driver/` |   
 | `Fedora 44` | Working without system modifications |
 | `Arch` |  Working without system modifications |
-| `openSUSE Tumbleweed` | Had to manually unplug and re-plugin docking station connection. Tried blacklisting `udl` and `udlfb` drivers to no avail. The solution is most likely related to the `usb` device instantiation and the solution out of scope of this script. For research, `udev` rule is: `/usr/lib/udev/rules.d/99-displaylink.rules` |
+| `openSUSE Tumbleweed` | May have to manually unplug and re-plugin docking station connection. The solution is most likely related to the `usb` device instantiation and the solution out of scope of this script. Tried blacklisting `udl` and `udlfb` drivers to no avail. Reference: [HowTo build Displaylink driver for OpenSuse Tumbleweed with latest kernel](https://0xcaffee.blog/posts/opensuse-tumbleweed-evdi/). For research purposes, the `udev` rule is: `/usr/lib/udev/rules.d/99-displaylink.rules`. Reference: [systemctl enable displaylink.service](https://github.com/displaylink-rpm/displaylink-rpm/issues/50) |
 
 | **Features** | |
 | :--- | :--- |
