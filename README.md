@@ -32,12 +32,12 @@ I want to give a huge shout-out, thanks, and appreciation for the developers and
 
 This script is a straightforward and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution.  
 
-| Successfully tested in: |
-| :--- | 
-| `Void` |   
-| `Fedora 44` |
-| `Arch` |  
-| `openSUSE Tumbleweed` |  
+| Successfully tested in: | Notes: |
+| :--- | :--- |
+| `Void` | Have to remove `down` service file from `/var/service/displaylink-driver/` |   
+| `Fedora 44` | Working without system modifications |
+| `Arch` |  Working without system modifications |
+| `openSUSE Tumbleweed` | Had to manually unplug and re-plugin docking station connection. Tried blacklisting `udl` and `udlfb` drivers to no avail. The solution is most likely related to the `usb` device instantiation and the solution out of scope of this script. For research, `udev` rule is: `/usr/lib/udev/rules.d/99-displaylink.rules` |
 
 | **Features** | |
 | :--- | :--- |
