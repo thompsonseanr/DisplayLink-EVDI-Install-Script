@@ -22,7 +22,7 @@ Due to an issue encountered with an older version of `EVDI 14.5.0` and the lates
 You will need to disable `Secure Boot` in your bios.
 
 I want to give a huge shout-out, thanks, and appreciation for the developers and maintainers of the following repos and packages:  
-| Distro | Repo/Package |
+| Distros | Repo/Package |
 | :--- | :--- |
 | Arch | [evdi-dkms](https://aur.archlinux.org/packages/evdi-dkms) |
 | Arch | [displaylink](https://aur.archlinux.org/packages/displaylink) |
@@ -32,11 +32,11 @@ I want to give a huge shout-out, thanks, and appreciation for the developers and
 
 This script is a straightforward and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution.  
 
-| Successfully Tested: | Notes: |
+| Successful Distros | Notes |
 | :--- | :--- |
-| **Void** | Have to remove `down` service file from `/var/service/displaylink-driver/` |   
-| **Fedora 44** | Working without system modifications |
-| **Arch** |  Working without system modifications |
+| **Void** | Have to remove `down` service file from `/var/service/displaylink-driver/`. Restart the the `displaylink-driver` service. |   
+| **Fedora 44** | Working without user interventions/solutions. |
+| **Arch** |  Working without user interventions/solutions. |
 | **openSUSE Tumbleweed** | May have to manually unplug and re-plugin docking station connection or restart the `displaylink-driver.service` service (I experienced this in `Arch` years ago. I think I ran a script that was essentially a service restart hook). The solution is most likely related to the `usb` device instantiation and the solution out of scope of this script. Tried blacklisting `udl` and `udlfb` drivers to no avail. Reference: [HowTo build Displaylink driver for OpenSuse Tumbleweed with latest kernel](https://0xcaffee.blog/posts/opensuse-tumbleweed-evdi/). For research purposes, the `udev` rule is: `/usr/lib/udev/rules.d/99-displaylink.rules`. Reference: [systemctl enable displaylink.service](https://github.com/displaylink-rpm/displaylink-rpm/issues/50) |
 
 | **Features** | |
