@@ -81,7 +81,7 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
     zypper install kernel-devel kernel-source libdrm-devel dkms
     ```
 
-## Run the `displaylink_synaptics_install` script:
+### Run the `displaylink_synaptics_install` script:
 
 **Instructions:**
 
@@ -98,6 +98,7 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
     ```
 
 ### To uninstall DisplayLink:
+> This is recommended if you are updating and will have to be done manually.
 
 ```
 sudo displaylink-installer uninstall
