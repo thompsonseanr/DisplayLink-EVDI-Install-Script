@@ -162,8 +162,8 @@ evdi_git_tag_util() {
 }
 
 unzip_displaylink() {
-	wgetTest="$(which wget)"
-	unzipTest="$(which unzip)"
+	local wgetTest="$(which wget)"
+	local unzipTest="$(which unzip)"
 
 	if [[ -z $displayLinkFullName ]]; then
 		if [[ -n $wgetTest ]]; then
