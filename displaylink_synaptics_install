@@ -396,7 +396,7 @@ else
 		printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink-driver.service${RESET}\n"
 		printf "${BLUE}:::${RESET} ${WHITE}or${RESET}\n"
 		printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink.service${RESET}\n"
-		printf "${BLUE}:::${RESET} ${WHITE}And starting the service if not running: ${RESET}\n"
+		printf "${BLUE}:::${RESET} ${WHITE}To start the service if not running: ${RESET}\n"
 		printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME> ${RESET}\n"
 	fi
 	printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
