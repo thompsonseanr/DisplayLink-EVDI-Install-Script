@@ -27,6 +27,7 @@ evdiGitTag=""
 
 # Note: Will pull DisplayLink if not downloaded already to /home/$USER/Downloads
 displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
+displayStatus=""
 displayLinkFullName=""
 displayLinkPath=""
 displayLinkName=""
@@ -46,6 +47,7 @@ if (( "${#dispArr[@]}" > 1 )); then
 	displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
 	displayLinkInstallDir="/opt/${displayLinkTarget}"
 fi
+
 
 # To-Do: Refactor
 # To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
@@ -92,10 +94,10 @@ evdi_git_tag_util() {
 	
 	if [[ -n $evdiGitPath ]]; then
 		cd "$evdiGitPath"
-		git pull
+		git pull -q
 		evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
 
-		read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version? To choose a specific version, enter ${RESET}${RED}'n'${RESET} ${WHITE}[Y/n]: ${RESET}")" evdiLatest
+		read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version (RECOMMENDED)? To choose a specific version, enter ${RESET}${RED}'n'${RESET} ${WHITE}[Y/n]: ${RESET}")" evdiLatest
 		firstChoice="${evdiLatest:0:1}"
 		evdiLatest="${firstChoice,}"
 
@@ -162,8 +164,8 @@ evdi_git_tag_util() {
 }
 
 unzip_displaylink() {
-	local wgetTest="$(which wget)"
-	local unzipTest="$(which unzip)"
+	local wgetTest="$(which wget 2>/dev/null)"
+	local unzipTest="$(which unzip 2>/dev/null)"
 
 	if [[ -z $displayLinkFullName ]]; then
 		if [[ -n $wgetTest ]]; then
@@ -370,23 +372,35 @@ sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$
 	fi
 EOF
 
-printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
-printf "${BLUE}:::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
-if [[ $runitTest == "runit" ]]; then
-	printf "${BLUE}:::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
-else
-	printf "${BLUE}:::${RESET} ${WHITE}Systemd -based distro users: Remember to check the status of the 'displaylink' service by running:${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink-driver.service${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}or${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink.service${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}And starting the service if not running: ${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME> ${RESET}\n"
+displayStatus="$(which displaylink-installer 2>/dev/null)"
+
+if [[ -z $displayStatus ]]; then
+	printf "${RED}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+	printf "${RED}:::${RESET}\n"
+	printf "${RED}:::${RESET} ${WHITE}DisplayLink Installer Failed to Install.${RESET}\n"
+	printf "${RED}:::${RESET}\n"
+	printf "${RED}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+else 
+	printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+	printf "${BLUE}:::${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
+	printf "${BLUE}:::${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
+	if [[ $runitTest == "runit" ]]; then
+		printf "${BLUE}:::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
+		printf "${BLUE}:::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
+		printf "${BLUE}:::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
+		printf "${BLUE}:::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
+	else
+		printf "${BLUE}:::${RESET} ${WHITE}Systemd -based distro users: Remember to check the status of the 'displaylink' service by running:${RESET}\n"
+		printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink-driver.service${RESET}\n"
+		printf "${BLUE}:::${RESET} ${WHITE}or${RESET}\n"
+		printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink.service${RESET}\n"
+		printf "${BLUE}:::${RESET} ${WHITE}And starting the service if not running: ${RESET}\n"
+		printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME> ${RESET}\n"
+	fi
+	printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 fi
-printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
 # Heredoc still hates your \tab
 fi
