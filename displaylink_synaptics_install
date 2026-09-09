@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -u
 shopt -s extglob
 
 #Color variables:
@@ -99,11 +100,18 @@ evdi_git_tag_util() {
 		evdiLatest="${firstChoice,}"
 
 		if [[ $evdiLatest == 'n' ]]; then
-			runSel=''
+			local -i runSel
+			local -a evdiArr
+			local -i ind
+			local -i runInd
+			local runPat=""
+			local -i arrInd
+			local -a runPart
+
 			readarray -t evdiArr < <(echo "$(git describe --tags $(git rev-list --tags --max-count=200) | grep -Eow '^v?[0-9]+\.[0-9]+\.[0-9]+($)')")
 			while [[ -z $evdiGitTag ]]; do
 				for ind in "${!evdiArr[@]}"; do
-					(( runInd = ind + 1 ))
+					runInd="ind + 1"
 					printf "${BLUE}::: ${runInd})${RESET} ${WHITE}${evdiArr[$ind]}${RESET}\n"
 
 					if [[ -z $runPat ]]; then
@@ -120,7 +128,7 @@ evdi_git_tag_util() {
 				fi
 				case $runSel in
 					@($runPat))
-						(( arrInd = runSel - 1 ))
+						arrInd="runSel - 1"
 						read -ra runPart <<< "${evdiArr[$arrInd]}"
 						evdiGitTag="${runPart[0]}"
 				;;
@@ -212,11 +220,17 @@ unzip_displaylink() {
 	else 
 		if (( "${#dispArr[@]}" > 1 )); then
 			printf "${GREEN}:::${RESET} ${WHITE}Loading user downloaded versions of the DisplayLink installer:${RESET}\n"
-			runSelDisp=""
 			displayLinkFullName=""
+			local -i runSelDisp
+			local -i indDisp
+			local -i runIndDisp
+			local runPatDisp=""
+			local -i arrIndDisp
+			local -a runPartDisp
+
 			while [[ -z $displayLinkFullName ]]; do
 				for indDisp in "${!dispArr[@]}"; do
-					(( runIndDisp = indDisp + 1 ))
+					runIndDisp="indDisp + 1"
 					printf "${BLUE}::: ${runIndDisp})${RESET} ${WHITE}${dispArr[$indDisp]}${RESET}\n"
 
 					if [[ -z $runPatDisp ]]; then
@@ -230,9 +244,9 @@ unzip_displaylink() {
 				
 				case $runSelDisp in
 					@($runPatDisp))
-						(( arrIndDisp = runSelDisp - 1 ))
-						read -ra runPatDisp <<< "${dispArr[$arrIndDisp]}"
-						displayLinkFullName="${runPatDisp[@]}"
+						arrIndDisp="runSelDisp - 1"
+						read -ra runPartDisp <<< "${dispArr[$arrIndDisp]}"
+						displayLinkFullName="${runPartDisp[@]}"
 						displayLinkPath="${displayLinkFullName%/*}"
 						displayLinkName="${displayLinkFullName##*/}"
 						displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
