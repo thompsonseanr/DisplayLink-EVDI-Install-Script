@@ -25,6 +25,8 @@ evdiTarPath="${evdiGitPath%/*}"
 evdiGitMain=""
 evdiGitTag=""
 
+# To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
+# Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 # Note: Will pull DisplayLink if not downloaded already to /home/$USER/Downloads
 displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
 displayStatus=""
@@ -48,11 +50,6 @@ if (( "${#dispArr[@]}" > 1 )); then
 	displayLinkInstallDir="/opt/${displayLinkTarget}"
 fi
 
-
-# To-Do: Refactor
-# To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
-# Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
-
 evdiTest="$(lsmod | grep -Eio "evdi" | head -1)"
 displayInstallerTest="/usr/bin/displaylink-installer"
 installDec=""
@@ -68,9 +65,9 @@ printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
 if [[ -n $evdiTest && -f $displayInstallerTest ]]; then 
 	printf "${RED}>>> WARNING:${RESET} ${WHITE}DisplayLink and EVDI kernel modules are already installed on your system.${RESET}\n"
-	printf "${RED}>>>${RESET} ${WHITE}If you want to first uninstall (RECOMMENDED), please run this command:${RESET}\n"
+	printf "${RED}>>>${RESET} ${WHITE}If you want to first uninstall (RECOMMENDED), please uninstall via your package manager or run this command:${RESET}\n"
 	printf "${RED}>>>${RESET} ${WHITE}sudo displaylink-installer uninstall${RESET}\n"
-	read -p "$(printf "${BLUE}:::${RESET} ${WHITE}Proceed with installing? [Y/n]: ${RESET}")" installDec
+	read -p "$(printf "${BLUE}:::${RESET} ${WHITE}Proceed with installation? [Y/n]: ${RESET}")" installDec
 	if [[ -z $installDec ]]; then 
 		installDec="y"
 	fi
