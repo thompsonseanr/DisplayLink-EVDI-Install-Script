@@ -54,8 +54,8 @@ evdiTest="$(lsmod | grep -Eio "evdi" | head -1)"
 displayInstallerTest="/usr/bin/displaylink-installer"
 installDec=""
 
-downloadEvdiFile="n"
-downloadDisplayFile="n"
+downloadEvdiFile="false"
+downloadDisplayFile="false"
 
 clear
 
@@ -86,132 +86,130 @@ evdi_git_tag_util() {
 		git clone -q "${evdiRepo}" /tmp/evdi 
 		evdiGitPath=$(find /tmp -maxdepth 1 -type d -name "evdi" 2>/dev/null)
 		evdiTarPath="${evdiGitPath%/*}"
-		downloadEvdiFile="y"
+		downloadEvdiFile="true"
 	fi
-	
-	if [[ -n $evdiGitPath ]]; then
-		cd "$evdiGitPath"
-		git pull -q
-		evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
 
-		read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version (RECOMMENDED)? To choose a specific version, enter ${RESET}${RED}'n'${RESET} ${WHITE}[Y/n]: ${RESET}")" evdiLatest
-		firstChoice="${evdiLatest:0:1}"
-		evdiLatest="${firstChoice,}"
-
-		if [[ $evdiLatest == 'n' ]]; then
-			local -i runSel
-			local -a evdiArr
-			local -i ind
-			local -i runInd
-			local runPat=""
-			local -i arrInd
-			local -a runPart
-
-			readarray -t evdiArr < <(echo "$(git describe --tags $(git rev-list --tags --max-count=200) | grep -Eow '^v?[0-9]+\.[0-9]+\.[0-9]+($)')")
-			while [[ -z $evdiGitTag ]]; do
-				for ind in "${!evdiArr[@]}"; do
-					runInd="ind + 1"
-					printf "${BLUE}::: ${runInd})${RESET} ${WHITE}${evdiArr[$ind]}${RESET}\n"
-
-					if [[ -z $runPat ]]; then
-							runPat="${runInd}"
-					else
-							runPat="${runPat}|${runInd}"
-					fi
-				done
-		
-				if (( "${#evdiArr[@]}" > 1 )); then
-					read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1-${runInd}]: ${RESET}")" runSel
-				else
-					read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1]: ${RESET}")" runSel
-				fi
-				case $runSel in
-					@($runPat))
-						arrInd="runSel - 1"
-						read -ra runPart <<< "${evdiArr[$arrInd]}"
-						evdiGitTag="${runPart[0]}"
-				;;
-					*)
-						printf "${RED}>>>${RESET} ${WHITE}Please choose an EVDI version to install.${RESET}\n"
-						evdiGitTag=''
-				;;
-				esac
-			done
-		else 
-			evdiGitTag="$(git describe --tags $(git rev-list --tags --max-count=1))"
-		fi
-
-		if [[ -n $evdiGitTag ]]; then
-			git fetch -q --tags && git checkout -b "$evdiGitTag" "$evdiGitTag" 2>/dev/null
-			tar -czf ../evdi.tar.gz .
-			git checkout -q "$evdiGitMain"
-			git branch -q -d "$evdiGitTag"
-		else
-			printf "${RED}>>>${RESET} ${WHITE}There are no tags for this repo. Exiting.${RESET}\n" >&2
-			if [ "$downloadEvdiFile" == "y" ]; then 
-				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
-				rm -rf "$evdiGitPath"
-			fi			
-			exit 1
-		fi
-	else
+	if [[ ! -d $evdiGitPath ]]; then 
 		printf "${RED}>>> Error:${RESET} ${WHITE}Could not clone https://github.com/DisplayLink/evdi${RESET}\n" >&2
 		exit 1
-	fi	
+	fi
+
+	cd "$evdiGitPath"
+	git pull -q
+	evdiGitMain="$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)"
+
+	read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Install with the latest EVDI version (RECOMMENDED)? To choose a specific version, enter ${RESET}${RED}'n'${RESET} ${WHITE}[Y/n]: ${RESET}")" evdiLatest
+	firstChoice="${evdiLatest:0:1}"
+	evdiLatest="${firstChoice,}"
+
+	if [[ $evdiLatest == 'n' ]]; then
+		local -i runSel
+		local -a evdiArr
+		local -i ind
+		local -i runInd
+		local runPat=""
+		local -i arrInd
+		local -a runPart
+
+		readarray -t evdiArr < <(echo "$(git describe --tags $(git rev-list --tags --max-count=200) | grep -Eow '^v?[0-9]+\.[0-9]+\.[0-9]+($)')")
+		while [[ -z $evdiGitTag ]]; do
+			for ind in "${!evdiArr[@]}"; do
+				runInd="ind + 1"
+				printf "${BLUE}::: ${runInd})${RESET} ${WHITE}${evdiArr[$ind]}${RESET}\n"
+
+				if [[ -z $runPat ]]; then
+					runPat="${runInd}"
+				else
+					runPat="${runPat}|${runInd}"
+				fi
+			done
+	
+			if (( "${#evdiArr[@]}" > 1 )); then
+				read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1-${runInd}]: ${RESET}")" runSel
+			else
+				read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice [1]: ${RESET}")" runSel
+			fi
+			case $runSel in
+				@($runPat))
+					arrInd="runSel - 1"
+					read -ra runPart <<< "${evdiArr[$arrInd]}"
+					evdiGitTag="${runPart[0]}"
+			;;
+				*)
+					printf "${RED}>>>${RESET} ${WHITE}Please choose an EVDI version to install.${RESET}\n"
+					evdiGitTag=''
+			;;
+			esac
+		done
+	else 
+		evdiGitTag="$(git describe --tags $(git rev-list --tags --max-count=1))"
+	fi
+
+	if [[ -z $evdiGitTag ]]; then
+		printf "${RED}>>>${RESET} ${WHITE}There are no tags for this repo. Exiting.${RESET}\n" >&2
+		if [[ $downloadEvdiFile == "true" ]]; then 
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n"
+			rm -rf "$evdiGitPath"
+		fi			
+		exit 1
+	fi
+
+	git fetch -q --tags && git checkout -b "$evdiGitTag" "$evdiGitTag" 2>/dev/null
+	tar -czf "${evdiTarPath}/evdi.tar.gz" .
+	git checkout -q "$evdiGitMain"
+	git branch -q -d "$evdiGitTag"
+
+	if [[ ! -f "${evdiTarPath}/evdi.tar.gz" ]]; then 
+		printf "${RED}>>>${RESET} ${WHITE}${evdiTarPath}/evdi.tar.gz does not exist. Exiting.${RESET}\n" >&2
+		if [[ $downloadEvdiFile == "true" ]]; then 
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n"
+			rm -rf "$evdiGitPath"
+		fi			
+		exit 1
+	fi
+
 }
 
 unzip_displaylink() {
 	local wgetTest="$(which wget 2>/dev/null)"
 	local unzipTest="$(which unzip 2>/dev/null)"
+	local failTest="false"
+
+	if [[ -z $wgetTest ]]; then
+		printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RESET}${RED}'wget'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
+		failTest="true"
+	fi
+
+	if [[ -z $unzipTest ]]; then 
+		printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RESET}${RED}'unzip'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
+		failTest="true"
+	fi
+
+	if [[ $failTest == "true" ]]; then
+		printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n"
+		if [[ $downloadEvdiFile == "true" ]]; then 
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n"
+			rm -f "${evdiTarPath}/evdi.tar.gz"
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n"
+			rm -rf "$evdiGitPath"
+		fi
+		exit 1
+	fi
 
 	if [[ -z $displayLinkFullName ]]; then
-		if [[ -n $wgetTest ]]; then
-			printf "${BLUE}:::${RESET} ${WHITE}Downloading DisplayLink for you.${RESET}\n"
-			wget -q -P /tmp/ "$displayLinkDl"
-			displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip" 2>/dev/null)"
-			downloadDisplayFile="y"
-		else
-			printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RESET}${RED}'wget'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
-			if [ "$downloadEvdiFile" == "y" ]; then 
-				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
-				rm -f "${evdiTarPath}/evdi.tar.gz"
-				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
-				rm -rf "$evdiGitPath"
-			fi
-			exit 1
-		fi
+		printf "${BLUE}:::${RESET} ${WHITE}Downloading DisplayLink for you.${RESET}\n"
+		wget -q -P /tmp/ "$displayLinkDl"
+		displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip" 2>/dev/null)"
+		downloadDisplayFile="true"
 
-		if [[ -f $displayLinkFullName ]]; then
-			displayLinkPath="${displayLinkFullName%/*}"
-			displayLinkName="${displayLinkFullName##*/}"
-			displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
-			displayLinkVer="$(grep -Eo "[0-9]+\.[0-9]+" <<< $displayLinkNameFix)"
-			displayLinkTarget="displaylink_${displayLinkVer}"
-			displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
-			displayLinkInstallDir="/opt/${displayLinkTarget}"
-			if [[ -n $unzipTest ]]; then
-				unzip "$displayLinkFullName" -d "$displayLinkFileDir"
-			else
-				printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RESET}${RED}'unzip'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
-				printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
-				printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n" >&2
-				rm -f "$displayLinkFullName"
-				if [ "$downloadEvdiFile" == "y" ]; then 
-					printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
-					rm -f "${evdiTarPath}/evdi.tar.gz"
-					printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
-					rm -rf "$evdiGitPath"
-				fi
-				exit 1
-			fi
-		else
+		if [[ ! -f $displayLinkFullName ]]; then 
 			printf "${RED}>>> Error:${RESET} ${WHITE}Could not download DisplayLink.${RESET}\n" >&2
-			printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
+			printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n"
 
-			if [ "$downloadEvdiFile" == "y" ]; then 
-				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
+			if [[ $downloadEvdiFile == "true" ]]; then 
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n"
 				rm -f "${evdiTarPath}/evdi.tar.gz"
-				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
+				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n"
 				rm -rf "$evdiGitPath"
 			fi
 			exit 1
@@ -246,13 +244,6 @@ unzip_displaylink() {
 						arrIndDisp="runSelDisp - 1"
 						read -ra runPartDisp <<< "${dispArr[$arrIndDisp]}"
 						displayLinkFullName="${runPartDisp[@]}"
-						displayLinkPath="${displayLinkFullName%/*}"
-						displayLinkName="${displayLinkFullName##*/}"
-						displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
-						displayLinkVer="$(grep -Eo "[0-9]+\.[0-9]+" <<< $displayLinkNameFix)"
-						displayLinkTarget="displaylink_${displayLinkVer}"
-						displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
-						displayLinkInstallDir="/opt/${displayLinkTarget}"
 				;;
 					*)
 						printf "${RED}>>>${RESET} ${WHITE}Please choose a DisplayLink version to install.${RESET}\n"
@@ -261,30 +252,39 @@ unzip_displaylink() {
 				esac
 			done
 		fi
+	fi
+	displayLinkPath="${displayLinkFullName%/*}"
+	displayLinkName="${displayLinkFullName##*/}"
+	displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
+	displayLinkVer="$(grep -Eo "[0-9]+\.[0-9]+" <<< $displayLinkNameFix)"
+	displayLinkTarget="displaylink_${displayLinkVer}"
+	displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
+	displayLinkInstallDir="/opt/${displayLinkTarget}"
+	
+	unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 
-		if [[ -n $unzipTest ]]; then
-			unzip "$displayLinkFullName" -d "$displayLinkFileDir"
-		else
-			printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RESET}${RED}'unzip'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
-			printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n" >&2
-			printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n" >&2
-			rm -f "$displayLinkFullName"
-			if [ "$downloadEvdiFile" == "y" ]; then 
-				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n" >&2
-				rm -f "${evdiTarPath}/evdi.tar.gz"
-				printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n" >&2
-				rm -rf "$evdiGitPath"
-			fi
-			exit 1
+	if [[ ! -d $displayLinkFileDir ]]; then
+		printf "${RED}>>>${RESET} ${WHITE}Installation target directory is missing. Exiting.${RESET}\n" >&2
+		printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n"
+		if [[ $downloadEvdiFile == "true" ]]; then 
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n"
+			rm -f "${evdiTarPath}/evdi.tar.gz"
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n"
+			rm -rf "$evdiGitPath"
 		fi
+		if [[ $downloadDisplayFile == "true" ]]; then 
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n"
+			rm -f "$displayLinkFullName"
+		fi
+		exit 1
 	fi
 }
 
 
 if [[ $installDec != "y" ]]; then
-	printf "${RED}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n" >&2
-	printf "${RED}>>>${RESET} ${WHITE}DisplayLink install is exiting.${RESET}\n" >&2
-	printf "${RED}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n" >&2
+	printf "${RED}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+	printf "${RED}>>>${RESET} ${WHITE}DisplayLink install is exiting.${RESET}\n"
+	printf "${RED}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 	exit 1
 else
 # Heredoc hates your \tab
@@ -293,80 +293,54 @@ evdi_git_tag_util
 
 unzip_displaylink
 
-if [[ -n $displayLinkInstallDir ]]; then
-	sudo bash -s "$displayLinkFileDir" "$displayLinkInstallDir" "$locUser" <<'EOF'
-		if [ -d "$2" ]; then
-			rm -rf "$2"
-		fi
-		mv "$1" "$2"
-		chown -R "$3":"$3" "$2"
+sudo bash -s "$displayLinkFileDir" "$displayLinkInstallDir" "$locUser" <<'EOF'
+	if [ -d "$2" ]; then
+		rm -rf "$2"
+	fi
+	mv "$1" "$2"
+	chown -R "$3":"$3" "$2"
 EOF
-else
-	printf "${RED}>>>${RESET} ${WHITE}Installation target directory is missing. Exiting.${RESET}\n" >&2
-	exit 1
-fi
 
 cd "$displayLinkInstallDir"
 
 sudo bash -s "$displayLinkInstallDir" "$locUser" "$RED" "$WHITE" "$RESET" <<'EOF'
 	runFile="$(find "$1" -type f -name "*.run" 2>/dev/null)"
-	if [[ -n $runFile ]]; then
-		chmod +x "$runFile"
-		"$runFile" --noexec --keep
-		chown -R "$2":"$2" "$1"
-	else
+
+	if [[ -z $runFile ]]; then 
 		printf "${3}>>>${5} ${4}No DisplayLink run file exists. Exiting.${5}\n" >&2
 		exit 1
 	fi
+
+	chmod +x "$runFile"
+	"$runFile" --noexec --keep
+	chown -R "$2":"$2" "$1"
 EOF
 
 extractDir="$(find "$displayLinkInstallDir" -maxdepth 1 -type d -name "displaylink-*" 2>/dev/null)"
 
-if [[ -n $extractDir ]]; then
-	cd "$extractDir"
-else
+if [[ -z $extractDir ]]; then
 	printf "${RED}>>>${RESET} ${WHITE}No extracted installation directory exists. Exiting.${RESET}\n" >&2
 	exit 1
 fi
 
-sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$RED" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" "$downloadEvdiFile" "$downloadDisplayFile" "$BLUE" <<'EOF'
-	if [ -f "$1/evdi.tar.gz" ]; then
-		mv "$1/evdi.tar.gz" "$1/evdi.tar.gz.bak.$(date +%Y%m%d)"
-	else
-		printf "${5}>>>${7} ${6}${1}/evdi.tar.gz does not exist. Exiting.${7}\n" >&2
-		exit 1
-	fi	
-	if [ -f "$2/evdi.tar.gz" ]; then
-		mv "$2/evdi.tar.gz" "$1/"
-		chown -R "$3":"$3" "$4"
-		chmod +x "$1/displaylink-installer.sh"
-		./displaylink-installer.sh noreboot
-		
-		printf "${12}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n" >&2
-		rm -rf "$4"
-		if [ "${10}" == "y" ]; then 
-			printf "${12}>>>${7} ${6}Removing: ${9}${7}\n" >&2
-			rm -rf "$9"
-		fi
-		if [ "${11}" == "y" ]; then 
-			printf "${12}>>>${7} ${6}Removing: ${8}${7}\n" >&2
-			rm -f "$8"
-		fi 
-	else
-		printf "${5}>>>${7} ${6}${2}/evdi.tar.gz does not exist. Exiting.${7}\n" >&2
-		printf "${5}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n" >&2
-		rm -rf "$4"
-		if [ "${10}" == "y" ]; then 
-			printf "${5}>>>${7} ${6}Removing: ${9}${7}\n" >&2
-			rm -rf "$9"
-		fi
-		if [ "${11}" == "y" ]; then 
-			printf "${5}>>>${7} ${6}Removing: ${8}${7}\n" >&2
-			rm -f "$8"
-		fi 
+cd "$extractDir"
 
-		exit 1
+sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$BLUE" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" "$downloadEvdiFile" "$downloadDisplayFile" <<'EOF'
+	mv "$2/evdi.tar.gz" "$1/"
+	chown -R "$3":"$3" "$4"
+	chmod +x "$1/displaylink-installer.sh"
+	./displaylink-installer.sh noreboot
+
+	printf "${5}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n"
+	rm -rf "$4"
+	if [ "${10}" = "true" ]; then 
+		printf "${5}>>>${7} ${6}Removing: ${9}${7}\n"
+		rm -rf "$9"
 	fi
+	if [ "${11}" = "true" ]; then 
+		printf "${5}>>>${7} ${6}Removing: ${8}${7}\n"
+		rm -f "$8"
+	fi 
 EOF
 
 displayStatus="$(which displaylink-installer 2>/dev/null)"
