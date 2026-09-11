@@ -253,7 +253,6 @@ unzip_displaylink() {
 			done
 		fi
 	fi
-	unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 	displayLinkPath="${displayLinkFullName%/*}"
 	displayLinkName="${displayLinkFullName##*/}"
 	displayLinkNameFix="'${displayLinkName//\'/\'\\\'\'}'"
@@ -261,12 +260,30 @@ unzip_displaylink() {
 	displayLinkTarget="displaylink_${displayLinkVer}"
 	displayLinkFileDir="${displayLinkPath}/${displayLinkTarget}"
 	displayLinkInstallDir="/opt/${displayLinkTarget}"
+	
+	unzip "$displayLinkFullName" -d "$displayLinkFileDir"
+
+	if [[ ! -d $displayLinkFileDir ]]; then
+		printf "${RED}>>>${RESET} ${WHITE}Installation target directory is missing. Exiting.${RESET}\n" >&2
+		printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n"
+		if [[ $downloadEvdiFile == "true" ]]; then 
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n"
+			rm -f "${evdiTarPath}/evdi.tar.gz"
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n"
+			rm -rf "$evdiGitPath"
+		fi
+		if [[ $downloadDisplayFile == "true" ]]; then 
+			printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n"
+			rm -f "$displayLinkFullName"
+		fi
+		exit 1
+	fi
 }
 
 
 if [[ $installDec != "y" ]]; then
 	printf "${RED}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-	printf "${RED}>>>${RESET} ${WHITE}DisplayLink install is exiting.${RESET}\n" >&2
+	printf "${RED}>>>${RESET} ${WHITE}DisplayLink install is exiting.${RESET}\n"
 	printf "${RED}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 	exit 1
 else
@@ -275,11 +292,6 @@ else
 evdi_git_tag_util
 
 unzip_displaylink
-
-if [[ -z $displayLinkInstallDir ]]; then
-	printf "${RED}>>>${RESET} ${WHITE}Installation target directory is missing. Exiting.${RESET}\n" >&2
-	exit 1
-fi
 
 sudo bash -s "$displayLinkFileDir" "$displayLinkInstallDir" "$locUser" <<'EOF'
 	if [ -d "$2" ]; then
