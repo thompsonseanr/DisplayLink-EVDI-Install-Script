@@ -348,30 +348,32 @@ displayStatus="$(which displaylink-installer 2>/dev/null)"
 if [[ -z $displayStatus ]]; then
 	printf "${RED}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 	printf "${RED}:::${RESET}\n"
-	printf "${RED}:::${RESET} ${WHITE}DisplayLink Installer Failed to Install.${RESET}\n"
+	printf "${RED}:::${RESET} ${WHITE}DisplayLink Installer Failed to Install. Exiting.${RESET}\n" >&2
 	printf "${RED}:::${RESET}\n"
 	printf "${RED}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-else 
-	printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-	printf "${BLUE}:::${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
-	printf "${BLUE}:::${RESET}\n"
-	printf "${BLUE}:::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
-	if [[ $runitTest == "runit" ]]; then
-		printf "${BLUE}:::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
-		printf "${BLUE}:::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
-		printf "${BLUE}:::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
-		printf "${BLUE}:::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
-	else
-		printf "${BLUE}:::${RESET} ${WHITE}Systemd -based distro users: Remember to check the status of the 'displaylink' service by running:${RESET}\n"
-		printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink-driver.service${RESET}\n"
-		printf "${BLUE}:::${RESET} ${WHITE}or${RESET}\n"
-		printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink.service${RESET}\n"
-		printf "${BLUE}:::${RESET} ${WHITE}To start the service if not running: ${RESET}\n"
-		printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME> ${RESET}\n"
-	fi
-	printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+	exit 1
 fi
+
+printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer Complete${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}You will need to reboot for the EVDI kernel modules to load${RESET}\n"
+if [[ $runitTest == "runit" ]]; then
+	printf "${BLUE}:::${RESET} ${WHITE}VOID linux/runit -based distro users: Remember to remove the 'down' service file and restart the 'displaylink-driver' service:${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}cd /var/service/displaylink-driver${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo mv down down.bak${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo sv restart displaylink-driver${RESET}\n"
+else
+	printf "${BLUE}:::${RESET} ${WHITE}Systemd -based distro users: Remember to check the status of the 'displaylink' service by running:${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink-driver.service${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}or${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl status displaylink.service${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}To start the service if not running: ${RESET}\n"
+	printf "${BLUE}:::${RESET} ${WHITE}sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME> ${RESET}\n"
+fi
+printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+
 
 # Heredoc still hates your \tab
 fi
