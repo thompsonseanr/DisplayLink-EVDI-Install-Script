@@ -231,9 +231,9 @@ unzip_displaylink() {
 					printf "${BLUE}::: ${runIndDisp})${RESET} ${WHITE}${dispArr[$indDisp]}${RESET}\n"
 
 					if [[ -z $runPatDisp ]]; then
-							runPatDisp="${runIndDisp}"
+						runPatDisp="${runIndDisp}"
 					else
-							runPatDisp="${runPatDisp}|${runIndDisp}"
+						runPatDisp="${runPatDisp}|${runIndDisp}"
 					fi
 				done
 
