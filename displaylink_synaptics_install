@@ -185,7 +185,7 @@ unzip_displaylink() {
 		failTest="true"
 	fi
 
-	if [ "$failTest" = "true" ]; then
+	if [[ $failTest == "true" ]]; then
 		printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n"
 		if [[ $downloadEvdiFile == "true" ]]; then 
 			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n"
