@@ -264,7 +264,7 @@ unzip_displaylink() {
 	unzip "$displayLinkFullName" -d "$displayLinkFileDir"
 
 	if [[ ! -d $displayLinkFileDir ]]; then
-		printf "${RED}>>>${RESET} ${WHITE}Installation target directory is missing. Exiting.${RESET}\n" >&2
+		printf "${RED}>>>${RESET} ${WHITE}Unarchived ${displayLinkFileDir} is missing. Exiting.${RESET}\n" >&2
 		printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Exiting.${RESET}\n"
 		if [[ $downloadEvdiFile == "true" ]]; then 
 			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n"
