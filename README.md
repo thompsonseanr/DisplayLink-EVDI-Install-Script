@@ -12,7 +12,7 @@
 > - [Porting the DisplayLink Ubuntu driver to other Linux distributions](https://support.displaylink.com/knowledgebase/articles/679060)  
 > - [Synaptics DisplayLink with evdi DKMS Module - Works!](https://voidforums.com/viewtopic.php?t=1781)  
 > - [Reddit: DisplayLink Driver](https://www.reddit.com/r/voidlinux/comments/peq1se/displaylink_driver/)
-> - [Alberta Tech - Hilarious Merch (I am not affiliated, just a fan)](https://shop.albertatech.co/)  
+> - [Alberta Tech - Hilarious Nerd Merch (I am not affiliated, just showing some love)](https://shop.albertatech.co/)  
 
 
 ## Preface:  
@@ -30,7 +30,7 @@ I want to give a huge shout-out, thanks, and appreciation for the developers and
 | Fedora | [Negativo17](https://negativo17.org/repos/fedora-multimedia) |
 
 
-This script is a straightforward and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution.  
+This script is a fun, straightforward, and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution.  
 
 | Successful Distros | Notes |
 | :--- | :--- |
