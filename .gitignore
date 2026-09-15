@@ -1,0 +1,5 @@
+.playwright_scraper/
+*.whl
+dist/
+build/
+*.egg-info/
