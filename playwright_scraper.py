@@ -15,7 +15,7 @@ def py_scraper():
 
         download = downloadInfo.value
         downloadUrl = download.url
-        print(f"Download URL: {downloadUrl}")
+        print(f"{downloadUrl}")
 
 
 if __name__ == "__main__":
