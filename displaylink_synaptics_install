@@ -28,7 +28,8 @@ evdiGitTag=""
 # To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 # Note: Will pull DisplayLink if not downloaded already to /home/$USER/Downloads
-displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
+# displayLinkDl.bak="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
+displayLinkDl=""
 displayStatus=""
 displayLinkFullName=""
 displayLinkPath=""
