@@ -54,6 +54,7 @@ evdiGitTag=""
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 displayLinkDl=""
+displayLinkScraper="$(pwd)/playwright_scraper 2>/dev/null"
 displayStatus=""
 displayLinkFullName=""
 displayLinkPath=""
@@ -230,7 +231,7 @@ unzip_displaylink() {
 	if [[ -z $displayLinkFullName ]]; then
 		printf "${BLUE}:::${RESET} ${WHITE}Downloading DisplayLink for you.${RESET}\n"
 		
-		_load "Retrieving latest DisplayLink Driver Download URL" displayLinkDl "./playwright_scraper 2>/dev/null"
+		_load "Retrieving latest DisplayLink Driver Download URL" displayLinkDl $displayLinkScraper
 		printf "\n"
 		if [[ -z $displayLinkDl ]]; then
 			displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
@@ -267,7 +268,7 @@ unzip_displaylink() {
 					fi
 				done
 
-				read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice for the local version of DisplayLink to install [1-${runIndDisp}]: ${RESET}")" runSelDisp
+				read -p "$(printf "\n${GREEN}:::${RESET} ${WHITE}Enter your choice for the local version of DisplayLink to install [1-${runIndDisp}]: ${RESET}")" runSelDisp
 				
 				case $runSelDisp in
 					@($runPatDisp))
