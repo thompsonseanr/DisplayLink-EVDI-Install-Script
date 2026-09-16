@@ -2,4 +2,5 @@
 *.whl
 dist/
 build/
-*.egg-info/
+*.spec
+playwright_scraper

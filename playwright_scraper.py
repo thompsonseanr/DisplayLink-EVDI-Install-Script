@@ -1,4 +1,3 @@
-#import sys
 from playwright.sync_api import sync_playwright, TimeoutError
 
 def py_scraper():
