@@ -16,6 +16,5 @@ def py_scraper():
         downloadUrl = download.url
         print(f"{downloadUrl}")
 
-
 if __name__ == "__main__":
     py_scraper()
