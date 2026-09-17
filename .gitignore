@@ -1,6 +1,6 @@
-.playwright_scraper/
-*.whl
-dist/
-build/
-*.spec
+../.playwright_scraper/
+../*.whl
+../dist/
+../build/
+../*.spec
 playwright_scraper
