@@ -1,5 +1,12 @@
+# Playwright Scraper
 py_playwright_scraper/*venv/
 py_playwright_scraper/dist/
 py_playwright_scraper/build/
 py_playwright_scraper/*.spec
 playwright_scraper
+
+# Displaylink Py Installer
+py_displaylink_synaptics_install/*venv/
+py_displaylink_synaptics_install/dist/
+py_displaylink_synaptics_install/build/
+py_displaylink_synaptics_install/*.spec/

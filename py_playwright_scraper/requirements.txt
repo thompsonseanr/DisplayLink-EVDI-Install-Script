@@ -1,0 +1,9 @@
+altgraph==0.17.5
+greenlet==3.5.6
+packaging==26.3
+playwright==1.63.0
+pyee==13.0.1
+pyinstaller==6.22.3
+pyinstaller-hooks-contrib==2026.7
+setuptools==84.0.0
+typing_extensions==4.16.0
