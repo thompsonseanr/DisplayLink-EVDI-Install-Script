@@ -54,7 +54,13 @@ evdiGitTag=""
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 displayLinkDl=""
-displayLinkScraper="$(pwd)/playwright_scraper 2>/dev/null"
+# IN-PROGRESS
+displayLinkScraper="$(find /home/$locUser -type f -name "playwright_scraper" 2>/dev/null)"
+#displayLinkScraper="${displayLinkScraperFind[0]} 2>/dev/null"
+echo "$displayLinkScraper"
+		_load "Retrieving latest DisplayLink Driver Download URL" displayLinkDl $displayLinkScraper
+		printf "\n"
+#displayLinkScraper="$(pwd)/playwright_scraper 2>/dev/null"
 displayStatus=""
 displayLinkFullName=""
 displayLinkPath=""
