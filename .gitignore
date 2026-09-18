@@ -1,4 +1,4 @@
-../.playwright_scraper/
+../*venv/
 ../*.whl
 ../dist/
 ../build/
