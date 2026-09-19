@@ -54,13 +54,7 @@ evdiGitTag=""
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 displayLinkDl=""
-# IN-PROGRESS
-displayLinkScraper="$(find /home/$locUser -type f -name "playwright_scraper" 2>/dev/null)"
-#displayLinkScraper="${displayLinkScraperFind[0]} 2>/dev/null"
-echo "$displayLinkScraper"
-		_load "Retrieving latest DisplayLink Driver Download URL" displayLinkDl $displayLinkScraper
-		printf "\n"
-#displayLinkScraper="$(pwd)/playwright_scraper 2>/dev/null"
+displayLinkScraper="$(find /home/$locUser -type f -name 'playwright_scraper' 2>/dev/null)"
 displayStatus=""
 displayLinkFullName=""
 displayLinkPath=""
@@ -237,8 +231,11 @@ unzip_displaylink() {
 	if [[ -z $displayLinkFullName ]]; then
 		printf "${BLUE}:::${RESET} ${WHITE}Downloading DisplayLink for you.${RESET}\n"
 		
-		_load "Retrieving latest DisplayLink Driver Download URL" displayLinkDl $displayLinkScraper
-		printf "\n"
+		if [[ -n $displayLinkScraper ]]; then
+			_load "Retrieving latest DisplayLink Driver Download URL" displayLinkDl $displayLinkScraper
+			printf "\n"
+		fi 
+
 		if [[ -z $displayLinkDl ]]; then
 			displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
 		fi
