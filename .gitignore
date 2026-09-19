@@ -4,3 +4,4 @@ dist/
 build/
 *.spec
 playwright_scraper
+playwright_scraper.orig
