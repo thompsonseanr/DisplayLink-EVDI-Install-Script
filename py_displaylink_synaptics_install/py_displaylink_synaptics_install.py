@@ -1,6 +1,9 @@
 import os
 import subprocess
 from pathlib import Path
+from textual import events
+from textual.app import App, ComposeResult
+from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
 
 # Personal Dev Notes: 
 # Will move playwright_scraper.py and executable over.
@@ -27,24 +30,24 @@ evdiRepo: str = "https://github.com/DisplayLink/evdi.git"
 evdiDirFind: list[Path] = dir_find(initSearchDir, "evdi")
 evdiGitPath: Path | None = evdiDirFind[0] if evdiDirFind else None
 evdiTarPath: str | None = os.path.dirname(evdiGitPath) if evdiGitPath else None
-evdiGitMain: str = ""
-evdiGitTag: str = ""
+evdiGitMain: str | None = ""
+evdiGitTag: str | None = ""
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
-displayLinkDl: str = ""
+displayLinkDl: str | None = ""
 displayLinkScraperFind: list[Path] = file_find(initSearchDir, "playwright_scraper")
 displayLinkScraper: Path | None = displayLinkScraperFind[0] if displayLinkScraperFind else None
 for scraper in displayLinkScraperFind:
     print(f"scraper: {scraper}")
-displayStatus: str = ""
-displayLinkFullName: str = ""
-displayLinkPath: str = ""
-displayLinkName: str = ""
-displayLinkNameFix: str = ""
-displayLinkVer: str = ""
-displayLinkTarget: str = ""
-displayLinkFileDir: str = ""
-displayLinkInstallDir: str = ""
+displayStatus: str | None = ""
+displayLinkFullName: str | None = ""
+displayLinkPath: str | None = ""
+displayLinkName: str | None = ""
+displayLinkNameFix: str | None = ""
+displayLinkVer: str | None = ""
+displayLinkTarget: str | None = ""
+displayLinkFileDir: str | None = ""
+displayLinkInstallDir: str | None = ""
 dispArr: list[Path] = file_find(initSearchDir, "DisplayLink*.zip")
 dispArrVal: Path | None = dispArr[0] if dispArr else None
 for displayVal in dispArr:
@@ -59,3 +62,24 @@ print(f"lsmod: {evdiTest.stdout}")
 downloadEvdiFile: str = "false"
 downloadDisplayFile: str = "false"
 
+
+
+
+class QuestionApp(App[str]):
+    def on_mount(self) -> None:
+        self.theme = "nord"
+    def compose(self) -> ComposeResult:
+        yield Label(":::::::::::::::::::::::::::::::::::::::::::")
+        yield Label("::: DisplayLink Installer")
+        yield Label(":::::::::::::::::::::::::::::::::::::::::::")
+        yield Button("Yes", id="yes", variant="primary") 
+        yield Button("No", id="no", variant="error")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.exit(event.button.id)
+
+if __name__ == "__main__":
+    app = QuestionApp()
+    reply = app.run()
+    print(reply)
+    # app.run()
