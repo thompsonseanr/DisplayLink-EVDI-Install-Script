@@ -14,6 +14,8 @@ from textual.binding import Binding
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
 
 # Personal Dev Notes: 
+# Change logic: do not look for /evdi in home, just clone it to /tmp/
+# Same for DisplayLinkManager. 
 # Will move playwright_scraper.py and executable over.
 # This will require either including the playwright_scraper.py itself or the code inside as a function.
 # Playwright drivers will have to be installed with this ENV:
@@ -118,6 +120,8 @@ def evdi_git_tag_util() -> None:
     global evdiGitMain
     global evdiGitTag
 
+    # Change logic: do not look for /evdi in home, just clone it to /tmp/
+    # Same for DisplayLinkManager. 
     if not evdiGitPath:
         try:
             shutil.rmtree("/tmp/evdi")
@@ -160,6 +164,7 @@ def evdi_git_tag_util() -> None:
     if not evdiList:
         clean_files()
 
+    # Create Dynamic menu for Textualize
     for tag in evdiList:
         print(tag.name, tag.commit.committed_datetime)
 
