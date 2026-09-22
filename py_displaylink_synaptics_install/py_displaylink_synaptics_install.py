@@ -4,6 +4,7 @@ import subprocess
 import shutil
 import git
 import tarfile
+from contextlib import suppress
 from pathlib import Path
 from typing import List
 from git import Repo
@@ -41,14 +42,17 @@ runitTest: subprocess.CompletedProcess[str] = subprocess.run("ps -p 1 -o comm=",
 
 initSearchDir: str = f"/home/{locUser}"
 evdiRepo: str = "https://github.com/DisplayLink/evdi.git"
-evdiDirFind: list[Path] = dir_find(initSearchDir, "evdi")
-evdiGitPath: Path | None = evdiDirFind[0] if evdiDirFind else None
-evdiTarPath: str | None = os.path.dirname(evdiGitPath) if evdiGitPath else None
+# evdiDirFind: list[Path] = dir_find(initSearchDir, "evdi")
+# evdiGitPath: Path | None = evdiDirFind[0] if evdiDirFind else None
+evdiGitPath: Path = Path("/tmp/evdi")
+# evdiTarPath: str | None = os.path.dirname(evdiGitPath) if evdiGitPath else None
+evdiTarPath: str = os.path.dirname(evdiGitPath)
 evdiGitMain: str | None
 evdiGitTag: str | None
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 displayLinkDl: str | None
+# This logic will change when executable is no longer called
 displayLinkScraperFind: list[Path] = file_find(initSearchDir, "playwright_scraper")
 displayLinkScraper: Path | None = displayLinkScraperFind[0] if displayLinkScraperFind else None
 for scraper in displayLinkScraperFind:
@@ -89,28 +93,28 @@ isDisplayLinkInstalled: bool = True if (evdiTest.stdout and displayInstallerTest
 print(f"isDisplayLinkInstalled: {isDisplayLinkInstalled}")
 
 def clean_files() -> None:
-    if downloadEvdiFile:
-        if Path(f"{evdiTarPath}/evdi.tar.gz").is_file():
-            try:
-                os.remove(f"{evdiTarPath}/evdi.tar.gz")
-            except FileNotFoundError:
-                pass
-        if evdiGitPath:
-            try:
-                shutil.rmtree(evdiGitPath)
-            except FileNotFoundError:
-                pass
-    if downloadDisplayFile:
-        if displayLinkFullName:
-            try:
-                os.remove(displayLinkFullName)
-            except FileNotFoundError:
-                pass
-        if displayLinkInstallDir and displayLinkInstallDir.is_dir():
-            try:
-                shutil.rmtree(displayLinkInstallDir)
-            except FileNotFoundError:
-                pass
+    # if downloadEvdiFile:
+    if Path(f"{evdiTarPath}/evdi.tar.gz").is_file():
+        try:
+            os.remove(f"{evdiTarPath}/evdi.tar.gz")
+        except FileNotFoundError:
+            pass
+    if evdiGitPath:
+        try:
+            shutil.rmtree(evdiGitPath)
+        except FileNotFoundError:
+            pass
+    # if downloadDisplayFile:
+    if displayLinkFullName:
+        try:
+            os.remove(displayLinkFullName)
+        except FileNotFoundError:
+            pass
+    if displayLinkInstallDir and displayLinkInstallDir.is_dir():
+        try:
+            shutil.rmtree(displayLinkInstallDir)
+        except FileNotFoundError:
+            pass
     sys.exit(1)
 
 def evdi_git_tag_util() -> None:
@@ -122,21 +126,17 @@ def evdi_git_tag_util() -> None:
 
     # Change logic: do not look for /evdi in home, just clone it to /tmp/
     # Same for DisplayLinkManager. 
-    if not evdiGitPath:
-        try:
+    if evdiGitPath.is_dir():
+        with suppress(FileNotFoundError):
             shutil.rmtree("/tmp/evdi")
-        except FileNotFoundError:
-            pass
-        try: 
+        with suppress(FileNotFoundError):
             os.remove("/tmp/evdi.tar.gz")
-        except FileNotFoundError:
-            pass
         
-        Repo.clone_from(evdiRepo, "/tmp/evdi")
+    Repo.clone_from(evdiRepo, "/tmp/evdi")
 
-        evdiDirFind = dir_find("/tmp/", "evdi")
-        evdiGitPath = evdiDirFind[0] if evdiDirFind else None
-        evdiTarPath = os.path.dirname(evdiGitPath) if evdiGitPath else None
+    evdiDirFind = dir_find("/tmp/", "evdi")
+    evdiGitPath = evdiDirFind[0] if evdiDirFind else None
+    evdiTarPath = os.path.dirname(evdiGitPath) if evdiGitPath else None
 
     if evdiGitPath is None: 
         sys.exit(1)
