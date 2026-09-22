@@ -4,6 +4,7 @@ import subprocess
 import shutil
 import git
 import tarfile
+import py_playwright_scraper
 from contextlib import suppress
 from pathlib import Path
 from typing import List
@@ -40,7 +41,7 @@ runitTest: subprocess.CompletedProcess[str] = subprocess.run("ps -p 1 -o comm=",
     text=True
 )
 
-initSearchDir: str = f"/home/{locUser}"
+initTmpDir: str = f"/tmp/"
 evdiRepo: str = "https://github.com/DisplayLink/evdi.git"
 # evdiDirFind: list[Path] = dir_find(initSearchDir, "evdi")
 # evdiGitPath: Path | None = evdiDirFind[0] if evdiDirFind else None
@@ -51,24 +52,28 @@ evdiGitMain: str | None
 evdiGitTag: str | None
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
-displayLinkDl: str | None
+#displayLinkDl: str | None
+# Download DisplayLink
+# py_playwright_scraper.py_scraper()
 # This logic will change when executable is no longer called
-displayLinkScraperFind: list[Path] = file_find(initSearchDir, "playwright_scraper")
-displayLinkScraper: Path | None = displayLinkScraperFind[0] if displayLinkScraperFind else None
-for scraper in displayLinkScraperFind:
-    print(f"scraper: {scraper}")
-displayStatus: str | None
-displayLinkFullNameFind: list[Path] = file_find(initSearchDir, "DisplayLink*.zip")
-displayLinkFullName: Path | None = displayLinkFullNameFind[0] if displayLinkScraperFind else None
-displayLinkPath: str | None
-displayLinkName: str | None
-displayLinkNameFix: str | None
-displayLinkVer: str | None
-displayLinkTarget: str | None
-displayLinkFileDir: Path | None
-displayLinkInstallDir: Path | None
-dispArr: list[Path] = file_find(initSearchDir, "DisplayLink*.zip")
-dispArrVal: Path | None = dispArr[0] if dispArr else None
+
+py_playwright_scraper.py_scraper()
+displayLinkFullNameFind: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
+displayLinkFullName: Path | None = displayLinkFullNameFind[0] if displayLinkFullNameFind else None
+if not displayLinkFullName:
+    sys.exit(1)
+else:
+    displayLinkPath: str = os.path.dirname(displayLinkFullName)
+    displayLinkName: Path = Path(displayLinkFullName).name
+    displayLinkNameFix: str = displayLinkName.name.replace(" ", "_")
+    displayLinkNameUpdate: Path = 
+    displayLinkVer: str | None
+    displayLinkTarget: str | None
+    displayLinkFileDir: Path | None
+    displayLinkInstallDir: Path | None
+    dispArr: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
+    dispArrVal: Path | None = dispArr[0] if dispArr else None
+
 for displayVal in dispArr:
     print(f"displayVal: {displayVal}")
 print(dispArrVal)
