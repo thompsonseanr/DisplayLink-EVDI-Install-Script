@@ -4,6 +4,7 @@ import subprocess
 import shutil
 import git
 import tarfile
+import re
 import py_playwright_scraper
 from contextlib import suppress
 from pathlib import Path
@@ -52,25 +53,26 @@ evdiGitMain: str | None
 evdiGitTag: str | None
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
-#displayLinkDl: str | None
+# displayLinkDl: str | None
 # Download DisplayLink
 # py_playwright_scraper.py_scraper()
 # This logic will change when executable is no longer called
 
+# Need to add proper test/timeout for successful or failed downloads
 py_playwright_scraper.py_scraper()
 displayLinkFullNameFind: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
 displayLinkFullName: Path | None = displayLinkFullNameFind[0] if displayLinkFullNameFind else None
 if not displayLinkFullName:
     sys.exit(1)
 else:
-    displayLinkPath: str = os.path.dirname(displayLinkFullName)
-    displayLinkName: Path = Path(displayLinkFullName).name
-    displayLinkNameFix: str = displayLinkName.name.replace(" ", "_")
-    displayLinkNameUpdate: Path = 
-    displayLinkVer: str | None
-    displayLinkTarget: str | None
-    displayLinkFileDir: Path | None
-    displayLinkInstallDir: Path | None
+    displayLinkPath: Path = displayLinkFullName.parent
+    displayLinkName: str = displayLinkFullName.name
+    displayLinkNameFix: Path = displayLinkFullName.parent / displayLinkFullName.name.replace(" ", "_")
+    displayLinkFullName.rename(displayLinkNameFix)
+    displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkName)
+    displayLinkTarget: str = f"displaylink_{displayLinkVer[0]}"
+    displayLinkFileDir: Path = displayLinkFullName.parent / displayLinkTarget
+    displayLinkInstallDir: Path = Path(f"/opt/displayLinkTarget")
     dispArr: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
     dispArrVal: Path | None = dispArr[0] if dispArr else None
 
@@ -98,33 +100,22 @@ isDisplayLinkInstalled: bool = True if (evdiTest.stdout and displayInstallerTest
 print(f"isDisplayLinkInstalled: {isDisplayLinkInstalled}")
 
 def clean_files() -> None:
-    # if downloadEvdiFile:
     if Path(f"{evdiTarPath}/evdi.tar.gz").is_file():
-        try:
+        with suppress(FileNotFoundError):
             os.remove(f"{evdiTarPath}/evdi.tar.gz")
-        except FileNotFoundError:
-            pass
     if evdiGitPath:
-        try:
+        with suppress(FileNotFoundError):
             shutil.rmtree(evdiGitPath)
-        except FileNotFoundError:
-            pass
-    # if downloadDisplayFile:
     if displayLinkFullName:
-        try:
+        with suppress(FileNotFoundError):
             os.remove(displayLinkFullName)
-        except FileNotFoundError:
-            pass
     if displayLinkInstallDir and displayLinkInstallDir.is_dir():
-        try:
+        with suppress(FileNotFoundError):
             shutil.rmtree(displayLinkInstallDir)
-        except FileNotFoundError:
-            pass
     sys.exit(1)
 
 def evdi_git_tag_util() -> None:
     global evdiGitPath
-    global evdiDirFind
     global evdiTarPath
     global evdiGitMain
     global evdiGitTag
@@ -139,8 +130,6 @@ def evdi_git_tag_util() -> None:
         
     Repo.clone_from(evdiRepo, "/tmp/evdi")
 
-    evdiDirFind = dir_find("/tmp/", "evdi")
-    evdiGitPath = evdiDirFind[0] if evdiDirFind else None
     evdiTarPath = os.path.dirname(evdiGitPath) if evdiGitPath else None
 
     if evdiGitPath is None: 
