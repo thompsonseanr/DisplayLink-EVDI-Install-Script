@@ -131,8 +131,6 @@ def evdi_git_tag_util() -> None:
         
     Repo.clone_from(evdiRepo, "/tmp/evdi")
 
-    evdiTarPath = os.path.dirname(evdiGitPath) if evdiGitPath else None
-
     if evdiGitPath is None: 
         sys.exit(1)
     elif not evdiGitPath.is_dir():
