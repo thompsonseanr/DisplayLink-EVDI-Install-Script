@@ -4,6 +4,7 @@ import subprocess
 import shutil
 import git
 import tarfile
+import zipfile
 import re
 import py_playwright_scraper
 from contextlib import suppress
@@ -68,17 +69,20 @@ else:
     displayLinkPath: Path = displayLinkFullName.parent
     displayLinkName: str = displayLinkFullName.name
     displayLinkNameFix: Path = displayLinkFullName.parent / displayLinkFullName.name.replace(" ", "_")
-    displayLinkFullName.rename(displayLinkNameFix)
-    displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkName)
+    displayLinkFullNameUp: Path = displayLinkFullName.rename(displayLinkNameFix)
+    print(f"displayLinkFullNameUp: {displayLinkFullNameUp}")
+    displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkFullNameUp.name)
+    print(f"displayLinkVer: {displayLinkVer[0]}")
     displayLinkTarget: str = f"displaylink_{displayLinkVer[0]}"
     displayLinkFileDir: Path = displayLinkFullName.parent / displayLinkTarget
-    displayLinkInstallDir: Path = Path(f"/opt/displayLinkTarget")
-    dispArr: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
-    dispArrVal: Path | None = dispArr[0] if dispArr else None
+    displayLinkInstallDir: Path = Path(f"/opt/{displayLinkTarget}")
 
-for displayVal in dispArr:
-    print(f"displayVal: {displayVal}")
-print(dispArrVal)
+    # dispArr: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
+    # dispArrVal: Path | None = dispArr[0] if dispArr else None
+
+# for displayVal in dispArr:
+#     print(f"displayVal: {displayVal}")
+# print(dispArrVal)
 # Logic if len(dispArr) > 1
 # Refactor and rethink
 
@@ -88,11 +92,11 @@ evdiTest: subprocess.CompletedProcess[str] = subprocess.run(f'lsmod | grep -Eio 
     text=True
 )
 displayInstallerTest: Path = Path("/usr/bin/displaylink-installer")
-installDec: str = ""
+installDec: str
 print(f"lsmod: {evdiTest.stdout}")
 
-downloadEvdiFile: bool = False
-downloadDisplayFile: bool = False
+# downloadEvdiFile: bool = False
+# downloadDisplayFile: bool = False
 
 # Test for DisplayLink
 isDisplayLinkInstalled: bool = True if (evdiTest.stdout and displayInstallerTest.is_file()) else False
@@ -106,12 +110,13 @@ def clean_files() -> None:
     if evdiGitPath:
         with suppress(FileNotFoundError):
             shutil.rmtree(evdiGitPath)
-    if displayLinkFullName:
+    if displayLinkFullNameUp:
         with suppress(FileNotFoundError):
-            os.remove(displayLinkFullName)
+            os.remove(displayLinkFullNameUp)
     if displayLinkInstallDir and displayLinkInstallDir.is_dir():
         with suppress(FileNotFoundError):
-            shutil.rmtree(displayLinkInstallDir)
+            # shutil.rmtree(displayLinkInstallDir)
+            subprocess.run(["sudo", "rm", "-rf", displayLinkInstallDir], check=True)
     sys.exit(1)
 
 def evdi_git_tag_util() -> None:
@@ -120,8 +125,6 @@ def evdi_git_tag_util() -> None:
     global evdiGitMain
     global evdiGitTag
 
-    # Change logic: do not look for /evdi in home, just clone it to /tmp/
-    # Same for DisplayLinkManager. 
     if evdiGitPath.is_dir():
         with suppress(FileNotFoundError):
             shutil.rmtree("/tmp/evdi")
@@ -176,9 +179,19 @@ def evdi_git_tag_util() -> None:
     localEvdiRepo.git.checkout(evdiGitMain)
     localEvdiRepo.delete_head(evdiGitTag)
 
+    # clean_files()
     
+def unzip_displaylink() -> None:
+    with zipfile.ZipFile(displayLinkFullNameUp, 'r') as zipRef:
+        zipRef.extractall(displayLinkFileDir)
 
 evdi_git_tag_util()
+unzip_displaylink()
+
+subprocess.run(["sudo", "mv", displayLinkFileDir, displayLinkInstallDir], check=True)
+subprocess.run(["sudo", "chown", "-R", f"{locUser}:{locUser}", displayLinkInstallDir], check=True)
+
+clean_files()
 
 # class DisplayLinkInstall(App):
 #     BINDINGS = [
