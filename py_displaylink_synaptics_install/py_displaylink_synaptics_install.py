@@ -70,9 +70,7 @@ else:
     displayLinkName: str = displayLinkFullName.name
     displayLinkNameFix: Path = displayLinkFullName.parent / displayLinkFullName.name.replace(" ", "_")
     displayLinkFullNameUp: Path = displayLinkFullName.rename(displayLinkNameFix)
-    print(f"displayLinkFullNameUp: {displayLinkFullNameUp}")
     displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkFullNameUp.name)
-    print(f"displayLinkVer: {displayLinkVer[0]}")
     displayLinkTarget: str = f"displaylink_{displayLinkVer[0]}"
     displayLinkFileDir: Path = displayLinkFullName.parent / displayLinkTarget
     displayLinkInstallDir: Path = Path(f"/opt/{displayLinkTarget}")
@@ -191,7 +189,10 @@ unzip_displaylink()
 subprocess.run(["sudo", "mv", displayLinkFileDir, displayLinkInstallDir], check=True)
 subprocess.run(["sudo", "chown", "-R", f"{locUser}:{locUser}", displayLinkInstallDir], check=True)
 
+# Menu to capture evdi decision, then do the remaining operations
+
 clean_files()
+
 
 # class DisplayLinkInstall(App):
 #     BINDINGS = [
