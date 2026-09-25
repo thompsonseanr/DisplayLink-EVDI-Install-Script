@@ -1,4 +1,5 @@
 import time
+import sys
 from playwright.sync_api import sync_playwright, TimeoutError
 
 def py_scraper():
@@ -8,7 +9,10 @@ def py_scraper():
         browser = p.chromium.launch(headless=True)
         context = browser.new_context(accept_downloads=True)
         page = context.new_page()
-        page.goto("https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu")
+        try:
+            page.goto("https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu")
+        except Exception as e:
+            sys.exit(1)
         downloadLink = page.locator("a.download-link").nth(1)
         downloadLink.click()
 
@@ -26,7 +30,7 @@ def py_scraper():
                 if a < retry - 1:
                     time.sleep(delay)
                 else:
-                    raise RuntimeError("")
+                    raise RuntimeError("Error")
 
         browser.close()
 

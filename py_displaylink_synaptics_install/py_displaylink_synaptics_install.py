@@ -43,7 +43,7 @@ runitTest: subprocess.CompletedProcess[str] = subprocess.run("ps -p 1 -o comm=",
     text=True
 )
 
-initTmpDir: str = f"/tmp/"
+initTmpDir: str = "/tmp/"
 evdiRepo: str = "https://github.com/DisplayLink/evdi.git"
 evdiGitPath: Path = Path("/tmp/evdi")
 evdiTarPath: str = os.path.dirname(evdiGitPath)
@@ -181,7 +181,7 @@ def extract_displaylink_firmware() -> None:
         shutil.move(f"{evdiTarPath}/evdi.tar.gz", extractDir)
         subprocess.run(["sudo", "chown", "-R", f"{locUser}:{locUser}", displayLinkInstallDir], check=True)
         subprocess.run(["sudo", "chmod", "+x", f"{extractDir}/displaylink-installer.sh"], check=True)
-        subprocess.run(["sudo", "./displaylink-installer.sh"], check=True)
+        subprocess.run(["sudo", "./displaylink-installer.sh", "noreboot"], check=True)
 
 
 # Menu to capture evdi decision, then do the remaining operations
