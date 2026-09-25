@@ -45,21 +45,12 @@ runitTest: subprocess.CompletedProcess[str] = subprocess.run("ps -p 1 -o comm=",
 
 initTmpDir: str = f"/tmp/"
 evdiRepo: str = "https://github.com/DisplayLink/evdi.git"
-# evdiDirFind: list[Path] = dir_find(initSearchDir, "evdi")
-# evdiGitPath: Path | None = evdiDirFind[0] if evdiDirFind else None
 evdiGitPath: Path = Path("/tmp/evdi")
-# evdiTarPath: str | None = os.path.dirname(evdiGitPath) if evdiGitPath else None
 evdiTarPath: str = os.path.dirname(evdiGitPath)
 evdiGitMain: str | None
 evdiGitTag: str | None
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
-# displayLinkDl: str | None
-# Download DisplayLink
-# py_playwright_scraper.py_scraper()
-# This logic will change when executable is no longer called
-
-# Need to add proper test/timeout for successful or failed downloads
 py_playwright_scraper.py_scraper()
 displayLinkFullNameFind: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
 displayLinkFullName: Path | None = displayLinkFullNameFind[0] if displayLinkFullNameFind else None
@@ -75,15 +66,6 @@ else:
     displayLinkFileDir: Path = displayLinkFullName.parent / displayLinkTarget
     displayLinkInstallDir: Path = Path(f"/opt/{displayLinkTarget}")
 
-    # dispArr: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
-    # dispArrVal: Path | None = dispArr[0] if dispArr else None
-
-# for displayVal in dispArr:
-#     print(f"displayVal: {displayVal}")
-# print(dispArrVal)
-# Logic if len(dispArr) > 1
-# Refactor and rethink
-
 evdiTest: subprocess.CompletedProcess[str] = subprocess.run(f'lsmod | grep -Eio "evdi" | head -1', 
     shell=True, 
     capture_output=True, 
@@ -92,9 +74,6 @@ evdiTest: subprocess.CompletedProcess[str] = subprocess.run(f'lsmod | grep -Eio 
 displayInstallerTest: Path = Path("/usr/bin/displaylink-installer")
 installDec: str
 print(f"lsmod: {evdiTest.stdout}")
-
-# downloadEvdiFile: bool = False
-# downloadDisplayFile: bool = False
 
 # Test for DisplayLink
 isDisplayLinkInstalled: bool = True if (evdiTest.stdout and displayInstallerTest.is_file()) else False
@@ -113,7 +92,6 @@ def clean_files() -> None:
             os.remove(displayLinkFullNameUp)
     if displayLinkInstallDir and displayLinkInstallDir.is_dir():
         with suppress(FileNotFoundError):
-            # shutil.rmtree(displayLinkInstallDir)
             subprocess.run(["sudo", "rm", "-rf", displayLinkInstallDir], check=True)
     sys.exit(1)
 
@@ -147,8 +125,6 @@ def evdi_git_tag_util() -> None:
     )
     evdiGitMain = evdiGitMainFind.stdout.strip()
 
-    print(f"evdiGitMain: {evdiGitMain}")
-
     evdiList: List[TagReference] = sorted(localEvdiRepo.tags, 
         key=lambda t: t.commit.committed_date, 
         reverse=True
@@ -161,9 +137,8 @@ def evdi_git_tag_util() -> None:
     for tag in evdiList:
         print(tag.name, tag.commit.committed_datetime)
 
-    # latest tag
+    # latest tag - placeholder
     print(f"evdiList: {evdiList[0]}")
-
     evdiGitTag = evdiList[0]
 
     localEvdiOrigin.fetch(tags=True)
@@ -175,20 +150,45 @@ def evdi_git_tag_util() -> None:
     localEvdiRepo.git.checkout(evdiGitMain)
     localEvdiRepo.delete_head(evdiGitTag)
 
-    # clean_files()
     
 def unzip_displaylink() -> None:
     with zipfile.ZipFile(displayLinkFullNameUp, 'r') as zipRef:
         zipRef.extractall(displayLinkFileDir)
 
-evdi_git_tag_util()
-unzip_displaylink()
 
-subprocess.run(["sudo", "mv", displayLinkFileDir, displayLinkInstallDir], check=True)
-subprocess.run(["sudo", "chown", "-R", f"{locUser}:{locUser}", displayLinkInstallDir], check=True)
+def install_dir_rename() -> None:
+    subprocess.run(["sudo", "mv", displayLinkFileDir, displayLinkInstallDir], check=True)
+    subprocess.run(["sudo", "chown", "-R", f"{locUser}:{locUser}", displayLinkInstallDir], check=True)
+    os.chdir(displayLinkInstallDir)
+
+def extract_displaylink_firmware() -> None:
+    runFileFind: list[Path] = file_find(displayLinkInstallDir, "*.run")
+    print(runFileFind[0])
+    runFile: Path | None = runFileFind[0] if runFileFind else None
+    if runFile:
+        subprocess.run(["sudo", "chmod", "+x", runFile], check=True)
+        try:
+            subprocess.run(["sudo", runFile, "--noexec", "--keep"], check=True)
+        except subprocess.CalledProcessError as e:
+            if e.returncode == 1:
+                os.chdir("/opt")
+                clean_files()
+        subprocess.run(["sudo", "chown", "-R", f"{locUser}:{locUser}", displayLinkInstallDir], check=True)
+        extractDirFind: list[Path] = dir_find(displayLinkInstallDir, "displaylink-*")
+        extractDir: Path | None = extractDirFind[0] if extractDirFind else None
+        os.chdir(extractDir)
+        os.remove("evdi.tar.gz")
+        shutil.move(f"{evdiTarPath}/evdi.tar.gz", extractDir)
+        subprocess.run(["sudo", "chown", "-R", f"{locUser}:{locUser}", displayLinkInstallDir], check=True)
+        subprocess.run(["sudo", "chmod", "+x", f"{extractDir}/displaylink-installer.sh"], check=True)
+        subprocess.run(["sudo", "./displaylink-installer.sh"], check=True)
+
 
 # Menu to capture evdi decision, then do the remaining operations
-
+evdi_git_tag_util()
+unzip_displaylink()
+install_dir_rename()
+extract_displaylink_firmware()
 clean_files()
 
 
