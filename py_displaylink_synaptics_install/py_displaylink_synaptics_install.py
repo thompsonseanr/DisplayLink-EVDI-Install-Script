@@ -29,6 +29,13 @@ from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
 # command = f'ls -l "{VAR}"'  
 #
 # Python subprocess.run output: $VAR.stdout
+#
+# Testing: 
+# sudo -E $(which python) py_displaylink_synaptics_install.py
+
+if os.getuid() != 0:
+    print("Please run this script with `sudo`. Exiting.")
+    sys.exit(1)
 
 def dir_find(initSearchDir: str, targetObj: str) -> list[Path]:
     return [d for d in Path(initSearchDir).rglob(targetObj) if d.is_dir()]
@@ -134,8 +141,8 @@ def evdi_git_tag_util() -> None:
         clean_files()
 
     # Create Dynamic menu for Textualize
-    for tag in evdiList:
-        print(tag.name, tag.commit.committed_datetime)
+    # for tag in evdiList:
+    #     print(tag.name, tag.commit.committed_datetime)
 
     # latest tag - placeholder
     print(f"evdiList: {evdiList[0]}")
@@ -157,8 +164,7 @@ def unzip_displaylink() -> None:
 
 
 def install_dir_rename() -> None:
-    subprocess.run(["sudo", "mv", displayLinkFileDir, displayLinkInstallDir], check=True)
-    subprocess.run(["sudo", "chown", "-R", f"{locUser}:{locUser}", displayLinkInstallDir], check=True)
+    subprocess.run(["mv", displayLinkFileDir, displayLinkInstallDir], check=True)
     os.chdir(displayLinkInstallDir)
 
 def extract_displaylink_firmware() -> None:
@@ -166,22 +172,20 @@ def extract_displaylink_firmware() -> None:
     print(runFileFind[0])
     runFile: Path | None = runFileFind[0] if runFileFind else None
     if runFile:
-        subprocess.run(["sudo", "chmod", "+x", runFile], check=True)
+        subprocess.run(["chmod", "+x", runFile], check=True)
         try:
-            subprocess.run(["sudo", runFile, "--noexec", "--keep"], check=True)
+            subprocess.run([runFile, "--noexec", "--keep"], check=True)
         except subprocess.CalledProcessError as e:
             if e.returncode == 1:
                 os.chdir("/opt")
                 clean_files()
-        subprocess.run(["sudo", "chown", "-R", f"{locUser}:{locUser}", displayLinkInstallDir], check=True)
         extractDirFind: list[Path] = dir_find(displayLinkInstallDir, "displaylink-*")
         extractDir: Path | None = extractDirFind[0] if extractDirFind else None
         os.chdir(extractDir)
         os.remove("evdi.tar.gz")
         shutil.move(f"{evdiTarPath}/evdi.tar.gz", extractDir)
-        subprocess.run(["sudo", "chown", "-R", f"{locUser}:{locUser}", displayLinkInstallDir], check=True)
-        subprocess.run(["sudo", "chmod", "+x", f"{extractDir}/displaylink-installer.sh"], check=True)
-        subprocess.run(["sudo", "./displaylink-installer.sh", "noreboot"], check=True)
+        subprocess.run(["chmod", "+x", f"{extractDir}/displaylink-installer.sh"], check=True)
+        subprocess.run(["./displaylink-installer.sh", "noreboot"], check=True)
 
 
 # Menu to capture evdi decision, then do the remaining operations
