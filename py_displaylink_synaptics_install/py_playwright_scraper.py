@@ -11,7 +11,7 @@ def py_scraper():
         page = context.new_page()
         try:
             page.goto("https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu")
-        except Exception as e:
+        except Exception:
             sys.exit(1)
         downloadLink = page.locator("a.download-link").nth(1)
         downloadLink.click()

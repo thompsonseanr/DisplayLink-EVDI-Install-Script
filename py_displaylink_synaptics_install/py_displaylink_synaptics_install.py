@@ -165,9 +165,9 @@ def unzip_displaylink() -> None:
 
 def install_dir_rename() -> None:
     subprocess.run(["mv", displayLinkFileDir, displayLinkInstallDir], check=True)
-    os.chdir(displayLinkInstallDir)
 
 def extract_displaylink_firmware() -> None:
+    os.chdir(displayLinkInstallDir)
     runFileFind: list[Path] = file_find(displayLinkInstallDir, "*.run")
     print(runFileFind[0])
     runFile: Path | None = runFileFind[0] if runFileFind else None
