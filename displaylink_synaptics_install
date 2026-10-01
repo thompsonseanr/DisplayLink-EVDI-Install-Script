@@ -338,23 +338,27 @@ fi
 
 cd "$extractDir"
 
-sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$BLUE" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" "$downloadEvdiFile" "$downloadDisplayFile" <<'EOF'
-	mv "$2/evdi.tar.gz" "$1/"
-	chown -R "$3":"$3" "$4"
-	chmod +x "$1/displaylink-installer.sh"
-	./displaylink-installer.sh noreboot
+# bugfix: direct sudo commands from here on, so apt retains TTY access and can ask user interactively
 
-	printf "${5}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n"
-	rm -rf "$4"
-	if [ "${10}" = "true" ]; then 
-		printf "${5}>>>${7} ${6}Removing: ${9}${7}\n"
-		rm -rf "$9"
-	fi
-	if [ "${11}" = "true" ]; then 
-		printf "${5}>>>${7} ${6}Removing: ${8}${7}\n"
-		rm -f "$8"
-	fi 
-EOF
+sudo mv "${evdiTarPath}/evdi.tar.gz" "${extractDir}/"
+sudo chown -R "${locUser}:${locUser}" "${displayLinkInstallDir}"
+sudo chmod +x "${extractDir}/displaylink-installer.sh"
+
+# Run the installer directly (not via heredoc) so it can prompt the user if needed
+sudo "./displaylink-installer.sh" noreboot
+
+printf "${BLUE}>>>${RESET} ${WHITE}Cleaning up files and removing: ${displayLinkInstallDir}${RESET}\n"
+sudo rm -rf "${displayLinkInstallDir}"
+
+if [[ "${downloadEvdiFile}" == "true" ]]; then 
+	printf "${BLUE}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n"
+	sudo rm -rf "${evdiGitPath}"
+fi
+
+if [[ "${downloadDisplayFile}" == "true" ]]; then 
+	printf "${BLUE}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n"
+	sudo rm -f "${displayLinkFullName}"
+fi
 
 displayStatus="$(which displaylink-installer 2>/dev/null)"
 
