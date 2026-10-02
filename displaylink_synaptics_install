@@ -3,8 +3,6 @@
 set -u
 shopt -s extglob
 
-clear
-
 #Color variables:
 # https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124
 # `read -p` printf workaround:
@@ -18,31 +16,6 @@ PURPLE='\e[35m'
 BOLD='\e[1m'
 RESET='\e[0m'
 
-# Animation Script
-# https://github.com/Jul10l1r4/Braile-progress-bar-bash
-chars='⡿⣟⣯⣷⣾⣽⣻⢿'
-sc=0
-animate() {
-	printf "\r\b${chars:sc++:1} ${BLUE}:::${RESET} ${WHITE}$1${RESET}"
-	((sc==${#chars})) && sc=0
-}
-
-_load(){
-  	while :;do
-    	animate "$1"
-  	done & 
-	local animatePid=$!
-	trap "kill $animatePid" EXIT
-  	printf -v "$2" "%s" "$($3)"
-	kill "$animatePid" && trap - EXIT 
-}
-
-
-printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer${RESET}\n"
-printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-
-
 locUser="$USER"
 runitTest="$(ps -p 1 -o comm=)"
 
@@ -52,9 +25,10 @@ evdiTarPath="${evdiGitPath%/*}"
 evdiGitMain=""
 evdiGitTag=""
 
+# To-Do: sudo /usr/bin/displaylink-installer version 2>&1 | grep -Eoi "DisplayLink Linux Software [0-9+].[0-9]+.[0-9]+"
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
-displayLinkDl=""
-displayLinkScraper="$(find /home/$locUser -type f -name 'playwright_scraper' 2>/dev/null)"
+# Note: Will pull DisplayLink if not downloaded already to /home/$USER/Downloads
+displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
 displayStatus=""
 displayLinkFullName=""
 displayLinkPath=""
@@ -83,6 +57,12 @@ installDec=""
 downloadEvdiFile="false"
 downloadDisplayFile="false"
 
+clear
+
+printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer${RESET}\n"
+printf "${BLUE}:::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+
 if [[ -n $evdiTest && -f $displayInstallerTest ]]; then 
 	printf "${RED}>>> WARNING:${RESET} ${WHITE}DisplayLink and EVDI kernel modules are already installed on your system.${RESET}\n"
 	printf "${RED}>>>${RESET} ${WHITE}If you want to first uninstall (RECOMMENDED), please uninstall via your package manager or run this command:${RESET}\n"
@@ -100,7 +80,7 @@ fi
 
 clean_files() {
 	printf "${RED}>>>${RESET} ${WHITE}Cleaning up files. Note: Only files downloaded or created by this script will be removed.${RESET}\n"
-
+	# EVDI Clean-up
 	if [[ $downloadEvdiFile == "true" ]]; then
 		if [[ -f "${evdiTarPath}/evdi.tar.gz" ]]; then 
 			printf "${RED}>>>${RESET} ${WHITE}Removing: ${evdiTarPath}/evdi.tar.gz${RESET}\n"
@@ -111,6 +91,7 @@ clean_files() {
 			rm -rf "$evdiGitPath"
 		fi
 	fi
+	# Displaylink Clean-up
 	if [[ $downloadDisplayFile == "true" ]]; then
 		if [[ -f $displayLinkFullName ]]; then
 			printf "${RED}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n"
@@ -230,16 +211,6 @@ unzip_displaylink() {
 
 	if [[ -z $displayLinkFullName ]]; then
 		printf "${BLUE}:::${RESET} ${WHITE}Downloading DisplayLink for you.${RESET}\n"
-		
-		if [[ -n $displayLinkScraper ]]; then
-			_load "Retrieving latest DisplayLink Driver Download URL" displayLinkDl $displayLinkScraper
-			printf "\n"
-		fi 
-
-		if [[ -z $displayLinkDl ]]; then
-			displayLinkDl="https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip"
-		fi
-
 		wget -q -P /tmp/ "$displayLinkDl"
 		displayLinkFullName="$(find /tmp -type f -name "DisplayLink*.zip" 2>/dev/null)"
 		downloadDisplayFile="true"
@@ -271,7 +242,7 @@ unzip_displaylink() {
 					fi
 				done
 
-				read -p "$(printf "\n${GREEN}:::${RESET} ${WHITE}Enter your choice for the local version of DisplayLink to install [1-${runIndDisp}]: ${RESET}")" runSelDisp
+				read -p "$(printf "${GREEN}:::${RESET} ${WHITE}Enter your choice for the local version of DisplayLink to install [1-${runIndDisp}]: ${RESET}")" runSelDisp
 				
 				case $runSelDisp in
 					@($runPatDisp))
@@ -367,23 +338,27 @@ fi
 
 cd "$extractDir"
 
-sudo bash -s "$extractDir" "$evdiTarPath" "$locUser" "$displayLinkInstallDir" "$BLUE" "$WHITE" "$RESET" "$displayLinkFullName" "$evdiGitPath" "$downloadEvdiFile" "$downloadDisplayFile" <<'EOF'
-	mv "$2/evdi.tar.gz" "$1/"
-	chown -R "$3":"$3" "$4"
-	chmod +x "$1/displaylink-installer.sh"
-	./displaylink-installer.sh noreboot
+# bugfix: direct sudo commands from here on, so apt retains TTY access and can ask user interactively
 
-	printf "${5}>>>${7} ${6}Cleaning up files and removing: ${4}${7}\n"
-	rm -rf "$4"
-	if [ "${10}" = "true" ]; then 
-		printf "${5}>>>${7} ${6}Removing: ${9}${7}\n"
-		rm -rf "$9"
-	fi
-	if [ "${11}" = "true" ]; then 
-		printf "${5}>>>${7} ${6}Removing: ${8}${7}\n"
-		rm -f "$8"
-	fi 
-EOF
+sudo mv "${evdiTarPath}/evdi.tar.gz" "${extractDir}/"
+sudo chown -R "${locUser}:${locUser}" "${displayLinkInstallDir}"
+sudo chmod +x "${extractDir}/displaylink-installer.sh"
+
+# Run the installer directly (not via heredoc) so it can prompt the user if needed
+sudo "./displaylink-installer.sh" noreboot
+
+printf "${BLUE}>>>${RESET} ${WHITE}Cleaning up files and removing: ${displayLinkInstallDir}${RESET}\n"
+sudo rm -rf "${displayLinkInstallDir}"
+
+if [[ "${downloadEvdiFile}" == "true" ]]; then 
+	printf "${BLUE}>>>${RESET} ${WHITE}Removing: ${evdiGitPath}${RESET}\n"
+	sudo rm -rf "${evdiGitPath}"
+fi
+
+if [[ "${downloadDisplayFile}" == "true" ]]; then 
+	printf "${BLUE}>>>${RESET} ${WHITE}Removing: ${displayLinkFullName}${RESET}\n"
+	sudo rm -f "${displayLinkFullName}"
+fi
 
 displayStatus="$(which displaylink-installer 2>/dev/null)"
 
