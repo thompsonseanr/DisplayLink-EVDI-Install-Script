@@ -13,6 +13,10 @@
 > - [Synaptics DisplayLink with evdi DKMS Module - Works!](https://voidforums.com/viewtopic.php?t=1781)  
 > - [Reddit: DisplayLink Driver](https://www.reddit.com/r/voidlinux/comments/peq1se/displaylink_driver/)
 > - [Alberta Tech - Hilarious Nerd Merch (I am not affiliated, just showing some love)](https://shop.albertatech.co/)  
+>
+>
+> **Bugfixes and Contributions:**  
+> - [edzweistein](https://github.com/edzweistein)  
 
 
 ## Preface:  
@@ -20,6 +24,7 @@
 Due to an issue encountered with an older, incompatible version of `EVDI` and the latest `Linux 7.X.X` kernel, this script was written to decouple the version of the `EVDI` module bundled with the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) installer and give users the option to choose the version of `EVDI` from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) that works for their kernel version.
 
 You will need to disable `Secure Boot` in your bios.
+
 
 I want to give a huge shout-out, thanks, and appreciation for the developers and maintainers of the following repos and packages:  
 | Distros | Repo/Package |
