@@ -97,8 +97,8 @@ def download_displaylink() -> None:
         displayLinkFullNameUp = displayLinkFullName.rename(displayLinkNameFix)
         displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkFullNameUp.name)
         displayLinkTarget: str = f"displaylink_{displayLinkVer[0]}"
-        displayLinkFileDir: Path = displayLinkFullName.parent / displayLinkTarget
-        displayLinkInstallDir: Path = Path(f"/opt/{displayLinkTarget}")
+        displayLinkFileDir = displayLinkFullName.parent / displayLinkTarget
+        displayLinkInstallDir = Path(f"/opt/{displayLinkTarget}")
 
 
 
