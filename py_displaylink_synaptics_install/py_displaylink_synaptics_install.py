@@ -20,7 +20,7 @@ from textual.containers import Container, Horizontal, VerticalScroll, Grid
 from textual.reactive import reactive
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
-from textual.widgets import Placeholder
+from textual.widgets import Placeholder, Static
 
 # Personal Dev Notes: 
 # Change logic: do not look for /evdi in home, just clone it to /tmp/
@@ -71,9 +71,17 @@ def displaylink_install_check() -> bool:
     )
     displayInstallerTest: Path = Path("/usr/bin/displaylink-installer")
     isDisplayLinkInstalled: bool = True if (evdiTest.stdout and displayInstallerTest.is_file()) else False
-    print(f"isDisplayLinkInstalled: {isDisplayLinkInstalled}")
     return isDisplayLinkInstalled
 
+def uninstall_display_link() -> None:
+    dlTest = displaylink_install_check()
+    if dlTest:
+        print("uninstalling")
+        subprocess.run("displaylink-installer uninstall", 
+            shell=True, 
+            capture_output=True,
+            text=True
+        )
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 displayLinkFullNameUp: Path | None = None
@@ -99,15 +107,6 @@ def download_displaylink() -> None:
         displayLinkTarget: str = f"displaylink_{displayLinkVer[0]}"
         displayLinkFileDir = displayLinkFullName.parent / displayLinkTarget
         displayLinkInstallDir = Path(f"/opt/{displayLinkTarget}")
-
-def uninstall_display_link() -> None:
-    diPath = Path("/usr/sbin/displaylink-installer")
-    if diPath.is_file():
-        subprocess.run("displaylink-installer --uninstall", 
-            shell=True, 
-            capture_output=True,
-            text=True
-        )
 
 
 def clean_files(evdiTp: str = evdiTarPath, 
@@ -243,6 +242,17 @@ def extract_displaylink_firmware(dliDir: Path | None = displayLinkInstallDir,
     # clean_files()
 
 
+UNINSTALL_MESSAGE = """
+[bold]>>> Uninstall DisplayLink Firmware?[/bold]
+
+::: Select [bold]'Yes'[/bold] to uninstall
+::: Select [bold]'No'[/bold] to exit the app
+
+
+An uninstall will require a reboot to fully remove EVDI software driver and this installer will have to be re-run.
+"""
+
+# Installed Warning Modal
 class InstallModal(ModalScreen[bool]):
     CSS_PATH = "styles.tcss"
 
@@ -251,9 +261,8 @@ class InstallModal(ModalScreen[bool]):
             yield Label("::: Warning: DisplayLink Firmware is already installed. Proceed?")
             yield Label("::: Navigate using `Tab`")
             with Grid(id="horizontalInstBtn"):
-                yield Button("No", id="noBtn", classes="installQbtn")
-                yield Button("Yes", id="instBtn", classes="installQbtn")
-        
+                yield Button("No", id="noBtn", classes="dialogQbtn")
+                yield Button("Yes", id="instBtn", classes="dialogQbtn")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "instBtn":
@@ -271,6 +280,25 @@ class IntroContainer(Container):
         yield Label(f"::: Hello.", id="installDec")
 
 
+class UninstallDialogScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Static(UNINSTALL_MESSAGE)
+            with Grid(id="horizontalInstBtn"):
+                yield Button("Yes", id="yesUnBtn", classes="dialogQbtn")
+                yield Button("No", id="noUnBtn", classes="dialogQbtn")
+        yield Footer(id="Footer")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "yesUnBtn":
+            # Once complete, exit callback
+            uninstall_display_link()
+        else:
+            self.app.exit()
+
 class AppScreen(Screen):
     CSS_PATH = "styles.tcss"
 
@@ -287,27 +315,33 @@ class DisplayLinkInstaller(App):
 
     CSS_PATH = "styles.tcss"
 
+    def __init__(self, displayLinkInstallCheck: bool) -> None:
+        self.displayLinkInstallCheck = displayLinkInstallCheck
+
+        super().__init__()
+
     modal_result = reactive[bool | None](None)
 
     def on_mount(self) -> None:
         self.theme = "nord"
-
-    displayLinkInstallCheck: bool = displaylink_install_check()
 
     def on_ready(self) -> None:
         self.push_screen(AppScreen())
         if self.displayLinkInstallCheck:
             self.push_screen(InstallModal(), self.handle_modal_result)
 
-    def handle_modal_result(self, result: bool) -> None:
+    def handle_modal_result(self, result: bool | None) -> None:
         self.modal_result = result
 
     def watch_modal_result(self, old_value: bool | None, new_value: bool | None) -> None:
         if new_value is not None:
-            status_label = self.screen.query_one("#installDec", Label)
-            status_label.update(f"::: Hello: {new_value}")
+            # Cool Feature. Keep for notes for now.
+            # status_label = self.screen.query_one("#installDec", Label)
+            # status_label.update(f"::: Hello: {new_value}")
             if not new_value:
                 self.exit()
+            else:
+                self.push_screen(UninstallDialogScreen())
 
 
 
@@ -323,7 +357,7 @@ class DisplayLinkInstaller(App):
 
 
 if __name__ == "__main__":
-    app = DisplayLinkInstaller()
-    reply = app.run()
-    print(f"reply: {reply}")
-    # app.run()
+    app = DisplayLinkInstaller(displayLinkInstallCheck=displaylink_install_check())
+    # reply = app.run()
+    # print(f"reply: {reply}")
+    app.run()

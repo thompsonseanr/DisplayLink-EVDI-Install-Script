@@ -1,5 +1,5 @@
 Header {
-    height: 3;
+    height: 1;
     align: center middle;
     dock: top;
 }
@@ -9,7 +9,7 @@ IntroContainer {
     border: solid white;
 }
 Footer {
-    height: 3;
+    height: 1;
     align: left middle;
     dock: bottom;
 }
@@ -38,13 +38,29 @@ InstallModal {
     border: solid #d8dee9;
 }
 
-.installQbtn {
+.dialogQbtn {
     color: #2e3440;
     background: #8fbcbb;
     text-style: none;
 }
 
-.installQbtn:focus {
+.dialogQbtn:focus {
     background: #d8dee9;
     text-style: bold underline;
+}
+
+/*
+UninstallDialogScreen
+*/
+UninstallDialogScreen {
+    align: center middle;
+}
+
+#unDispDialog {
+    align: center middle;
+    width: 80;
+    height: 30;
+    background: $surface;
+    border: tall $primary;
+    padding: 1 2;
 }
