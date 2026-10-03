@@ -222,8 +222,6 @@ if not installDec:
     # extract_displaylink_firmware()
     # clean_files()
 
-# class InstallButtons(Container):
-#     CSS_PATH = "styles.tcss"
 
 class InstallModal(ModalScreen[bool]):
     CSS_PATH = "styles.tcss"
@@ -248,6 +246,7 @@ class IntroContainer(Container):
     CSS_PATH = "styles.tcss"
 
     # Container for DisplayLink/Evdi Events
+    # Uninstall Logic if True, else download Displaylink and EVDI
     def compose(self) -> ComposeResult:
         yield Label(f"::: Hello.", id="installDec")
 
