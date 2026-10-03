@@ -49,7 +49,7 @@ def file_find(initSearchDir: Path, targetObj: str) -> list[Path]:
     return [f for f in Path(initSearchDir).rglob(targetObj) if f.is_file()]
 
 locUser: str | None = os.getenv('USER') if os.getenv('USER') else None
-runitTest: subprocess.CompletedProcess[str] = subprocess.run("ps -p 1 -o comm=", 
+runitTest: subprocess.CompletedProcess[str] = subprocess.run("ps -p 1 -o comm=",
     shell=True, 
     capture_output=True, 
     text=True
@@ -100,6 +100,14 @@ def download_displaylink() -> None:
         displayLinkFileDir = displayLinkFullName.parent / displayLinkTarget
         displayLinkInstallDir = Path(f"/opt/{displayLinkTarget}")
 
+uninstall_display_link() -> None:
+    diPath = Path("/usr/sbin/displaylink-installer")
+    if diPath.is_file():
+        subprocess.run("displaylink-installer --uninstall", 
+            shell=True, 
+            capture_output=True,
+            text=True
+        )
 
 
 def clean_files(evdiTp: str = evdiTarPath, 
