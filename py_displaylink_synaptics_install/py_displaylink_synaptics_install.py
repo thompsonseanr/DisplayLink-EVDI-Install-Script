@@ -242,14 +242,22 @@ def extract_displaylink_firmware(dliDir: Path | None = displayLinkInstallDir,
     # clean_files()
 
 
+MODAL_MESSAGE = """
+[bold]>>> Warning:[/bold] DisplayLink Firmware is already installed. Proceed?
+
+::: Navigate using `Tab`
+"""
+
 UNINSTALL_MESSAGE = """
-[bold]>>> Uninstall DisplayLink Firmware?[/bold]
+[bold]>>> Uninstall the DisplayLink and EVDI Firmwares?[/bold]
 
 ::: Select [bold]'Yes'[/bold] to uninstall
 ::: Select [bold]'No'[/bold] to exit the app
 
 
-An uninstall will require a reboot to fully remove EVDI software driver and this installer will have to be re-run.
+[bold]Note:[/bold] 
+
+An uninstall will require a reboot to fully remove the EVDI software driver and this installer will have to be re-run.
 """
 
 # Installed Warning Modal
@@ -258,8 +266,7 @@ class InstallModal(ModalScreen[bool]):
 
     def compose(self) -> ComposeResult:
         with Container(id="installDialog"):
-            yield Label("::: Warning: DisplayLink Firmware is already installed. Proceed?")
-            yield Label("::: Navigate using `Tab`")
+            yield Static(MODAL_MESSAGE)
             with Grid(id="horizontalInstBtn"):
                 yield Button("No", id="noBtn", classes="dialogQbtn")
                 yield Button("Yes", id="instBtn", classes="dialogQbtn")
@@ -294,7 +301,7 @@ class UninstallDialogScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesUnBtn":
-            # Once complete, exit callback
+            # Once complete, exit callback with either 'call_from_thread' with python `thread` or @work decorator 
             uninstall_display_link()
         else:
             self.app.exit()
