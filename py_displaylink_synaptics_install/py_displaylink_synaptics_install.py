@@ -225,7 +225,7 @@ if not installDec:
 # class InstallButtons(Container):
 #     CSS_PATH = "styles.tcss"
 
-class InstallModal(ModalScreen):
+class InstallModal(ModalScreen[bool]):
     CSS_PATH = "styles.tcss"
 
     def compose(self) -> ComposeResult:
@@ -248,8 +248,8 @@ class IntroContainer(Container):
     CSS_PATH = "styles.tcss"
 
     # Container for DisplayLink/Evdi Events
-    # def compose(self) -> ComposeResult:
-    #     yield Label(f"::: {self.displayLinkInstallCheck}")
+    def compose(self) -> ComposeResult:
+        yield Label(f"::: Hello.", id="installDec")
 
 
 class AppScreen(Screen):
@@ -268,6 +268,8 @@ class DisplayLinkInstaller(App):
 
     CSS_PATH = "styles.tcss"
 
+    modal_result = reactive[bool | None](None)
+
     def on_mount(self) -> None:
         self.theme = "nord"
 
@@ -276,7 +278,19 @@ class DisplayLinkInstaller(App):
     def on_ready(self) -> None:
         self.push_screen(AppScreen())
         if self.displayLinkInstallCheck:
-            self.push_screen(InstallModal())
+            self.push_screen(InstallModal(), self.handle_modal_result)
+
+    def handle_modal_result(self, result: bool) -> None:
+        self.modal_result = result
+
+    def watch_modal_result(self, old_value: bool | None, new_value: bool | None) -> None:
+        if new_value is not None:
+            status_label = self.screen.query_one("#installDec", Label)
+            status_label.update(f"::: Hello: {new_value}")
+            if not new_value:
+                self.exit()
+
+
 
     # def compose(self) -> ComposeResult:
         # yield Header()
