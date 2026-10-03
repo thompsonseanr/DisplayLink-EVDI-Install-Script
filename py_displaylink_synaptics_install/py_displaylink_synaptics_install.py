@@ -100,7 +100,7 @@ def download_displaylink() -> None:
         displayLinkFileDir = displayLinkFullName.parent / displayLinkTarget
         displayLinkInstallDir = Path(f"/opt/{displayLinkTarget}")
 
-uninstall_display_link() -> None:
+def uninstall_display_link() -> None:
     diPath = Path("/usr/sbin/displaylink-installer")
     if diPath.is_file():
         subprocess.run("displaylink-installer --uninstall", 
