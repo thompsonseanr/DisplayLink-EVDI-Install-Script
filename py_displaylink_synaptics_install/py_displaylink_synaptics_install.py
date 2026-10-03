@@ -76,9 +76,9 @@ def displaylink_install_check() -> bool:
 
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
-displayLinkFullNameUp: Path
-displayLinkFileDir: Path
-displayLinkInstallDir: Path
+displayLinkFullNameUp: Path | None = None
+displayLinkFileDir: Path | None = None
+displayLinkInstallDir: Path | None = None
 
 def download_displaylink() -> None:
     global displayLinkFullNameUp
@@ -104,8 +104,8 @@ def download_displaylink() -> None:
 
 def clean_files(evdiTp: str = evdiTarPath, 
     evdiGp: Path = evdiGitPath,
-    dlfnUp: Path = displayLinkFullNameUp,
-    dliDir: Path = displayLinkInstallDir, 
+    dlfnUp: Path | None = displayLinkFullNameUp,
+    dliDir: Path | None = displayLinkInstallDir, 
     sysEx: int = 0) -> None:
 
     if Path(f"{evdiTp}/evdi.tar.gz").is_file():
@@ -182,46 +182,51 @@ def evdi_git_tag_util(evdiGp: Path = evdiGitPath,
     localEvdiRepo.delete_head(evdiGitTag)
 
     
-def unzip_displaylink(dlfnUp: Path = displayLinkFullNameUp,
-    dlfDir: Path = displayLinkFileDir) -> None:
-    with zipfile.ZipFile(dlfnUp, 'r') as zipRef:
-        zipRef.extractall(dlfDir)
+def unzip_displaylink(dlfnUp: Path | None = displayLinkFullNameUp,
+    dlfDir: Path | None = displayLinkFileDir) -> None:
+    if dlfnUp and dlfDir:
+        with zipfile.ZipFile(dlfnUp, 'r') as zipRef:
+            zipRef.extractall(dlfDir)
 
 
-def install_dir_rename(dlfDir: Path = displayLinkFileDir,
-    dliDir: Path = displayLinkInstallDir) -> None:
-    shutil.move(dlfDir, dliDir)
+def install_dir_rename(dlfDir: Path | None = displayLinkFileDir,
+    dliDir: Path | None = displayLinkInstallDir) -> None:
+    if dlfDir and dliDir:
+        shutil.move(dlfDir, dliDir)
 
-def extract_displaylink_firmware(dliDir: Path = displayLinkInstallDir,
+def extract_displaylink_firmware(dliDir: Path | None = displayLinkInstallDir,
     evdiTp: str = evdiTarPath) -> None:
-
-    os.chdir(dliDir)
-    runFileFind: list[Path] = file_find(dliDir, "*.run")
-    runFile: Path | None = runFileFind[0] if runFileFind else None
-    if runFile is None:
+    if not dliDir:
         clean_files(sysEx=1)
     else:
-        subprocess.run(["chmod", "+x", runFile], check=True)
-        try:
-            subprocess.run([runFile, "--noexec", "--keep"], check=True)
-        except subprocess.CalledProcessError as e:
-            if e.returncode == 1:
-                os.chdir("/opt")
-                clean_files(sysEx=1)
-
-        extractDirFind: list[Path] = dir_find(dliDir, "displaylink-*")
-        extractDir: Path | None = extractDirFind[0] if extractDirFind else None
-        if extractDir is None:
+        os.chdir(dliDir)
+        runFileFind: list[Path] = file_find(dliDir, "*.run")
+        runFile: Path | None = runFileFind[0] if runFileFind else None
+        if runFile is None:
             clean_files(sysEx=1)
         else:
-            os.chdir(str(extractDir))
-            os.remove("evdi.tar.gz")
-            shutil.move(Path(f"{evdiTp}/evdi.tar.gz"), extractDir)
-            subprocess.run(["chmod", "+x", f"{extractDir}/displaylink-installer.sh"], check=True)
-            subprocess.run(["./displaylink-installer.sh", "noreboot"], check=True)
+            subprocess.run(["chmod", "+x", runFile], check=True)
+            try:
+                subprocess.run([runFile, "--noexec", "--keep"], check=True)
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 1:
+                    os.chdir("/opt")
+                    clean_files(sysEx=1)
+
+            extractDirFind: list[Path] = dir_find(dliDir, "displaylink-*")
+            extractDir: Path | None = extractDirFind[0] if extractDirFind else None
+            if extractDir is None:
+                clean_files(sysEx=1)
+            else:
+                os.chdir(str(extractDir))
+                os.remove("evdi.tar.gz")
+                shutil.move(Path(f"{evdiTp}/evdi.tar.gz"), extractDir)
+                subprocess.run(["chmod", "+x", f"{extractDir}/displaylink-installer.sh"], check=True)
+                subprocess.run(["./displaylink-installer.sh", "noreboot"], check=True)
 
 
     # Menu to capture evdi decision, then do the remaining operations
+    #
     # download_displaylink()
     # evdi_git_tag_util()
     # unzip_displaylink()
