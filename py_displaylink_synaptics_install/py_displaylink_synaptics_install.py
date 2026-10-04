@@ -344,7 +344,7 @@ class DisplayLinkInstaller(App):
 
     CSS_PATH = "styles.tcss"
 
-    def __init__(self, displayLinkInstallCheck: bool, uninistallDisp, **kwargs) -> None:
+    def __init__(self, displayLinkInstallCheck, uninistallDisp, **kwargs) -> None:
         self.displayLinkInstallCheck = displayLinkInstallCheck
         self.uninistallDisp = uninistallDisp
         super().__init__(**kwargs)
