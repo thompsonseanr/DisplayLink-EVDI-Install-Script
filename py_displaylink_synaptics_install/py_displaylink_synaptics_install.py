@@ -73,15 +73,21 @@ def displaylink_install_check() -> bool:
     isDisplayLinkInstalled: bool = True if (evdiTest.stdout and displayInstallerTest.is_file()) else False
     return isDisplayLinkInstalled
 
-def uninstall_display_link() -> None:
+def uninstall_display_link() -> bool:
     dlTest = displaylink_install_check()
     if dlTest:
         print("uninstalling")
-        subprocess.run("displaylink-installer uninstall", 
-            shell=True, 
+        dlUnSub: subprocess.CompletedProcess[str] = subprocess.run("displaylink-installer uninstall", 
+            shell=True,
             capture_output=True,
             text=True
         )
+        if dlUnSub.returncode != 0:
+            return False
+        else:
+            return True
+    else:
+        return False
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
 displayLinkFullNameUp: Path | None = None
@@ -290,6 +296,11 @@ class IntroContainer(Container):
 class UninstallDialogScreen(Screen):
     CSS_PATH = "styles.tcss"
 
+    def __init__(self, uninistallDisplay, **kwargs) -> None:
+        self.uninistallDisplay = uninistallDisplay
+
+        super().__init__(**kwargs)
+
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="unDispDialog"):
@@ -302,7 +313,7 @@ class UninstallDialogScreen(Screen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesUnBtn":
             # Once complete, exit callback with either 'call_from_thread' with python `thread` or @work decorator 
-            uninstall_display_link()
+            self.uninistallDisplay()
         else:
             self.app.exit()
 
@@ -322,10 +333,11 @@ class DisplayLinkInstaller(App):
 
     CSS_PATH = "styles.tcss"
 
-    def __init__(self, displayLinkInstallCheck: bool) -> None:
+    def __init__(self, displayLinkInstallCheck: bool, uninistallDisp: bool, **kwargs) -> None:
         self.displayLinkInstallCheck = displayLinkInstallCheck
+        self.uninistallDisp = uninistallDisp
 
-        super().__init__()
+        super().__init__(**kwargs)
 
     modal_result = reactive[bool | None](None)
 
@@ -348,7 +360,7 @@ class DisplayLinkInstaller(App):
             if not new_value:
                 self.exit()
             else:
-                self.push_screen(UninstallDialogScreen())
+                self.push_screen(UninstallDialogScreen(uninistallDisplay=self.uninistallDisp))
 
 
 
@@ -364,7 +376,9 @@ class DisplayLinkInstaller(App):
 
 
 if __name__ == "__main__":
-    app = DisplayLinkInstaller(displayLinkInstallCheck=displaylink_install_check())
+    app = DisplayLinkInstaller(displayLinkInstallCheck=displaylink_install_check(),
+            uninistallDisp=uninstall_display_link
+            )
     # reply = app.run()
     # print(f"reply: {reply}")
     app.run()
