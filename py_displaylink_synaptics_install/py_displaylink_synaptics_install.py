@@ -13,14 +13,14 @@ from typing import List
 from git import Repo
 from git import TagReference
 from git.exc import GitCommandError
-from textual import events
+from textual import events, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, VerticalScroll, Grid
 from textual.reactive import reactive
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
-from textual.widgets import Placeholder, Static
+from textual.widgets import Placeholder, Static, LoadingIndicator
 
 # Personal Dev Notes: 
 # Change logic: do not look for /evdi in home, just clone it to /tmp/
@@ -298,7 +298,6 @@ class UninstallDialogScreen(Screen):
 
     def __init__(self, uninistallDisplay, **kwargs) -> None:
         self.uninistallDisplay = uninistallDisplay
-
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -306,16 +305,28 @@ class UninstallDialogScreen(Screen):
         with Container(id="unDispDialog"):
             yield Static(UNINSTALL_MESSAGE)
             with Grid(id="horizontalInstBtn"):
-                yield Button("Yes", id="yesUnBtn", classes="dialogQbtn")
-                yield Button("No", id="noUnBtn", classes="dialogQbtn")
+                yield Button("Yes", id="yesUnBtn", classes="dialogUnbtn")
+                yield Button("No", id="noUnBtn", classes="dialogUnbtn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesUnBtn":
-            # Once complete, exit callback with either 'call_from_thread' with python `thread` or @work decorator 
-            self.uninistallDisplay()
+            # Once complete, exit callback with either 'call_from_thread' with python `thread` or @work decorator
+            if False:
+                self.uninistallDisplay()
+            self.app.push_screen(UninstallIndicatorScreen())
         else:
             self.app.exit()
+
+class UninstallIndicatorScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Label("Uninstalling Synaptics DisplayLink Driver and the EVDI software driver.")
+            yield LoadingIndicator()
+        yield Footer(id="Footer")
 
 class AppScreen(Screen):
     CSS_PATH = "styles.tcss"
@@ -333,10 +344,9 @@ class DisplayLinkInstaller(App):
 
     CSS_PATH = "styles.tcss"
 
-    def __init__(self, displayLinkInstallCheck: bool, uninistallDisp: bool, **kwargs) -> None:
+    def __init__(self, displayLinkInstallCheck: bool, uninistallDisp, **kwargs) -> None:
         self.displayLinkInstallCheck = displayLinkInstallCheck
         self.uninistallDisp = uninistallDisp
-
         super().__init__(**kwargs)
 
     modal_result = reactive[bool | None](None)

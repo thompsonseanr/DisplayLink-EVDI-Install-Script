@@ -40,12 +40,13 @@ InstallModal {
 
 .dialogQbtn {
     color: #2e3440;
-    background: #8fbcbb;
+    background: #5e81ac;
     text-style: none;
 }
 
 .dialogQbtn:focus {
-    background: #d8dee9;
+    color: #d8dee9;
+    background: #bf616a;
     text-style: bold underline;
 }
 
@@ -63,4 +64,16 @@ UninstallDialogScreen {
     background: $surface;
     border: tall $primary;
     padding: 1 2;
+}
+
+.dialogUnbtn {
+    color: #2e3440;
+    background: #5e81ac;
+    text-style: none;
+}
+
+.dialogUnbtn:focus {
+    color: #d8dee9;
+    background: #bf616a;
+    text-style: bold underline;
 }
