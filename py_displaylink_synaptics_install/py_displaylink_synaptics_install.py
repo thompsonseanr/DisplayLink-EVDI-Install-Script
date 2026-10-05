@@ -208,7 +208,7 @@ def evdi_git_list_util(
 
 
 def evdi_pull_tag_util(
-    eList: list,
+    evList: list,
     evdiGp: Path = evdiGitPath,
     evdiTp: str = evdiTarPath,
     ) -> None:
@@ -219,8 +219,8 @@ def evdi_pull_tag_util(
     #     print(tag.name, tag.commit.committed_datetime)
 
     # latest tag - placeholder
-    print(f"evdiList: {eList[0]}")
-    evdiGitTag: str = eList[0]
+    print(f"evdiList: {evList[0]}")
+    evdiGitTag: str = evList[0]
 
     evdiOrigin.fetch(tags=True)
     localEvdiRepo.git.checkout("-b", evdiGitTag)
@@ -289,6 +289,7 @@ def extract_displaylink_firmware(
     #
     # download_displaylink()
     # evdi_git_list_util()
+    # evdi_pull_tag_util()
     # unzip_displaylink()
     # install_dir_rename()
     # extract_displaylink_firmware()
@@ -314,6 +315,26 @@ UNINSTALL_MESSAGE = """
 Uninstalling will require a reboot to fully remove the EVDI software driver and this installer will have to be re-run.
 """
 
+BEGIN_MESSAGE = """
+[bold]::: Welcome to the DisplayLink and EVDI installer for linux docking station multi-monitor support.[/bold]
+
+::: Navigate using `Tab`
+
+::: Select [bold]'Yes'[/bold] to begin installation
+::: Select [bold]'No'[/bold] to exit the app
+
+"""
+
+EVDI_DEC_MESSAGE = """
+[bold]::: Would you like to choose a particular EVDI release version to install or go with the latest?[/bold]
+
+::: Navigate using `Tab`
+
+::: Select [bold]'Yes'[/bold] to install with the latest release tag
+::: Select [bold]'No'[/bold] to choose a version of EVDI from a list
+
+"""
+
 
 # DisplayLink/EVDI Installed Warning Modal
 class InstallModal(ModalScreen[bool]):
@@ -337,8 +358,12 @@ class InstallModal(ModalScreen[bool]):
 class UninstallDialogScreen(Screen):
     CSS_PATH = "styles.tcss"
 
-    def __init__(self, uninistallDisplay, **kwargs) -> None:
-        self.uninistallDisplay = uninistallDisplay
+    def __init__(
+        self, 
+        uninstallDisplay,
+        **kwargs
+        ) -> None:
+        self.uninstallDisplay = uninstallDisplay
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -352,7 +377,7 @@ class UninstallDialogScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesUnBtn":
-            self.app.push_screen(UninstallIndicatorScreen(uninistallDisplayInd=self.uninistallDisplay))
+            self.app.push_screen(UninstallIndicatorScreen(uninstallDisplay=self.uninstallDisplay))
         else:
             self.app.exit()
 
@@ -361,8 +386,12 @@ class UninstallDialogScreen(Screen):
 class UninstallIndicatorScreen(Screen):
     CSS_PATH = "styles.tcss"
 
-    def __init__(self, uninistallDisplayInd, **kwargs) -> None:
-        self.uninistallDisplayInd = uninistallDisplayInd
+    def __init__(
+        self, 
+        uninstallDisplay, 
+        **kwargs
+        ) -> None:
+        self.uninstallDisplay = uninstallDisplay
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -377,7 +406,7 @@ class UninstallIndicatorScreen(Screen):
 
     @work(thread=True)
     def exec_uninistallDisplayInd(self) -> None:
-        self.uninistallDisplayInd()
+        self.uninstallDisplay()
         self.app.call_from_thread(self.app.push_screen, UninstallCompleteScreen())
 
 
@@ -388,7 +417,7 @@ class UninstallCompleteScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="unDispDialog"):
-            yield Label(">>> Uninstallation Complete. Restart?")
+            yield Label(">>> Uninstall Complete. Restart?")
             with Grid(id="horizontalInstBtn"):
                 yield Button("Yes", id="yesReBtn", classes="dialogUnbtn")
                 yield Button("No", id="noReBtn", classes="dialogUnbtn")
@@ -400,23 +429,110 @@ class UninstallCompleteScreen(Screen):
         else:
             self.app.exit()
 
-
-# Main Install Dialog Container
-class IntroContainer(Container):
+# Main Install Dialog Begin Screen
+class BeginInstallScreen(Screen):
     CSS_PATH = "styles.tcss"
 
-    # Container for DisplayLink/Evdi Events
-    def compose(self) -> ComposeResult:
-        yield Label(f"::: Hello.", id="installDec")
-
-
-class AppScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    def __init__(
+        self, 
+        evdiList,
+        evdiPullTag,
+        **kwargs
+        ) -> None:
+        self.evdiList = evdi_git_list_util()
+        self.evdiPullTag = evdi_pull_tag_util
+        super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        yield IntroContainer()
+        with Container(id="unDispDialog"):
+            yield Static(BEGIN_MESSAGE)
+            with Grid(id="horizontalInstBtn"):
+                yield Button("Yes", id="yesBeginBtn", classes="dialogBeginbtn")
+                yield Button("No", id="noBeginBtn", classes="dialogBeginbtn")
         yield Footer(id="Footer")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "yesBeginBtn":
+            self.app.push_screen(EvdiDecisionScreen(evdiList=self.evdiList, evdiPullTag=self.evdiPullTag))
+        else:
+            self.app.exit()
+
+
+# EVDI Decision Screen
+class EvdiDecisionScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def __init__(
+        self, 
+        evdiList,
+        evdiPullTag,
+        **kwargs
+        ) -> None:
+        self.evdiList = evdi_git_list_util()
+        self.evdiPullTag = evdi_pull_tag_util
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Static(EVDI_DEC_MESSAGE)
+            with Grid(id="horizontalInstBtn"):
+                yield Button("Yes", id="yesBeginBtn", classes="dialogBeginbtn")
+                yield Button("No", id="noBeginBtn", classes="dialogBeginbtn")
+        yield Footer(id="Footer")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "yesBeginBtn":
+            # Push List Screen
+            self.app.push_screen(DownloadSoftware(evdiListDec=self.evdiList[0]))
+        else:
+            # Push to Download Indicator
+            self.app.push_screen(DownloadSoftware(evdiListDec=self.evdiList[0]))
+
+# Software Download Screen
+class DownloadSoftware(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def __init__(self, evdiListDec, **kwargs) -> None:
+        self.evdiListDec = evdiListDec
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Label(">>> Cloning the EVDI software driver and downloading the latest Synaptics DisplayLink Driver.")
+            yield LoadingIndicator()
+        yield Footer(id="Footer")
+
+    def on_mount(self) -> None:
+        self.exec_pull_evdi()
+
+    # Async download both files
+    @work(thread=True)
+    def exec_pull_evdi(self) -> None:
+        time.sleep(1.5)
+        # self.uninstallDisplay()
+        # self.app.call_from_thread(self.app.push_screen, UninstallCompleteScreen())
+
+
+
+# Main Install Dialog Container and Screen -- Keep for reference
+# class IntroContainer(Container):
+#     CSS_PATH = "styles.tcss"
+
+#     # Container for DisplayLink/Evdi Events
+#     def compose(self) -> ComposeResult:
+#         yield Label(f"::: Hello.", id="installDec")
+
+
+# class AppScreen(Screen):
+#     CSS_PATH = "styles.tcss"
+
+#     def compose(self) -> ComposeResult:
+#         yield Header(id="Header")
+#         yield IntroContainer()
+#         yield Footer(id="Footer")
 
 
 class DisplayLinkInstaller(App):
@@ -426,10 +542,19 @@ class DisplayLinkInstaller(App):
 
     CSS_PATH = "styles.tcss"
 
-    def __init__(self, displayLinkInstallCheck, uninistallDisp, **kwargs) -> None:
+    def __init__(
+        self, 
+        displayLinkInstallCheck, 
+        uninstallDisplay, 
+        evdiGitList,
+        evdiPullTag,
+        **kwargs
+        ) -> None:
         # self.displayLinkInstallCheck = displayLinkInstallCheck()
         self.displayLinkInstallCheck = False
-        self.uninistallDisp = uninistallDisp
+        self.uninstallDisplay = uninstallDisplay
+        self.evdiGitList = evdiGitList
+        self.evdiPullTag = evdiPullTag
         super().__init__(**kwargs)
 
     modal_result = reactive[bool | None](None)
@@ -438,7 +563,8 @@ class DisplayLinkInstaller(App):
         self.theme = "nord"
 
     def on_ready(self) -> None:
-        self.push_screen(AppScreen())
+        # self.push_screen(AppScreen())
+        self.push_screen(BeginInstallScreen(evdiList=self.evdiGitList, evdiPullTag=self.evdiPullTag))
         if self.displayLinkInstallCheck:
             self.push_screen(InstallModal(), self.handle_modal_result)
 
@@ -453,12 +579,14 @@ class DisplayLinkInstaller(App):
             if not new_value:
                 self.exit()
             else:
-                self.push_screen(UninstallDialogScreen(uninistallDisplay=self.uninistallDisp))
+                self.push_screen(UninstallDialogScreen(uninstallDisplay=self.uninstallDisplay))
 
 
 if __name__ == "__main__":
     app = DisplayLinkInstaller(
         displayLinkInstallCheck=displaylink_install_check,
-        uninistallDisp=uninstall_display_link
+        uninstallDisplay=uninstall_display_link,
+        evdiGitList=evdi_git_list_util,
+        evdiPullTag=evdi_pull_tag_util
         )
     app.run()
