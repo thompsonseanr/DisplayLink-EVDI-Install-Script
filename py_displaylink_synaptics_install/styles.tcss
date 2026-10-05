@@ -77,3 +77,10 @@ UninstallDialogScreen {
     background: #bf616a;
     text-style: bold underline;
 }
+
+/*
+UninstallIndicatorScreen
+*/
+UninstallIndicatorScreen {
+    align: center middle;
+}

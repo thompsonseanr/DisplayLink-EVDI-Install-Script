@@ -7,6 +7,7 @@ import tarfile
 import zipfile
 import re
 import py_playwright_scraper
+import time
 from contextlib import suppress
 from pathlib import Path
 from typing import List
@@ -314,27 +315,63 @@ class UninstallDialogScreen(Screen):
             # Once complete, exit callback with either 'call_from_thread' with python `thread` or @work decorator
             if False:
                 self.uninistallDisplay()
-            self.app.push_screen(UninstallIndicatorScreen())
+            self.app.push_screen(UninstallIndicatorScreen(uninistallDisplayInd=self.uninistallDisplay))
         else:
             self.app.exit()
 
 class UninstallIndicatorScreen(Screen):
     CSS_PATH = "styles.tcss"
 
+    def __init__(self, uninistallDisplayInd, **kwargs) -> None:
+        self.uninistallDisplayInd = uninistallDisplayInd
+        super().__init__(**kwargs)
+
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="unDispDialog"):
-            yield Label("Uninstalling Synaptics DisplayLink Driver and the EVDI software driver.")
+            yield Label(">>> Uninstalling Synaptics DisplayLink Driver and the EVDI software driver.")
             yield LoadingIndicator()
         yield Footer(id="Footer")
+
+    @work(thread=True)
+    def exec_uninistallDisplayInd(self) -> None:
+        # self.uninistallDisplayInd()
+        time.sleep(1.5)
+
+        self.call_from_thread(self.app.push_screen(UninstallCompleteScreen()))
+
+    exec_uninistallDisplayInd()
+
+
+class UninstallCompleteScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Label(">>> Uninstalling Synaptics DisplayLink Driver and the EVDI software driver.")
+            yield LoadingIndicator()
+        yield Footer(id="Footer")
+
 
 class AppScreen(Screen):
     CSS_PATH = "styles.tcss"
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        yield IntroContainer(id="IntroContainer")
+        with Container(id="unDispDialog"):
+            yield Label(">>> Uninstallation Complete. Restart?")
+            with Grid(id="horizontalInstBtn"):
+                yield Button("Yes", id="yesReBtn", classes="dialogUnbtn")
+                yield Button("No", id="noReBtn", classes="dialogUnbtn")
         yield Footer(id="Footer")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "yesReBtn":
+            # Restart Computer
+            self.app.exit()
+        else:
+            self.app.exit()
 
 
 class DisplayLinkInstaller(App):
