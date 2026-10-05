@@ -84,3 +84,10 @@ UninstallIndicatorScreen
 UninstallIndicatorScreen {
     align: center middle;
 }
+
+/*
+UninstallCompleteScreen
+*/
+UninstallCompleteScreen {
+    align: center middle;
+}

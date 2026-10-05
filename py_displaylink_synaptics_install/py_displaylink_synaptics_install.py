@@ -256,7 +256,7 @@ MODAL_MESSAGE = """
 """
 
 UNINSTALL_MESSAGE = """
-[bold]>>> Uninstall the DisplayLink and EVDI Firmwares?[/bold]
+[bold]>>> Uninstall the DisplayLink and EVDI Firmware?[/bold]
 
 ::: Select [bold]'Yes'[/bold] to uninstall
 ::: Select [bold]'No'[/bold] to exit the app
@@ -264,7 +264,7 @@ UNINSTALL_MESSAGE = """
 
 [bold]Note:[/bold] 
 
-An uninstall will require a reboot to fully remove the EVDI software driver and this installer will have to be re-run.
+Uninstalling will require a reboot to fully remove the EVDI software driver and this installer will have to be re-run.
 """
 
 # Installed Warning Modal
@@ -289,7 +289,6 @@ class IntroContainer(Container):
     CSS_PATH = "styles.tcss"
 
     # Container for DisplayLink/Evdi Events
-    # Uninstall Logic if True, else download Displaylink and EVDI
     def compose(self) -> ComposeResult:
         yield Label(f"::: Hello.", id="installDec")
 
@@ -312,12 +311,10 @@ class UninstallDialogScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesUnBtn":
-            # Once complete, exit callback with either 'call_from_thread' with python `thread` or @work decorator
-            if False:
-                self.uninistallDisplay()
             self.app.push_screen(UninstallIndicatorScreen(uninistallDisplayInd=self.uninistallDisplay))
         else:
             self.app.exit()
+
 
 class UninstallIndicatorScreen(Screen):
     CSS_PATH = "styles.tcss"
@@ -333,28 +330,16 @@ class UninstallIndicatorScreen(Screen):
             yield LoadingIndicator()
         yield Footer(id="Footer")
 
+    def on_mount(self) -> None:
+        self.exec_uninistallDisplayInd()
+
     @work(thread=True)
     def exec_uninistallDisplayInd(self) -> None:
-        # self.uninistallDisplayInd()
-        time.sleep(1.5)
-
-        self.app.call_from_thread(self.app.push_screen(UninstallCompleteScreen()))
-
-    exec_uninistallDisplayInd()
+        self.uninistallDisplayInd()
+        self.app.call_from_thread(self.app.push_screen, UninstallCompleteScreen())
 
 
 class UninstallCompleteScreen(Screen):
-    CSS_PATH = "styles.tcss"
-
-    def compose(self) -> ComposeResult:
-        yield Header(id="Header")
-        with Container(id="unDispDialog"):
-            yield Label(">>> Uninstalling Synaptics DisplayLink Driver and the EVDI software driver.")
-            yield LoadingIndicator()
-        yield Footer(id="Footer")
-
-
-class AppScreen(Screen):
     CSS_PATH = "styles.tcss"
 
     def compose(self) -> ComposeResult:
@@ -368,10 +353,18 @@ class AppScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesReBtn":
-            # Restart Computer
-            self.app.exit()
+            subprocess.run(["reboot"], text=True)
         else:
             self.app.exit()
+
+
+class AppScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        yield IntroContainer()
+        yield Footer(id="Footer")
 
 
 class DisplayLinkInstaller(App):
@@ -410,22 +403,8 @@ class DisplayLinkInstaller(App):
                 self.push_screen(UninstallDialogScreen(uninistallDisplay=self.uninistallDisp))
 
 
-
-    # def compose(self) -> ComposeResult:
-        # yield Header()
-        # yield Label(f"::: {self.displayLinkInstallCheck}")
-        # yield Button("Start", id="start", variant="primary") 
-        # yield Button("No", id="no", variant="error")
-        # yield Footer()
-
-    # def on_button_pressed(self, event: Button.Pressed) -> None:
-    #     self.exit(event.button.id)
-
-
 if __name__ == "__main__":
     app = DisplayLinkInstaller(displayLinkInstallCheck=displaylink_install_check(),
             uninistallDisp=uninstall_display_link
             )
-    # reply = app.run()
-    # print(f"reply: {reply}")
     app.run()
