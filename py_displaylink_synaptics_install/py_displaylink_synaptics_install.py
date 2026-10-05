@@ -43,18 +43,23 @@ if os.getuid() != 0:
     print("Please run this script with `sudo`. Exiting.")
     sys.exit(1)
 
+
 def dir_find(initSearchDir: Path, targetObj: str) -> list[Path]:
     return [d for d in Path(initSearchDir).rglob(targetObj) if d.is_dir()]
+
 
 def file_find(initSearchDir: Path, targetObj: str) -> list[Path]:
     return [f for f in Path(initSearchDir).rglob(targetObj) if f.is_file()]
 
+
 locUser: str | None = os.getenv('USER') if os.getenv('USER') else None
-runitTest: subprocess.CompletedProcess[str] = subprocess.run("ps -p 1 -o comm=",
+runitTest: subprocess.CompletedProcess[str] = subprocess.run(
+    "ps -p 1 -o comm=",
     shell=True, 
     capture_output=True, 
     text=True
 )
+
 
 initTmpDir: Path = Path("/tmp/")
 evdiRepo: str = "https://github.com/DisplayLink/evdi.git"
@@ -64,8 +69,10 @@ evdiTarPath: str = os.path.dirname(evdiGitPath)
 installDec: bool | None = None
 testDec: bool | None = None
 
+
 def displaylink_install_check() -> bool:
-    evdiTest: subprocess.CompletedProcess[str] = subprocess.run(f'lsmod | grep -Eio "evdi" | head -1', 
+    evdiTest: subprocess.CompletedProcess[str] = subprocess.run(
+        f'lsmod | grep -Eio "evdi" | head -1', 
         shell=True, 
         capture_output=True, 
         text=True
@@ -74,11 +81,13 @@ def displaylink_install_check() -> bool:
     isDisplayLinkInstalled: bool = True if (evdiTest.stdout and displayInstallerTest.is_file()) else False
     return isDisplayLinkInstalled
 
+
 def uninstall_display_link() -> bool:
     dlTest = displaylink_install_check()
     if dlTest:
         print("uninstalling")
-        dlUnSub: subprocess.CompletedProcess[str] = subprocess.run("displaylink-installer uninstall", 
+        dlUnSub: subprocess.CompletedProcess[str] = subprocess.run(
+            "displaylink-installer uninstall", 
             shell=True,
             capture_output=True,
             text=True
@@ -116,11 +125,13 @@ def download_displaylink() -> None:
         displayLinkInstallDir = Path(f"/opt/{displayLinkTarget}")
 
 
-def clean_files(evdiTp: str = evdiTarPath, 
+def clean_files(
+    evdiTp: str = evdiTarPath, 
     evdiGp: Path = evdiGitPath,
     dlfnUp: Path | None = displayLinkFullNameUp,
     dliDir: Path | None = displayLinkInstallDir, 
-    sysEx: int = 0) -> None:
+    sysEx: int = 0
+    ) -> None:
 
     if Path(f"{evdiTp}/evdi.tar.gz").is_file():
         with suppress(FileNotFoundError):
@@ -136,10 +147,13 @@ def clean_files(evdiTp: str = evdiTarPath,
             shutil.rmtree(dliDir)
     sys.exit(sysEx)
 
-def evdi_git_tag_util(evdiGp: Path = evdiGitPath,
+
+def evdi_git_tag_util(
+    evdiGp: Path = evdiGitPath,
     evdiTp: str = evdiTarPath,
     evdiGr: str = evdiRepo,
-    initTd: Path = initTmpDir) -> None:
+    initTd: Path = initTmpDir
+    ) -> None:
 
     evdiGitMain: str
     evdiGitTag: str
@@ -159,7 +173,8 @@ def evdi_git_tag_util(evdiGp: Path = evdiGitPath,
     localEvdiRepo: git.repo.base.Repo = git.Repo(evdiGp)
     localEvdiOrigin: git.remote.Remote = localEvdiRepo.remotes.origin
     localEvdiOrigin.pull()
-    evdiGitMainFind: subprocess.CompletedProcess[str] = subprocess.run("git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2", 
+    evdiGitMainFind: subprocess.CompletedProcess[str] = subprocess.run(
+        "git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2", 
         shell=True, 
         capture_output=True,
         text=True
@@ -195,21 +210,31 @@ def evdi_git_tag_util(evdiGp: Path = evdiGitPath,
     localEvdiRepo.git.checkout(evdiGitMain)
     localEvdiRepo.delete_head(evdiGitTag)
 
-    
-def unzip_displaylink(dlfnUp: Path | None = displayLinkFullNameUp,
-    dlfDir: Path | None = displayLinkFileDir) -> None:
+
+def unzip_displaylink(
+    dlfnUp: Path | None = displayLinkFullNameUp,
+    dlfDir: Path | None = displayLinkFileDir
+    ) -> None:
+
     if dlfnUp and dlfDir:
         with zipfile.ZipFile(dlfnUp, 'r') as zipRef:
             zipRef.extractall(dlfDir)
 
 
-def install_dir_rename(dlfDir: Path | None = displayLinkFileDir,
-    dliDir: Path | None = displayLinkInstallDir) -> None:
+def install_dir_rename(
+    dlfDir: Path | None = displayLinkFileDir,
+    dliDir: Path | None = displayLinkInstallDir
+    ) -> None:
+    
     if dlfDir and dliDir:
         shutil.move(dlfDir, dliDir)
 
-def extract_displaylink_firmware(dliDir: Path | None = displayLinkInstallDir,
-    evdiTp: str = evdiTarPath) -> None:
+
+def extract_displaylink_firmware(
+    dliDir: Path | None = displayLinkInstallDir,
+    evdiTp: str = evdiTarPath
+    ) -> None:
+    
     if not dliDir:
         clean_files(sysEx=1)
     else:
@@ -267,7 +292,7 @@ UNINSTALL_MESSAGE = """
 Uninstalling will require a reboot to fully remove the EVDI software driver and this installer will have to be re-run.
 """
 
-# Installed Warning Modal
+# DisplayLink/EVDI Installed Warning Modal
 class InstallModal(ModalScreen[bool]):
     CSS_PATH = "styles.tcss"
 
@@ -285,14 +310,7 @@ class InstallModal(ModalScreen[bool]):
             self.dismiss(False)
 
 
-class IntroContainer(Container):
-    CSS_PATH = "styles.tcss"
-
-    # Container for DisplayLink/Evdi Events
-    def compose(self) -> ComposeResult:
-        yield Label(f"::: Hello.", id="installDec")
-
-
+# Main DisplayLink/EVDI Uninstall Dialog Screen
 class UninstallDialogScreen(Screen):
     CSS_PATH = "styles.tcss"
 
@@ -316,6 +334,7 @@ class UninstallDialogScreen(Screen):
             self.app.exit()
 
 
+# DisplayLink Uninstall Animation Screen
 class UninstallIndicatorScreen(Screen):
     CSS_PATH = "styles.tcss"
 
@@ -339,6 +358,7 @@ class UninstallIndicatorScreen(Screen):
         self.app.call_from_thread(self.app.push_screen, UninstallCompleteScreen())
 
 
+# DisplayLink Uninstallation Complete and Reboot Screen
 class UninstallCompleteScreen(Screen):
     CSS_PATH = "styles.tcss"
 
@@ -358,6 +378,15 @@ class UninstallCompleteScreen(Screen):
             self.app.exit()
 
 
+# Main Install Dialog Container
+class IntroContainer(Container):
+    CSS_PATH = "styles.tcss"
+
+    # Container for DisplayLink/Evdi Events
+    def compose(self) -> ComposeResult:
+        yield Label(f"::: Hello.", id="installDec")
+
+
 class AppScreen(Screen):
     CSS_PATH = "styles.tcss"
 
@@ -375,7 +404,7 @@ class DisplayLinkInstaller(App):
     CSS_PATH = "styles.tcss"
 
     def __init__(self, displayLinkInstallCheck, uninistallDisp, **kwargs) -> None:
-        self.displayLinkInstallCheck = displayLinkInstallCheck
+        self.displayLinkInstallCheck = displayLinkInstallCheck()
         self.uninistallDisp = uninistallDisp
         super().__init__(**kwargs)
 
@@ -404,7 +433,8 @@ class DisplayLinkInstaller(App):
 
 
 if __name__ == "__main__":
-    app = DisplayLinkInstaller(displayLinkInstallCheck=displaylink_install_check(),
-            uninistallDisp=uninstall_display_link
-            )
+    app = DisplayLinkInstaller(
+        displayLinkInstallCheck=displaylink_install_check,
+        uninistallDisp=uninstall_display_link
+        )
     app.run()
