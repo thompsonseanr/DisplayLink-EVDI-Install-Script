@@ -338,7 +338,7 @@ class UninstallIndicatorScreen(Screen):
         # self.uninistallDisplayInd()
         time.sleep(1.5)
 
-        self.call_from_thread(self.app.push_screen(UninstallCompleteScreen()))
+        self.app.call_from_thread(self.app.push_screen(UninstallCompleteScreen()))
 
     exec_uninistallDisplayInd()
 
