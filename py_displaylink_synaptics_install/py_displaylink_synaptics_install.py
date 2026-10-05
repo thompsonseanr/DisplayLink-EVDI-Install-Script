@@ -109,7 +109,15 @@ def download_displaylink() -> None:
     global displayLinkFileDir
     global displayLinkInstallDir
 
+    displayLinkFullNameFindArt: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
+    if displayLinkFullNameFindArt:
+        for fd in displayLinkFullNameFindArt:
+            if fd and fd.is_file():
+                with suppress(FileNotFoundError):
+                    os.remove(fd)
+
     py_playwright_scraper.py_scraper()
+
     displayLinkFullNameFind: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
     displayLinkFullName: Path | None = displayLinkFullNameFind[0] if displayLinkFullNameFind else None
     if not displayLinkFullName:
@@ -126,10 +134,10 @@ def download_displaylink() -> None:
 
 
 def clean_files(
-    evdiTp: str = evdiTarPath, 
+    evdiTp: str = evdiTarPath,
     evdiGp: Path = evdiGitPath,
     dlfnUp: Path | None = displayLinkFullNameUp,
-    dliDir: Path | None = displayLinkInstallDir, 
+    dliDir: Path | None = displayLinkInstallDir,
     sysEx: int = 0
     ) -> None:
 
@@ -139,7 +147,7 @@ def clean_files(
     if evdiGp:
         with suppress(FileNotFoundError):
             shutil.rmtree(evdiGp)
-    if dlfnUp:
+    if dlfnUp and dlfnUp.is_file():
         with suppress(FileNotFoundError):
             os.remove(dlfnUp)
     if dliDir and dliDir.is_dir():
@@ -185,7 +193,8 @@ def evdi_git_tag_util(
     else:
         evdiGitMain = evdiGitMainFind.stdout.strip()
 
-    evdiList: List[TagReference] = sorted(localEvdiRepo.tags, 
+    evdiList: List[TagReference] = sorted(
+        localEvdiRepo.tags, 
         key=lambda t: t.commit.committed_date, 
         reverse=True
     )
@@ -280,6 +289,7 @@ MODAL_MESSAGE = """
 ::: Navigate using `Tab`
 """
 
+
 UNINSTALL_MESSAGE = """
 [bold]>>> Uninstall the DisplayLink and EVDI Firmware?[/bold]
 
@@ -291,6 +301,7 @@ UNINSTALL_MESSAGE = """
 
 Uninstalling will require a reboot to fully remove the EVDI software driver and this installer will have to be re-run.
 """
+
 
 # DisplayLink/EVDI Installed Warning Modal
 class InstallModal(ModalScreen[bool]):
@@ -404,7 +415,8 @@ class DisplayLinkInstaller(App):
     CSS_PATH = "styles.tcss"
 
     def __init__(self, displayLinkInstallCheck, uninistallDisp, **kwargs) -> None:
-        self.displayLinkInstallCheck = displayLinkInstallCheck()
+        # self.displayLinkInstallCheck = displayLinkInstallCheck()
+        self.displayLinkInstallCheck = False
         self.uninistallDisp = uninistallDisp
         super().__init__(**kwargs)
 
