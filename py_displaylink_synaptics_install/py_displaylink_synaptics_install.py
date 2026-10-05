@@ -65,6 +65,8 @@ initTmpDir: Path = Path("/tmp/")
 evdiRepo: str = "https://github.com/DisplayLink/evdi.git"
 evdiGitPath: Path = Path("/tmp/evdi")
 evdiTarPath: str = os.path.dirname(evdiGitPath)
+evdiOrigin: git.remote.Remote
+localEvdiRepo: git.repo.base.Repo
 
 installDec: bool | None = None
 testDec: bool | None = None
@@ -113,8 +115,7 @@ def download_displaylink() -> None:
     if displayLinkFullNameFindArt:
         for fd in displayLinkFullNameFindArt:
             if fd and fd.is_file():
-                with suppress(FileNotFoundError):
-                    os.remove(fd)
+                os.remove(fd)
 
     py_playwright_scraper.py_scraper()
 
@@ -156,15 +157,16 @@ def clean_files(
     sys.exit(sysEx)
 
 
-def evdi_git_tag_util(
+def evdi_git_list_util(
     evdiGp: Path = evdiGitPath,
     evdiTp: str = evdiTarPath,
     evdiGr: str = evdiRepo,
     initTd: Path = initTmpDir
-    ) -> None:
+    ) -> list:
 
+    global evdiOrigin
+    global localEvdiRepo
     evdiGitMain: str
-    evdiGitTag: str
 
     if evdiGp.is_dir():
         with suppress(FileNotFoundError):
@@ -178,20 +180,20 @@ def evdi_git_tag_util(
         clean_files(sysEx=1)
 
     os.chdir(evdiGp)
-    localEvdiRepo: git.repo.base.Repo = git.Repo(evdiGp)
-    localEvdiOrigin: git.remote.Remote = localEvdiRepo.remotes.origin
-    localEvdiOrigin.pull()
-    evdiGitMainFind: subprocess.CompletedProcess[str] = subprocess.run(
-        "git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2", 
-        shell=True, 
-        capture_output=True,
-        text=True
-    )
+    localEvdiRepo = git.Repo(evdiGp)
+    evdiOrigin = localEvdiRepo.remotes.origin
+    evdiOrigin.pull()
+    # evdiGitMainFind: subprocess.CompletedProcess[str] = subprocess.run(
+    #     "git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2", 
+    #     shell=True, 
+    #     capture_output=True,
+    #     text=True
+    # )
 
-    if not evdiGitMainFind:
-        clean_files(sysEx=1)
-    else:
-        evdiGitMain = evdiGitMainFind.stdout.strip()
+    # if not evdiGitMainFind:
+    #     clean_files(sysEx=1)
+    # else:
+    #     evdiGitMain = evdiGitMainFind.stdout.strip()
 
     evdiList: List[TagReference] = sorted(
         localEvdiRepo.tags, 
@@ -202,22 +204,32 @@ def evdi_git_tag_util(
     if not evdiList:
         clean_files(sysEx=1)
 
+    return evdiList
+
+
+def evdi_pull_tag_util(
+    eList: list,
+    evdiGp: Path = evdiGitPath,
+    evdiTp: str = evdiTarPath,
+    ) -> None:
+
+    global localEvdiRepo
     # Create Dynamic menu for Textualize
     # for tag in evdiList:
     #     print(tag.name, tag.commit.committed_datetime)
 
     # latest tag - placeholder
-    print(f"evdiList: {evdiList[0]}")
-    evdiGitTag = evdiList[0]
+    print(f"evdiList: {eList[0]}")
+    evdiGitTag: str = eList[0]
 
-    localEvdiOrigin.fetch(tags=True)
+    evdiOrigin.fetch(tags=True)
     localEvdiRepo.git.checkout("-b", evdiGitTag)
 
     with tarfile.open(f"{evdiTp}/evdi.tar.gz", "w:gz") as tarFile:
         tarFile.add(evdiGp, arcname=".")
 
-    localEvdiRepo.git.checkout(evdiGitMain)
-    localEvdiRepo.delete_head(evdiGitTag)
+    # localEvdiRepo.git.checkout(evdiGitMain)
+    # localEvdiRepo.delete_head(evdiGitTag)
 
 
 def unzip_displaylink(
@@ -276,7 +288,7 @@ def extract_displaylink_firmware(
     # Menu to capture evdi decision, then do the remaining operations
     #
     # download_displaylink()
-    # evdi_git_tag_util()
+    # evdi_git_list_util()
     # unzip_displaylink()
     # install_dir_rename()
     # extract_displaylink_firmware()
