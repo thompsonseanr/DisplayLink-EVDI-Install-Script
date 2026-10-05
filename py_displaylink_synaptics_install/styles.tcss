@@ -17,9 +17,11 @@ Footer {
 /*
 InstallModal
 */
+
 InstallModal {
     align: center middle;
 }
+
 #installDialog {
     align: center middle;
     width: 80;
@@ -44,15 +46,17 @@ InstallModal {
     text-style: none;
 }
 
-.dialogQbtn:focus {
+.dialogQbtn:focus, .dialogQbtn:hover {
     color: #d8dee9;
     background: #bf616a;
     text-style: bold underline;
 }
 
+
 /*
 UninstallDialogScreen
 */
+
 UninstallDialogScreen {
     align: center middle;
 }
@@ -72,15 +76,17 @@ UninstallDialogScreen {
     text-style: none;
 }
 
-.dialogUnbtn:focus {
+.dialogUnbtn:focus, .dialogUnbtn:hover {
     color: #d8dee9;
     background: #bf616a;
     text-style: bold underline;
 }
 
+
 /*
 UninstallIndicatorScreen
 */
+
 UninstallIndicatorScreen {
     align: center middle;
 }
@@ -89,5 +95,12 @@ UninstallIndicatorScreen {
 UninstallCompleteScreen
 */
 UninstallCompleteScreen {
+    align: center middle;
+}
+
+/*
+IntroContainer
+*/
+IntroContainer {
     align: center middle;
 }
