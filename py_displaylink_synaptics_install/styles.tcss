@@ -134,3 +134,63 @@ EvdiDecisionScreen
 EvdiDecisionScreen {
     align: center middle;
 }
+
+/*
+DownloadEvdiSoftware
+*/
+
+DownloadEvdiSoftware {
+    align: center middle;
+}
+
+/*
+DisplayLinkDownloadScreen
+*/
+
+DisplayLinkDownloadScreen {
+    align: center middle;
+}
+
+/*
+BeginDisplayLinkInstallDialogueScreen
+*/
+
+BeginDisplayLinkInstallDialogueScreen {
+    align: center middle;
+}
+
+Button.dialogInstallbtn {
+    color: #2e3440;
+    background: #5e81ac;
+    text-style: none;
+}
+
+Button.dialogInstallbtn:focus, .dialogInstallbtn:hover {
+    color: #d8dee9;
+    background: #bf616a;
+    text-style: bold underline;
+}
+
+/*
+DisplayLinkInstallationScreen
+*/
+
+DisplayLinkInstallationScreen {
+    align: center middle;
+}
+
+/*
+CleanFilesExitScreen
+*/
+
+CleanFilesExitScreen {
+    align: center middle;
+}
+
+/*
+ExitScreen
+*/
+
+ExitScreen {
+    align: center middle;
+}

@@ -22,6 +22,7 @@ from textual.reactive import reactive
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
 from textual.widgets import Placeholder, Static, LoadingIndicator
+from typing import Optional
 
 # Personal Dev Notes: 
 # Change logic: do not look for /evdi in home, just clone it to /tmp/
@@ -102,9 +103,9 @@ def uninstall_display_link() -> bool:
         return False
 
 # Current DisplayLink Download: https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip
-displayLinkFullNameUp: Path | None = None
-displayLinkFileDir: Path | None = None
-displayLinkInstallDir: Path | None = None
+displayLinkFullNameUp: Path
+displayLinkFileDir: Path
+displayLinkInstallDir: Path
 
 def download_displaylink() -> None:
     global displayLinkFullNameUp
@@ -127,8 +128,13 @@ def download_displaylink() -> None:
         displayLinkPath: Path = displayLinkFullName.parent
         displayLinkName: str = displayLinkFullName.name
         displayLinkNameFix: Path = displayLinkFullName.parent / displayLinkFullName.name.replace(" ", "_")
-        displayLinkFullNameUp = displayLinkFullName.rename(displayLinkNameFix)
+        # displayLinkFullNameUp = displayLinkFullName.rename(displayLinkNameFix)
+        shutil.move(str(displayLinkFullName), str(displayLinkNameFix))
+        displayLinkFullNameUp = displayLinkNameFix
+        # displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkFullNameUp.name)
         displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkFullNameUp.name)
+        version_str = displayLinkVer[0] if displayLinkVer else "6.3"
+
         displayLinkTarget: str = f"displaylink_{displayLinkVer[0]}"
         displayLinkFileDir = displayLinkFullName.parent / displayLinkTarget
         displayLinkInstallDir = Path(f"/opt/{displayLinkTarget}")
@@ -137,10 +143,15 @@ def download_displaylink() -> None:
 def clean_files(
     evdiTp: str = evdiTarPath,
     evdiGp: Path = evdiGitPath,
-    dlfnUp: Path | None = displayLinkFullNameUp,
-    dliDir: Path | None = displayLinkInstallDir,
-    sysEx: int = 0
+    dlfnUp: Optional[Path] = None,
+    dliDir: Optional[Path] = None
+    # sysEx: int = 0
     ) -> None:
+
+    if dlfnUp is None:
+        dlfnUp = displayLinkFullNameUp
+    if dliDir is None:
+        dliDir = displayLinkInstallDir
 
     if Path(f"{evdiTp}/evdi.tar.gz").is_file():
         with suppress(FileNotFoundError):
@@ -148,13 +159,14 @@ def clean_files(
     if evdiGp:
         with suppress(FileNotFoundError):
             shutil.rmtree(evdiGp)
-    if dlfnUp and dlfnUp.is_file():
+    if dlfnUp and Path(dlfnUp).is_file():
         with suppress(FileNotFoundError):
             os.remove(dlfnUp)
     if dliDir and dliDir.is_dir():
         with suppress(FileNotFoundError):
             shutil.rmtree(dliDir)
-    sys.exit(sysEx)
+    # return sys.exit(sysEx)
+    return
 
 
 def evdi_git_list_util(
@@ -162,7 +174,7 @@ def evdi_git_list_util(
     evdiTp: str = evdiTarPath,
     evdiGr: str = evdiRepo,
     initTd: Path = initTmpDir
-    ) -> list:
+    ) -> List[TagReference]:
 
     global evdiOrigin
     global localEvdiRepo
@@ -177,23 +189,11 @@ def evdi_git_list_util(
     try:   
         Repo.clone_from(evdiGr, evdiGp)
     except GitCommandError:
-        clean_files(sysEx=1)
+        clean_files()
 
     os.chdir(evdiGp)
     localEvdiRepo = git.Repo(evdiGp)
     evdiOrigin = localEvdiRepo.remotes.origin
-    evdiOrigin.pull()
-    # evdiGitMainFind: subprocess.CompletedProcess[str] = subprocess.run(
-    #     "git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2", 
-    #     shell=True, 
-    #     capture_output=True,
-    #     text=True
-    # )
-
-    # if not evdiGitMainFind:
-    #     clean_files(sysEx=1)
-    # else:
-    #     evdiGitMain = evdiGitMainFind.stdout.strip()
 
     evdiList: List[TagReference] = sorted(
         localEvdiRepo.tags, 
@@ -202,68 +202,98 @@ def evdi_git_list_util(
     )
 
     if not evdiList:
-        clean_files(sysEx=1)
+        clean_files()
 
     return evdiList
 
 
 def evdi_pull_tag_util(
-    evList: list,
+    evList: List[TagReference],
     evdiGp: Path = evdiGitPath,
+    evdiDec: int = 0,
     evdiTp: str = evdiTarPath,
     ) -> None:
 
     global localEvdiRepo
-    # Create Dynamic menu for Textualize
-    # for tag in evdiList:
-    #     print(tag.name, tag.commit.committed_datetime)
-
-    # latest tag - placeholder
-    print(f"evdiList: {evList[0]}")
-    evdiGitTag: str = evList[0]
-
+    evdiGitTag: str = evList[evdiDec].name
     evdiOrigin.fetch(tags=True)
-    localEvdiRepo.git.checkout("-b", evdiGitTag)
+    evdiBranchTag: str = f"{evdiGitTag}"
+    localEvdiRepo.git.checkout("-b", evdiBranchTag, evdiGitTag)
 
     with tarfile.open(f"{evdiTp}/evdi.tar.gz", "w:gz") as tarFile:
         tarFile.add(evdiGp, arcname=".")
 
-    # localEvdiRepo.git.checkout(evdiGitMain)
-    # localEvdiRepo.delete_head(evdiGitTag)
-
 
 def unzip_displaylink(
-    dlfnUp: Path | None = displayLinkFullNameUp,
-    dlfDir: Path | None = displayLinkFileDir
+    # dlfnUp: Optional[Path] = None,
+    # dlfDir: Optional[Path] = None
     ) -> None:
+
+    # if dlfnUp is None:
+    #     dlfnUp = displayLinkFullNameUp
+    if dlfDir is None:
+        dlfDir = displayLinkFileDir
+
+    # Must create local variables -- passed variables are breaking
+    dlfnUpFind: list[Path] = file_find(initTmpDir, "DisplayLink*.zip")
+    dlfnUp: Path | None = dlfnUpFind[0] if dlfnUpFind else None
+        # displayLinkPath: Path = displayLinkFullName.parent
+        # displayLinkName: str = displayLinkFullName.name
+        # displayLinkNameFix: Path = displayLinkFullName.parent / displayLinkFullName.name.replace(" ", "_")
+        # # displayLinkFullNameUp = displayLinkFullName.rename(displayLinkNameFix)
+        # shutil.move(str(displayLinkFullName), str(displayLinkNameFix))
+        # displayLinkFullNameUp = displayLinkNameFix
+        # # displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkFullNameUp.name)
+        # displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkFullNameUp.name)
+        # version_str = displayLinkVer[0] if displayLinkVer else "6.3"
+
+        # displayLinkTarget: str = f"displaylink_{displayLinkVer[0]}"
+        # displayLinkFileDir = displayLinkFullName.parent / displayLinkTarget
+        # displayLinkInstallDir = Path(f"/opt/{displayLinkTarget}")
 
     if dlfnUp and dlfDir:
         with zipfile.ZipFile(dlfnUp, 'r') as zipRef:
             zipRef.extractall(dlfDir)
 
+    # FIX 3: Add explicit file checks and directory auto-creation
+    # if dlfnUp and dlfnUp.is_file() and dlfDir:
+    #     dlfDir.mkdir(parents=True, exist_ok=True)
+    #     with zipfile.ZipFile(dlfnUp, 'r') as zipRef:
+    #         zipRef.extractall(dlfDir)
+    # else:
+    #     raise FileNotFoundError(f"Cannot unzip; target archive missing or invalid: {dlfnUp}")
 
 def install_dir_rename(
-    dlfDir: Path | None = displayLinkFileDir,
-    dliDir: Path | None = displayLinkInstallDir
+    dlfDir: Optional[Path] = None,
+    dliDir: Optional[Path] = None
     ) -> None:
+
+    if dlfDir is None:
+        dlfDir = displayLinkFileDir
+    if dliDir is None:
+        dliDir = displayLinkInstallDir
     
     if dlfDir and dliDir:
         shutil.move(dlfDir, dliDir)
 
 
+
 def extract_displaylink_firmware(
-    dliDir: Path | None = displayLinkInstallDir,
+    dliDir: Optional[Path] = None,
     evdiTp: str = evdiTarPath
     ) -> None:
     
+    if dliDir is None:
+        dliDir = displayLinkInstallDir
+
     if not dliDir:
-        clean_files(sysEx=1)
+        clean_files()
     else:
         os.chdir(dliDir)
         runFileFind: list[Path] = file_find(dliDir, "*.run")
         runFile: Path | None = runFileFind[0] if runFileFind else None
         if runFile is None:
-            clean_files(sysEx=1)
+            clean_files()
         else:
             subprocess.run(["chmod", "+x", runFile], check=True)
             try:
@@ -271,12 +301,12 @@ def extract_displaylink_firmware(
             except subprocess.CalledProcessError as e:
                 if e.returncode == 1:
                     os.chdir("/opt")
-                    clean_files(sysEx=1)
+                    clean_files()
 
             extractDirFind: list[Path] = dir_find(dliDir, "displaylink-*")
             extractDir: Path | None = extractDirFind[0] if extractDirFind else None
             if extractDir is None:
-                clean_files(sysEx=1)
+                clean_files()
             else:
                 os.chdir(str(extractDir))
                 os.remove("evdi.tar.gz")
@@ -335,6 +365,16 @@ EVDI_DEC_MESSAGE = """
 
 """
 
+INSTALL_DEC_MESSAGE = """
+[bold]::: Install DisplayLink and EVDI?[/bold]
+
+::: Navigate using `Tab`
+
+::: Select [bold]'Yes'[/bold] to install
+::: Select [bold]'No'[/bold] to delete downloaded files/directories and close the app
+
+"""
+
 
 # DisplayLink/EVDI Installed Warning Modal
 class InstallModal(ModalScreen[bool]):
@@ -363,6 +403,7 @@ class UninstallDialogScreen(Screen):
         uninstallDisplay,
         **kwargs
         ) -> None:
+
         self.uninstallDisplay = uninstallDisplay
         super().__init__(**kwargs)
 
@@ -391,6 +432,7 @@ class UninstallIndicatorScreen(Screen):
         uninstallDisplay, 
         **kwargs
         ) -> None:
+
         self.uninstallDisplay = uninstallDisplay
         super().__init__(**kwargs)
 
@@ -435,12 +477,23 @@ class BeginInstallScreen(Screen):
 
     def __init__(
         self, 
-        evdiList,
+        evdiGitList,
         evdiPullTag,
+        downloadDisplayLink,
+        unzipDisplaylink,
+        installDirRename,
+        extractDisplaylinkFirmware,
+        cleanFiles,
         **kwargs
         ) -> None:
-        self.evdiList = evdi_git_list_util()
-        self.evdiPullTag = evdi_pull_tag_util
+
+        self.evdiGitList = evdiGitList
+        self.evdiPullTag = evdiPullTag
+        self.downloadDisplayLink = downloadDisplayLink
+        self.unzipDisplaylink = unzipDisplaylink
+        self.installDirRename = installDirRename
+        self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
+        self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -454,7 +507,15 @@ class BeginInstallScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesBeginBtn":
-            self.app.push_screen(EvdiDecisionScreen(evdiList=self.evdiList, evdiPullTag=self.evdiPullTag))
+            self.app.push_screen(EvdiDecisionScreen(
+                evdiGitList=self.evdiGitList, 
+                evdiPullTag=self.evdiPullTag, 
+                downloadDisplayLink=self.downloadDisplayLink,
+                unzipDisplaylink=self.downloadDisplayLink,
+                installDirRename=self.installDirRename,
+                extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
+                cleanFiles=self.cleanFiles
+            ))
         else:
             self.app.exit()
 
@@ -465,12 +526,23 @@ class EvdiDecisionScreen(Screen):
 
     def __init__(
         self, 
-        evdiList,
+        evdiGitList,
         evdiPullTag,
+        downloadDisplayLink,
+        unzipDisplaylink,
+        installDirRename,
+        extractDisplaylinkFirmware,
+        cleanFiles,
         **kwargs
         ) -> None:
-        self.evdiList = evdi_git_list_util()
-        self.evdiPullTag = evdi_pull_tag_util
+
+        self.evdiGitList = evdiGitList
+        self.evdiPullTag = evdiPullTag
+        self.downloadDisplayLink = downloadDisplayLink
+        self.unzipDisplaylink = unzipDisplaylink
+        self.installDirRename = installDirRename
+        self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
+        self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -485,36 +557,246 @@ class EvdiDecisionScreen(Screen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesBeginBtn":
             # Push List Screen
-            self.app.push_screen(DownloadSoftware(evdiListDec=self.evdiList[0]))
+            self.app.push_screen(DownloadEvdiSoftware(
+                evdiGitList=self.evdiGitList, 
+                evdiPullTag=self.evdiPullTag, 
+                downloadDisplayLink=self.downloadDisplayLink,
+                unzipDisplaylink=self.downloadDisplayLink,
+                installDirRename=self.installDirRename,
+                extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
+                cleanFiles=self.cleanFiles
+            ))
         else:
             # Push to Download Indicator
-            self.app.push_screen(DownloadSoftware(evdiListDec=self.evdiList[0]))
+            self.app.push_screen(DownloadEvdiSoftware(
+                evdiGitList=self.evdiGitList, 
+                evdiPullTag=self.evdiPullTag, 
+                downloadDisplayLink=self.downloadDisplayLink,
+                unzipDisplaylink=self.downloadDisplayLink,
+                installDirRename=self.installDirRename,
+                extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
+                cleanFiles=self.cleanFiles
+            ))
 
-# Software Download Screen
-class DownloadSoftware(Screen):
+# EVDI Software Download Screen
+class DownloadEvdiSoftware(Screen):
     CSS_PATH = "styles.tcss"
 
-    def __init__(self, evdiListDec, **kwargs) -> None:
-        self.evdiListDec = evdiListDec
+    def __init__(
+        self, 
+        evdiGitList, 
+        evdiPullTag,
+        downloadDisplayLink,
+        unzipDisplaylink,
+        installDirRename,
+        extractDisplaylinkFirmware,
+        cleanFiles,
+        **kwargs
+        ) -> None:
+
+        self.evdiGitList = evdiGitList
+        self.evdiPullTag = evdiPullTag
+        self.downloadDisplayLink = downloadDisplayLink
+        self.unzipDisplaylink = unzipDisplaylink
+        self.installDirRename = installDirRename
+        self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
+        self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="unDispDialog"):
-            yield Label(">>> Cloning the EVDI software driver and downloading the latest Synaptics DisplayLink Driver.")
+            yield Label(">>> Cloning the EVDI software driver.")
             yield LoadingIndicator()
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
         self.exec_pull_evdi()
 
-    # Async download both files
     @work(thread=True)
     def exec_pull_evdi(self) -> None:
-        time.sleep(1.5)
-        # self.uninstallDisplay()
-        # self.app.call_from_thread(self.app.push_screen, UninstallCompleteScreen())
+        localEvdiList = self.evdiGitList()
+        self.evdiPullTag(localEvdiList)
+        self.app.call_from_thread(self.app.push_screen, DisplayLinkDownloadScreen(
+                downloadDisplayLink=self.downloadDisplayLink,
+                unzipDisplaylink=self.downloadDisplayLink,
+                installDirRename=self.installDirRename,
+                extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
+                cleanFiles=self.cleanFiles
+        ))
 
+
+# DisplayLink Software Download Screen
+class DisplayLinkDownloadScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def __init__(
+        self, 
+        downloadDisplayLink,
+        unzipDisplaylink,
+        installDirRename,
+        extractDisplaylinkFirmware,
+        cleanFiles,
+        **kwargs
+        ) -> None:
+
+        self.downloadDisplayLink = downloadDisplayLink
+        self.unzipDisplaylink = unzipDisplaylink
+        self.installDirRename = installDirRename
+        self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
+        self.cleanFiles = cleanFiles
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Label(">>> Downloading the latest Synaptics DisplayLink Driver.")
+            yield LoadingIndicator()
+        yield Footer(id="Footer")
+
+    def on_mount(self) -> None:
+        self.exec_download_display()
+
+    @work(thread=True)
+    def exec_download_display(self) -> None:
+        self.downloadDisplayLink()
+        self.app.call_from_thread(self.app.push_screen, BeginDisplayLinkInstallDialogueScreen(
+            unzipDisplaylink=self.downloadDisplayLink,
+            installDirRename=self.installDirRename,
+            extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
+            cleanFiles=self.cleanFiles
+        ))
+
+# Function execution order:
+# unzip_displaylink()
+# install_dir_rename()
+# extract_displaylink_firmware()
+# clean_files
+
+# DisplayLink Software Install Screen
+class BeginDisplayLinkInstallDialogueScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def __init__(
+        self, 
+        unzipDisplaylink,
+        installDirRename,
+        extractDisplaylinkFirmware,
+        cleanFiles,
+        **kwargs
+        ) -> None:
+
+        self.unzipDisplaylink = unzipDisplaylink
+        self.installDirRename = installDirRename
+        self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
+        self.cleanFiles = cleanFiles
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Static(INSTALL_DEC_MESSAGE)
+            with Grid(id="horizontalInstBtn"):
+                yield Button("Yes", id="yesInstallBtn", classes="dialogInstallbtn")
+                yield Button("No", id="noInstallBtn", classes="dialogInstallbtn")
+        yield Footer(id="Footer")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "yesInstallBtn":
+            # Push DisplayLinkInstallationScreen Screen
+            self.app.push_screen(DisplayLinkInstallationScreen(
+                unzipDisplaylink=self.unzipDisplaylink,
+                installDirRename=self.installDirRename,
+                extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
+                cleanFiles=self.cleanFiles
+            ))
+        else:
+            # Push to Clean Screen
+            self.app.push_screen(CleanFilesExitScreen(
+                cleanFiles=self.cleanFiles
+            ))
+
+
+# DisplayLink Install Functions Screen
+class DisplayLinkInstallationScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def __init__(
+        self, 
+        unzipDisplaylink,
+        installDirRename,
+        extractDisplaylinkFirmware,
+        cleanFiles,
+        **kwargs
+        ) -> None:
+
+        self.unzipDisplaylink = unzipDisplaylink
+        self.installDirRename = installDirRename
+        self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
+        self.cleanFiles = cleanFiles
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Label(">>> Now installing Synaptics DisplayLink Driver.")
+            yield LoadingIndicator()
+        yield Footer(id="Footer")
+
+    def on_mount(self) -> None:
+        self.exec_display_install()
+
+    @work(thread=True)
+    def exec_display_install(self) -> None:
+        self.unzipDisplaylink()
+        self.installDirRename()
+        self.extractDisplaylinkFirmware()
+        self.app.call_from_thread(self.app.push_screen, CleanFilesExitScreen(cleanFiles=self.cleanFiles))
+
+
+# Clean Files and Exit Screen
+class CleanFilesExitScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def __init__(
+        self,
+        cleanFiles,
+        **kwargs
+        ) -> None:
+
+        self.cleanFiles = cleanFiles
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Label(">>> Now removing all downloaded files and exiting.")
+        yield Footer(id="Footer")
+
+    def on_mount(self) -> None:
+        self.exec_clean_files()
+
+    @work(thread=True)
+    def exec_clean_files(self) -> None:
+        self.cleanFiles()
+        self.app.call_from_thread(self.app.push_screen, ExitScreen())
+
+
+class ExitScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def on_mount(self) -> None:
+        time.sleep(5) 
+        self.app.exit()
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Label(">>> Now Exiting")
+        yield Footer(id="Footer")
+
+
+# DisplayLink Installation Complete Screen
 
 
 # Main Install Dialog Container and Screen -- Keep for reference
@@ -534,6 +816,11 @@ class DownloadSoftware(Screen):
 #         yield IntroContainer()
 #         yield Footer(id="Footer")
 
+# Function execution order:
+# unzip_displaylink()
+# install_dir_rename()
+# extract_displaylink_firmware()
+# clean_files()
 
 class DisplayLinkInstaller(App):
     BINDINGS = [
@@ -548,13 +835,23 @@ class DisplayLinkInstaller(App):
         uninstallDisplay, 
         evdiGitList,
         evdiPullTag,
+        downloadDisplayLink,
+        unzipDisplaylink,
+        installDirRename,
+        extractDisplaylinkFirmware,
+        cleanFiles,
         **kwargs
         ) -> None:
-        # self.displayLinkInstallCheck = displayLinkInstallCheck()
-        self.displayLinkInstallCheck = False
+        self.displayLinkInstallCheck = displayLinkInstallCheck()
+        # self.displayLinkInstallCheck = False
         self.uninstallDisplay = uninstallDisplay
         self.evdiGitList = evdiGitList
         self.evdiPullTag = evdiPullTag
+        self.downloadDisplayLink = downloadDisplayLink
+        self.unzipDisplaylink = unzipDisplaylink
+        self.installDirRename = installDirRename
+        self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
+        self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     modal_result = reactive[bool | None](None)
@@ -563,8 +860,15 @@ class DisplayLinkInstaller(App):
         self.theme = "nord"
 
     def on_ready(self) -> None:
-        # self.push_screen(AppScreen())
-        self.push_screen(BeginInstallScreen(evdiList=self.evdiGitList, evdiPullTag=self.evdiPullTag))
+        self.push_screen(BeginInstallScreen(
+            evdiGitList=self.evdiGitList, 
+            evdiPullTag=self.evdiPullTag, 
+            downloadDisplayLink=self.downloadDisplayLink,
+            unzipDisplaylink=self.downloadDisplayLink,
+            installDirRename=self.installDirRename,
+            extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
+            cleanFiles=self.cleanFiles
+        ))
         if self.displayLinkInstallCheck:
             self.push_screen(InstallModal(), self.handle_modal_result)
 
@@ -587,6 +891,11 @@ if __name__ == "__main__":
         displayLinkInstallCheck=displaylink_install_check,
         uninstallDisplay=uninstall_display_link,
         evdiGitList=evdi_git_list_util,
-        evdiPullTag=evdi_pull_tag_util
+        evdiPullTag=evdi_pull_tag_util,
+        downloadDisplayLink=download_displaylink,
+        unzipDisplaylink = unzip_displaylink,
+        installDirRename = install_dir_rename,
+        extractDisplaylinkFirmware = extract_displaylink_firmware,
+        cleanFiles = clean_files
         )
     app.run()
