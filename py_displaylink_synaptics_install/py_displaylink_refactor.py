@@ -22,7 +22,7 @@ from textual.reactive import reactive
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
 from textual.widgets import Placeholder, Static, LoadingIndicator
-from typing import Optional
+
 
 if os.getuid() != 0:
     print("Please run this script with `sudo`. Exiting.")
@@ -96,11 +96,9 @@ class DispLink:
             displayLinkPath: Path = displayLinkFullName.parent
             displayLinkName: str = displayLinkFullName.name
             displayLinkNameFix: Path = displayLinkFullName.parent / displayLinkFullName.name.replace(" ", "_")
-            # displayLinkFullNameUp = displayLinkFullName.rename(displayLinkNameFix)
             shutil.move(str(displayLinkFullName), str(displayLinkNameFix))
             cls.displayLinkFullNameUp = displayLinkNameFix
             displayLinkVer: List[str] = re.findall(r"\d+\.\d+", cls.displayLinkFullNameUp.name)
-            # version_str = displayLinkVer[0] if displayLinkVer else "6.3"
             displayLinkTarget: str = f"displaylink_{displayLinkVer[0]}"
             cls.displayLinkFileDir = displayLinkFullName.parent / displayLinkTarget
             cls.displayLinkInstallDir = Path(f"/opt/{displayLinkTarget}")
@@ -218,11 +216,11 @@ class DispLink:
                     shutil.move(Path(f"{cls.evdiTarPath}/evdi.tar.gz"), extractDir)
                     subprocess.run(
                         ["chmod", "+x", f"{extractDir}/displaylink-installer.sh"], check=True
-                        )
+                    )
                     subprocess.run(
                         ["./displaylink-installer.sh", "noreboot"], 
                         check=True
-                        )
+                    )
 
 
 MODAL_MESSAGE = """
@@ -319,7 +317,6 @@ class UninstallDialogScreen(Screen):
         if event.button.id == "yesUnBtn":
             self.app.push_screen(UninstallIndicatorScreen(
                 displayLinkCl=self.displayLinkCl
-                # uninstallDisplay=self.uninstallDisplay
             ))
         else:
             self.app.exit()
@@ -332,12 +329,10 @@ class UninstallIndicatorScreen(Screen):
     def __init__(
         self,
         displayLinkCl,
-        # uninstallDisplay, 
         **kwargs
         ) -> None:
 
         self.displayLinkCl = displayLinkCl
-        # self.uninstallDisplay = uninstallDisplay
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -352,7 +347,6 @@ class UninstallIndicatorScreen(Screen):
 
     @work(thread=True)
     def exec_uninistallDisplayInd(self) -> None:
-        # self.uninstallDisplay()
         self.displayLinkCl.uninstall_display_link()
         self.app.call_from_thread(self.app.push_screen, UninstallCompleteScreen())
 
@@ -383,23 +377,10 @@ class BeginInstallScreen(Screen):
     def __init__(
         self,
         displayLinkCl,
-        # evdiGitList,
-        # evdiPullTag,
-        # downloadDisplayLink,
-        # unzipDisplaylink,
-        # installDirRename,
-        # extractDisplaylinkFirmware,
-        # cleanFiles,
         **kwargs
         ) -> None:
+        
         self.displayLinkCl = displayLinkCl
-        # self.evdiGitList = evdiGitList
-        # self.evdiPullTag = evdiPullTag
-        # self.downloadDisplayLink = downloadDisplayLink
-        # self.unzipDisplaylink = unzipDisplaylink
-        # self.installDirRename = installDirRename
-        # self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
-        # self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -415,13 +396,6 @@ class BeginInstallScreen(Screen):
         if event.button.id == "yesBeginBtn":
             self.app.push_screen(EvdiDecisionScreen(
                 displayLinkCl=self.displayLinkCl
-                # evdiGitList=self.evdiGitList, 
-                # evdiPullTag=self.evdiPullTag, 
-                # downloadDisplayLink=self.downloadDisplayLink,
-                # unzipDisplaylink=self.downloadDisplayLink,
-                # installDirRename=self.installDirRename,
-                # extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
-                # cleanFiles=self.cleanFiles
             ))
         else:
             self.app.exit()
@@ -434,24 +408,10 @@ class EvdiDecisionScreen(Screen):
     def __init__(
         self, 
         displayLinkCl,
-        # evdiGitList,
-        # evdiPullTag,
-        # downloadDisplayLink,
-        # unzipDisplaylink,
-        # installDirRename,
-        # extractDisplaylinkFirmware,
-        # cleanFiles,
         **kwargs
         ) -> None:
 
         self.displayLinkCl = displayLinkCl
-        # self.evdiGitList = evdiGitList
-        # self.evdiPullTag = evdiPullTag
-        # self.downloadDisplayLink = downloadDisplayLink
-        # self.unzipDisplaylink = unzipDisplaylink
-        # self.installDirRename = installDirRename
-        # self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
-        # self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -465,29 +425,17 @@ class EvdiDecisionScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesBeginBtn":
-            # Push List Screen
+            # Push List Screen. To-Do: EVDI List Screen
             self.app.push_screen(DownloadEvdiSoftware(
                 displayLinkCl=self.displayLinkCl
-                # evdiGitList=self.evdiGitList, 
-                # evdiPullTag=self.evdiPullTag, 
-                # downloadDisplayLink=self.downloadDisplayLink,
-                # unzipDisplaylink=self.downloadDisplayLink,
-                # installDirRename=self.installDirRename,
-                # extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
-                # cleanFiles=self.cleanFiles
             ))
         else:
             # Push to Download Indicator
             self.app.push_screen(DownloadEvdiSoftware(
                 displayLinkCl=self.displayLinkCl
-                # evdiGitList=self.evdiGitList, 
-                # evdiPullTag=self.evdiPullTag, 
-                # downloadDisplayLink=self.downloadDisplayLink,
-                # unzipDisplaylink=self.downloadDisplayLink,
-                # installDirRename=self.installDirRename,
-                # extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
-                # cleanFiles=self.cleanFiles
             ))
+
+# To-Do: EVDI List Screen
 
 # EVDI Software Download Screen
 class DownloadEvdiSoftware(Screen):
@@ -496,24 +444,10 @@ class DownloadEvdiSoftware(Screen):
     def __init__(
         self,
         displayLinkCl,
-        # evdiGitList, 
-        # evdiPullTag,
-        # downloadDisplayLink,
-        # unzipDisplaylink,
-        # installDirRename,
-        # extractDisplaylinkFirmware,
-        # cleanFiles,
         **kwargs
         ) -> None:
 
         self.displayLinkCl = displayLinkCl
-        # self.evdiGitList = evdiGitList
-        # self.evdiPullTag = evdiPullTag
-        # self.downloadDisplayLink = downloadDisplayLink
-        # self.unzipDisplaylink = unzipDisplaylink
-        # self.installDirRename = installDirRename
-        # self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
-        # self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -528,17 +462,10 @@ class DownloadEvdiSoftware(Screen):
 
     @work(thread=True)
     def exec_pull_evdi(self) -> None:
-        # localEvdiList = self.evdiGitList()
         localEvdiList = self.displayLinkCl.evdi_git_list_util()
-        # self.evdiPullTag(localEvdiList)
         self.displayLinkCl.evdi_pull_tag_util(localEvdiList)
         self.app.call_from_thread(self.app.push_screen, DisplayLinkDownloadScreen(
                 displayLinkCl=self.displayLinkCl
-                # downloadDisplayLink=self.downloadDisplayLink,
-                # unzipDisplaylink=self.downloadDisplayLink,
-                # installDirRename=self.installDirRename,
-                # extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
-                # cleanFiles=self.cleanFiles
         ))
 
 
@@ -549,20 +476,10 @@ class DisplayLinkDownloadScreen(Screen):
     def __init__(
         self,
         displayLinkCl,
-        # downloadDisplayLink,
-        # unzipDisplaylink,
-        # installDirRename,
-        # extractDisplaylinkFirmware,
-        # cleanFiles,
         **kwargs
         ) -> None:
 
         self.displayLinkCl = displayLinkCl
-        # self.downloadDisplayLink = downloadDisplayLink
-        # self.unzipDisplaylink = unzipDisplaylink
-        # self.installDirRename = installDirRename
-        # self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
-        # self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -577,21 +494,11 @@ class DisplayLinkDownloadScreen(Screen):
 
     @work(thread=True)
     def exec_download_display(self) -> None:
-        # self.downloadDisplayLink()
         self.displayLinkCl.download_displaylink()
         self.app.call_from_thread(self.app.push_screen, BeginDisplayLinkInstallDialogueScreen(
             displayLinkCl=self.displayLinkCl
-            # unzipDisplaylink=self.downloadDisplayLink,
-            # installDirRename=self.installDirRename,
-            # extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
-            # cleanFiles=self.cleanFiles
         ))
 
-# Function execution order:
-# unzip_displaylink()
-# install_dir_rename()
-# extract_displaylink_firmware()
-# clean_files
 
 # DisplayLink Software Install Screen
 class BeginDisplayLinkInstallDialogueScreen(Screen):
@@ -600,18 +507,10 @@ class BeginDisplayLinkInstallDialogueScreen(Screen):
     def __init__(
         self,
         displayLinkCl,
-        # unzipDisplaylink,
-        # installDirRename,
-        # extractDisplaylinkFirmware,
-        # cleanFiles,
         **kwargs
         ) -> None:
 
         self.displayLinkCl = displayLinkCl
-        # self.unzipDisplaylink = unzipDisplaylink
-        # self.installDirRename = installDirRename
-        # self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
-        # self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -625,19 +524,13 @@ class BeginDisplayLinkInstallDialogueScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesInstallBtn":
-            # Push DisplayLinkInstallationScreen Screen
             self.app.push_screen(DisplayLinkInstallationScreen(
                 displayLinkCl=self.displayLinkCl
-                # unzipDisplaylink=self.unzipDisplaylink,
-                # installDirRename=self.installDirRename,
-                # extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
-                # cleanFiles=self.cleanFiles
             ))
         else:
             # Push to Clean Screen
             self.app.push_screen(CleanFilesExitScreen(
                 displayLinkCl=self.displayLinkCl
-                # cleanFiles=self.cleanFiles
             ))
 
 
@@ -648,18 +541,10 @@ class DisplayLinkInstallationScreen(Screen):
     def __init__(
         self,
         displayLinkCl,
-        # unzipDisplaylink,
-        # installDirRename,
-        # extractDisplaylinkFirmware,
-        # cleanFiles,
         **kwargs
         ) -> None:
 
         self.displayLinkCl = displayLinkCl
-        # self.unzipDisplaylink = unzipDisplaylink
-        # self.installDirRename = installDirRename
-        # self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
-        # self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -674,7 +559,6 @@ class DisplayLinkInstallationScreen(Screen):
 
     @work(thread=True)
     def exec_display_install(self) -> None:
-        # self.extractDisplaylinkFirmware()
         self.displayLinkCl.extract_displaylink_firmware()
         self.app.call_from_thread(self.app.push_screen, CleanFilesExitScreen(
             displayLinkCl=self.displayLinkCl
@@ -688,12 +572,10 @@ class CleanFilesExitScreen(Screen):
     def __init__(
         self,
         displayLinkCl,
-        # cleanFiles,
         **kwargs
         ) -> None:
 
         self.displayLinkCl = displayLinkCl
-        # self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -707,11 +589,11 @@ class CleanFilesExitScreen(Screen):
 
     @work(thread=True)
     def exec_clean_files(self) -> None:
-        # self.cleanFiles()
         self.displayLinkCl.clean_files()
         self.app.call_from_thread(self.app.push_screen, ExitScreen())
 
 
+# Exit Screen - Needs work - Maybe a close button?
 class ExitScreen(Screen):
     CSS_PATH = "styles.tcss"
 
@@ -726,32 +608,6 @@ class ExitScreen(Screen):
         yield Footer(id="Footer")
 
 
-# DisplayLink Installation Complete Screen
-
-
-# Main Install Dialog Container and Screen -- Keep for reference
-# class IntroContainer(Container):
-#     CSS_PATH = "styles.tcss"
-
-#     # Container for DisplayLink/Evdi Events
-#     def compose(self) -> ComposeResult:
-#         yield Label(f"::: Hello.", id="installDec")
-
-
-# class AppScreen(Screen):
-#     CSS_PATH = "styles.tcss"
-
-#     def compose(self) -> ComposeResult:
-#         yield Header(id="Header")
-#         yield IntroContainer()
-#         yield Footer(id="Footer")
-
-# Function execution order:
-# unzip_displaylink()
-# install_dir_rename()
-# extract_displaylink_firmware()
-# clean_files()
-
 class DisplayLinkInstaller(App):
     BINDINGS = [
         Binding(key="q", action="quit", description="Quit the DisplayLink Installer")
@@ -762,30 +618,11 @@ class DisplayLinkInstaller(App):
     def __init__(
         self,
         displayLinkCl,
-        # displayLinkInstallCheck, 
-        # uninstallDisplay, 
-        # evdiGitList,
-        # evdiPullTag,
-        # downloadDisplayLink,
-        # unzipDisplaylink,
-        # installDirRename,
-        # extractDisplaylinkFirmware,
-        # cleanFiles,
         **kwargs
         ) -> None:
         
         self.displayLinkCl = displayLinkCl
         self.displayLinkInstallCheck = displayLinkCl.displaylink_install_check()
-
-        # self.displayLinkInstallCheck = False
-        # self.uninstallDisplay = uninstallDisplay
-        # self.evdiGitList = evdiGitList
-        # self.evdiPullTag = evdiPullTag
-        # self.downloadDisplayLink = downloadDisplayLink
-        # self.unzipDisplaylink = unzipDisplaylink
-        # self.installDirRename = installDirRename
-        # self.extractDisplaylinkFirmware = extractDisplaylinkFirmware
-        # self.cleanFiles = cleanFiles
         super().__init__(**kwargs)
 
     modal_result = reactive[bool | None](None)
@@ -796,13 +633,6 @@ class DisplayLinkInstaller(App):
     def on_ready(self) -> None:
         self.push_screen(BeginInstallScreen(
             displayLinkCl=self.displayLinkCl
-            # evdiGitList=self.evdiGitList, 
-            # evdiPullTag=self.evdiPullTag, 
-            # downloadDisplayLink=self.downloadDisplayLink,
-            # unzipDisplaylink=self.downloadDisplayLink,
-            # installDirRename=self.installDirRename,
-            # extractDisplaylinkFirmware=self.extractDisplaylinkFirmware,
-            # cleanFiles=self.cleanFiles
         ))
         if self.displayLinkInstallCheck:
             self.push_screen(InstallModal(), self.handle_modal_result)
@@ -812,14 +642,12 @@ class DisplayLinkInstaller(App):
 
     def watch_modal_result(self, old_value: bool | None, new_value: bool | None) -> None:
         if new_value is not None:
-            # Cool Feature. Keep for notes for now.
-            # status_label = self.screen.query_one("#installDec", Label)
-            # status_label.update(f"::: Hello: {new_value}")
             if not new_value:
                 self.exit()
             else:
-                # self.push_screen(UninstallDialogScreen(uninstallDisplay=self.uninstallDisplay))
-                self.push_screen(UninstallDialogScreen(displayLinkCl=self.displayLinkCl))
+                self.push_screen(UninstallDialogScreen(
+                    displayLinkCl=self.displayLinkCl
+                ))
 
 
 if __name__ == "__main__":
