@@ -131,10 +131,8 @@ def download_displaylink() -> None:
         # displayLinkFullNameUp = displayLinkFullName.rename(displayLinkNameFix)
         shutil.move(str(displayLinkFullName), str(displayLinkNameFix))
         displayLinkFullNameUp = displayLinkNameFix
-        # displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkFullNameUp.name)
         displayLinkVer: List[str] = re.findall(r"\d+\.\d+", displayLinkFullNameUp.name)
         version_str = displayLinkVer[0] if displayLinkVer else "6.3"
-
         displayLinkTarget: str = f"displaylink_{displayLinkVer[0]}"
         displayLinkFileDir = displayLinkFullName.parent / displayLinkTarget
         displayLinkInstallDir = Path(f"/opt/{displayLinkTarget}")
@@ -893,9 +891,9 @@ if __name__ == "__main__":
         evdiGitList=evdi_git_list_util,
         evdiPullTag=evdi_pull_tag_util,
         downloadDisplayLink=download_displaylink,
-        unzipDisplaylink = unzip_displaylink,
-        installDirRename = install_dir_rename,
-        extractDisplaylinkFirmware = extract_displaylink_firmware,
-        cleanFiles = clean_files
+        unzipDisplaylink=unzip_displaylink,
+        installDirRename=install_dir_rename,
+        extractDisplaylinkFirmware=extract_displaylink_firmware,
+        cleanFiles=clean_files
         )
     app.run()
