@@ -40,13 +40,13 @@ InstallModal {
     border: solid #d8dee9;
 }
 
-.dialogQbtn {
+Button.dialogQbtn {
     color: #2e3440;
     background: #5e81ac;
     text-style: none;
 }
 
-.dialogQbtn:focus, .dialogQbtn:hover {
+Button.dialogQbtn:focus, .dialogQbtn:hover {
     color: #d8dee9;
     background: #bf616a;
     text-style: bold underline;
@@ -70,13 +70,13 @@ UninstallDialogScreen {
     padding: 1 2;
 }
 
-.dialogUnbtn {
+Button.dialogUnbtn {
     color: #2e3440;
     background: #5e81ac;
     text-style: none;
 }
 
-.dialogUnbtn:focus, .dialogUnbtn:hover {
+Button.dialogUnbtn:focus, .dialogUnbtn:hover {
     color: #d8dee9;
     background: #bf616a;
     text-style: bold underline;
@@ -94,6 +94,7 @@ UninstallIndicatorScreen {
 /*
 UninstallCompleteScreen
 */
+
 UninstallCompleteScreen {
     align: center middle;
 }
@@ -101,6 +102,95 @@ UninstallCompleteScreen {
 /*
 IntroContainer
 */
+
 IntroContainer {
+    align: center middle;
+}
+
+/*
+BeginInstallScreen
+*/
+
+BeginInstallScreen {
+    align: center middle;
+}
+
+Button.dialogBeginbtn {
+    color: #2e3440;
+    background: #5e81ac;
+    text-style: none;
+}
+
+Button.dialogBeginbtn:focus, .dialogBeginbtn:hover {
+    color: #d8dee9;
+    background: #81a1c1;
+    text-style: bold underline;
+}
+
+/*
+EvdiDecisionScreen
+*/
+
+EvdiDecisionScreen {
+    align: center middle;
+}
+
+/*
+DownloadEvdiSoftware
+*/
+
+DownloadEvdiSoftware {
+    align: center middle;
+}
+
+/*
+DisplayLinkDownloadScreen
+*/
+
+DisplayLinkDownloadScreen {
+    align: center middle;
+}
+
+/*
+BeginDisplayLinkInstallDialogueScreen
+*/
+
+BeginDisplayLinkInstallDialogueScreen {
+    align: center middle;
+}
+
+Button.dialogInstallbtn {
+    color: #2e3440;
+    background: #5e81ac;
+    text-style: none;
+}
+
+Button.dialogInstallbtn:focus, .dialogInstallbtn:hover {
+    color: #d8dee9;
+    background: #bf616a;
+    text-style: bold underline;
+}
+
+/*
+DisplayLinkInstallationScreen
+*/
+
+DisplayLinkInstallationScreen {
+    align: center middle;
+}
+
+/*
+CleanFilesExitScreen
+*/
+
+CleanFilesExitScreen {
+    align: center middle;
+}
+
+/*
+ExitScreen
+*/
+
+ExitScreen {
     align: center middle;
 }
