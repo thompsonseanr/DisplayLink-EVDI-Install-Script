@@ -23,6 +23,9 @@ from textual.screen import ModalScreen, Screen
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
 from textual.widgets import Placeholder, Static, LoadingIndicator
 
+# Personal Dev Notes: 
+# Playwright drivers will have to be installed with this ENV:
+# PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
 
 if os.getuid() != 0:
     print("Please run this script with `sudo`. Exiting.")
