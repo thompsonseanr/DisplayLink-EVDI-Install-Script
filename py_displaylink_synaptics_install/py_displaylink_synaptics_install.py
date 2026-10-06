@@ -74,10 +74,7 @@ class DispLink:
                 capture_output=True,
                 text=True
             )
-            if dlUnSub.returncode != 0:
-                return False
-            else:
-                return True
+            return False if dlUnSub.returncode != 0 else True
         else:
             return False
 
