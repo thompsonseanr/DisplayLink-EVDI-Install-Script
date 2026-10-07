@@ -64,19 +64,21 @@ class DispLink:
         isDisplayLinkInstalled: bool = True if (evdiTest.stdout and displayInstallerTest.is_file()) else False
         return isDisplayLinkInstalled
 
+    # Fix return type and refactor. Convert to subprocess.Popen
     @classmethod
     def uninstall_display_link(cls) -> bool:
         dlTest = cls.displaylink_install_check()
         if dlTest:
-            print("uninstalling")
+            # print("uninstalling")
             dlUnSub: subprocess.CompletedProcess[str] = subprocess.run("displaylink-installer uninstall", 
                 shell=True,
                 capture_output=True,
                 text=True
             )
-            return False if dlUnSub.returncode != 0 else True
-        else:
-            return False
+            return dlUnSub
+        #     return False if dlUnSub.returncode != 0 else True
+        # else:
+        #     return False
 
     @classmethod
     def download_displaylink(cls) -> None:
@@ -182,7 +184,7 @@ class DispLink:
         if cls.displayLinkFileDir and cls.displayLinkInstallDir:
             shutil.move(cls.displayLinkFileDir, cls.displayLinkInstallDir)
 
-
+    # Fix return type and refactor 
     @classmethod
     def extract_displaylink_firmware(cls) -> None:
 
@@ -200,7 +202,9 @@ class DispLink:
             else:
                 subprocess.run(["chmod", "+x", runFile])
                 try:
+                    # Triggers a shell window that I need to fix. Convert ot subprocess.Popen and change try/except
                     subprocess.run([runFile, "--noexec", "--keep"], 
+                        shell=True,
                         check=True,
                         capture_output=True,
                         text=True
@@ -219,7 +223,8 @@ class DispLink:
                     os.remove("evdi.tar.gz")
                     shutil.move(Path(f"{cls.evdiTarPath}/evdi.tar.gz"), extractDir)
                     subprocess.run(["chmod", "+x", f"{extractDir}/displaylink-installer.sh"])
-                    subprocess.run(["./displaylink-installer.sh", "noreboot"],
+                    # Refactor to subprocess.Popen
+                    return subprocess.run(["./displaylink-installer.sh", "noreboot"],
                         capture_output=True,
                         text=True
                     )
@@ -342,6 +347,7 @@ class UninstallIndicatorScreen(Screen):
         with Container(id="unDispDialog"):
             yield Label(">>> Uninstalling Synaptics DisplayLink Driver and the EVDI software driver.")
             yield LoadingIndicator()
+            # yield RichLog(highlight=True, markup=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -349,13 +355,13 @@ class UninstallIndicatorScreen(Screen):
 
     @work(thread=True)
     def exec_uninistallDisplayInd(self) -> None:
-        dispLog = self.query_one(RichLog)
+        # dispLog = self.query_one(RichLog)
         dispRes = self.displayLinkCl.uninstall_display_link()
 
-        if dispRes.stdout:
-            dispLog.write(dispRes.stdout)
-        if dispRes.stderr:
-            dispLog.write(f"[red]STDERR:[/] {dispRes.stderr}")
+        # if dispRes.stdout:
+        #     dispLog.write(dispRes.stdout)
+        # if dispRes.stderr:
+        #     dispLog.write(f"[red]STDERR:[/] {dispRes.stderr}")
 
         self.app.call_from_thread(self.app.push_screen, UninstallCompleteScreen())
 
@@ -561,7 +567,7 @@ class DisplayLinkInstallationScreen(Screen):
         with Container(id="unDispDialog"):
             yield Label(">>> Now installing Synaptics DisplayLink Driver.")
             yield LoadingIndicator()
-            yield RichLog(highlight=True, markup=True)
+            # yield RichLog(highlight=True, markup=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -569,13 +575,13 @@ class DisplayLinkInstallationScreen(Screen):
 
     @work(thread=True)
     def exec_display_install(self) -> None:
-        dispLog = self.query_one(RichLog)
+        # dispLog = self.query_one(RichLog)
         dispRes = self.displayLinkCl.extract_displaylink_firmware()
 
-        if dispRes.stdout:
-            dispLog.write(dispRes.stdout)
-        if dispRes.stderr:
-            dispLog.write(f"[red]STDERR:[/] {dispRes.stderr}")
+        # if dispRes.stdout:
+        #     dispLog.write(dispRes.stdout)
+        # if dispRes.stderr:
+        #     dispLog.write(f"[red]STDERR:[/] {dispRes.stderr}")
 
         self.app.call_from_thread(self.app.push_screen, CleanFilesExitScreen(
             displayLinkCl=self.displayLinkCl
