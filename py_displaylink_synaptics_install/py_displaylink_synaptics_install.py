@@ -18,6 +18,7 @@ from textual import events, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, VerticalScroll, Grid
+from textual.events import Print
 from textual.reactive import reactive
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
@@ -68,8 +69,7 @@ class DispLink:
         dlTest = cls.displaylink_install_check()
         if dlTest:
             print("uninstalling")
-            dlUnSub: subprocess.CompletedProcess[str] = subprocess.run(
-                "displaylink-installer uninstall", 
+            dlUnSub: subprocess.CompletedProcess[str] = subprocess.run("displaylink-installer uninstall", 
                 shell=True,
                 capture_output=True,
                 text=True
@@ -198,9 +198,13 @@ class DispLink:
             if runFile is None:
                 cls.clean_files()
             else:
-                subprocess.run(["chmod", "+x", runFile], check=True)
+                subprocess.run(["chmod", "+x", runFile])
                 try:
-                    subprocess.run([runFile, "--noexec", "--keep"], check=True)
+                    subprocess.run([runFile, "--noexec", "--keep"], 
+                        check=True,
+                        capture_output=True,
+                        text=True
+                    )
                 except subprocess.CalledProcessError as e:
                     if e.returncode == 1:
                         os.chdir("/opt")
@@ -214,12 +218,10 @@ class DispLink:
                     os.chdir(str(extractDir))
                     os.remove("evdi.tar.gz")
                     shutil.move(Path(f"{cls.evdiTarPath}/evdi.tar.gz"), extractDir)
-                    subprocess.run(
-                        ["chmod", "+x", f"{extractDir}/displaylink-installer.sh"], check=True
-                    )
-                    subprocess.run(
-                        ["./displaylink-installer.sh", "noreboot"], 
-                        check=True
+                    subprocess.run(["chmod", "+x", f"{extractDir}/displaylink-installer.sh"])
+                    subprocess.run(["./displaylink-installer.sh", "noreboot"],
+                        capture_output=True,
+                        text=True
                     )
 
 
@@ -347,7 +349,14 @@ class UninstallIndicatorScreen(Screen):
 
     @work(thread=True)
     def exec_uninistallDisplayInd(self) -> None:
-        self.displayLinkCl.uninstall_display_link()
+        dispLog = self.query_one(RichLog)
+        dispRes = self.displayLinkCl.uninstall_display_link()
+
+        if dispRes.stdout:
+            dispLog.write(dispRes.stdout)
+        if dispRes.stderr:
+            dispLog.write(f"[red]STDERR:[/] {dispRes.stderr}")
+
         self.app.call_from_thread(self.app.push_screen, UninstallCompleteScreen())
 
 
@@ -465,7 +474,7 @@ class DownloadEvdiSoftware(Screen):
         localEvdiList = self.displayLinkCl.evdi_git_list_util()
         self.displayLinkCl.evdi_pull_tag_util(localEvdiList)
         self.app.call_from_thread(self.app.push_screen, DisplayLinkDownloadScreen(
-                displayLinkCl=self.displayLinkCl
+            displayLinkCl=self.displayLinkCl
         ))
 
 
@@ -552,6 +561,7 @@ class DisplayLinkInstallationScreen(Screen):
         with Container(id="unDispDialog"):
             yield Label(">>> Now installing Synaptics DisplayLink Driver.")
             yield LoadingIndicator()
+            yield RichLog(highlight=True, markup=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -559,7 +569,14 @@ class DisplayLinkInstallationScreen(Screen):
 
     @work(thread=True)
     def exec_display_install(self) -> None:
-        self.displayLinkCl.extract_displaylink_firmware()
+        dispLog = self.query_one(RichLog)
+        dispRes = self.displayLinkCl.extract_displaylink_firmware()
+
+        if dispRes.stdout:
+            dispLog.write(dispRes.stdout)
+        if dispRes.stderr:
+            dispLog.write(f"[red]STDERR:[/] {dispRes.stderr}")
+
         self.app.call_from_thread(self.app.push_screen, CleanFilesExitScreen(
             displayLinkCl=self.displayLinkCl
         ))
@@ -597,15 +614,19 @@ class CleanFilesExitScreen(Screen):
 class ExitScreen(Screen):
     CSS_PATH = "styles.tcss"
 
-    def on_mount(self) -> None:
-        time.sleep(5) 
-        self.app.exit()
-
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="unDispDialog"):
-            yield Label(">>> Now Exiting")
+            # Create dynamic exit messages like the bash script
+            # yield Static(EXIT_MESSAGES)
+            yield Label(">>> Exit the installer?")
+            with Grid(id="horizontalInstBtn"):
+                yield Button("Yes", id="yesQuitBtn", classes="dialogInstallbtn")
         yield Footer(id="Footer")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "yesQuitBtn":
+            self.app.exit()
 
 
 class DisplayLinkInstaller(App):
