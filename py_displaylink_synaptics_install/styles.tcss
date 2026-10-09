@@ -13,6 +13,11 @@ Footer {
     align: left middle;
     dock: bottom;
 }
+RichLog {
+    height: 1fr;
+    border: tall $primary;
+    background: #000000;
+}
 
 /*
 InstallModal
