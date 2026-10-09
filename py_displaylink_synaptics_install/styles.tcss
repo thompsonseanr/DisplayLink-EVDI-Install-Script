@@ -127,8 +127,8 @@ Button.dialogBeginbtn {
 }
 
 Button.dialogBeginbtn:focus, .dialogBeginbtn:hover {
-    color: #d8dee9;
-    background: #81a1c1;
+    color: #2e3440;
+    background: #88c0d0;
     text-style: bold underline;
 }
 
@@ -171,8 +171,8 @@ Button.dialogInstallbtn {
 }
 
 Button.dialogInstallbtn:focus, .dialogInstallbtn:hover {
-    color: #d8dee9;
-    background: #bf616a;
+    color: #2e3440;
+    background: #88c0d0;
     text-style: bold underline;
 }
 

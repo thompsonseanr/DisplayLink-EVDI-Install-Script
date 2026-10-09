@@ -66,18 +66,11 @@ class DispLink:
         isDisplayLinkInstalled: bool = True if (evdiTest.stdout and displayInstallerTest.is_file()) else False
         return isDisplayLinkInstalled
 
-    # Fix return type and refactor. Convert to subprocess.Popen
     @staticmethod
     def uninstall_display_link():
-        # print("uninstalling")
-        # dlUnSub: subprocess.CompletedProcess[str] = subprocess.run("displaylink-installer uninstall", 
-        #     shell=True,
-        #     capture_output=True,
-        #     text=True
-        # )
         with subprocess.Popen(
-            "displaylink-installer uninstall", 
-            shell=True, 
+            ["displaylink-installer", "uninstall"], 
+            shell=False, 
             stdout=subprocess.PIPE, 
             stderr=subprocess.STDOUT, 
             text=True, 
@@ -156,7 +149,7 @@ class DispLink:
         # Broken -- may return to subprocess because it keeps pulling 1.14.5
         evdiList: List[TagReference] = sorted(
             cls.localEvdiRepo.tags, 
-            key=lambda t: t.commit.committed_date, 
+            key=lambda t: t.commit.committed_date,
             reverse=True
         )
 
@@ -196,7 +189,6 @@ class DispLink:
         if cls.displayLinkFileDir and cls.displayLinkInstallDir:
             shutil.move(cls.displayLinkFileDir, cls.displayLinkInstallDir)
 
-    # Fix return type and refactor 
     @classmethod
     def extract_displaylink_firmware(cls) -> None:
 
@@ -213,22 +205,15 @@ class DispLink:
                 cls.clean_files()
             else:
                 subprocess.run(["chmod", "+x", runFile])
-                # try:
-                #     # Triggers a shell window that I need to fix. Convert ot subprocess.Popen and change try/except
-                #     subprocess.run([runFile, "--noexec", "--keep"],
-                #         check=True,
-                #         capture_output=True,
-                #         text=True
-                #     )
-                # except subprocess.CalledProcessError as e:
-                #     if e.returncode == 1:
-                #         os.chdir("/opt")
-                #         cls.clean_files()
                 extractDisplay = subprocess.Popen(
-                    [runFile, "--noexec", "--keep", "--nowait"],
+                    [runFile, "--nox11", "--noprogress", "--noexec", "--keep"],
+                    shell=False,
                     stdout=subprocess.PIPE, 
                     stderr=subprocess.STDOUT,
-                    text=True
+                    stdin=subprocess.DEVNULL,
+                    start_new_session=True,
+                    text=True,
+                    bufsize=1
                 )
                 extractDisplay.wait()
 
@@ -241,14 +226,9 @@ class DispLink:
                     os.remove("evdi.tar.gz")
                     shutil.move(Path(f"{cls.evdiTarPath}/evdi.tar.gz"), extractDir)
                     subprocess.run(["chmod", "+x", f"{extractDir}/displaylink-installer.sh"])
-                    # Refactor to subprocess.Popen
-                    # return subprocess.run(["./displaylink-installer.sh", "noreboot"],
-                    #     capture_output=True,
-                    #     text=True
-                    # )
                     with subprocess.Popen(
                         ["./displaylink-installer.sh", "noreboot"],
-                        shell=True, 
+                        shell=False, 
                         stdout=subprocess.PIPE, 
                         stderr=subprocess.STDOUT, 
                         text=True, 
@@ -439,7 +419,11 @@ class BeginInstallScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesBeginBtn":
-            self.app.push_screen(EvdiDecisionScreen(
+            # Future Release
+            # self.app.push_screen(EvdiDecisionScreen(
+            #     displayLinkCl=self.displayLinkCl
+            # ))
+            self.app.push_screen(DownloadEvdiSoftware(
                 displayLinkCl=self.displayLinkCl
             ))
         else:
@@ -447,6 +431,7 @@ class BeginInstallScreen(Screen):
 
 
 # EVDI Decision Screen
+# Future Release
 class EvdiDecisionScreen(Screen):
     CSS_PATH = "styles.tcss"
 
