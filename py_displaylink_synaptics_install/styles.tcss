@@ -3,11 +3,6 @@ Header {
     align: center middle;
     dock: top;
 }
-IntroContainer {
-    width: 1fr;
-    height: 1fr;
-    border: solid white;
-}
 Footer {
     height: 1;
     align: left middle;
@@ -17,6 +12,9 @@ RichLog {
     height: 1fr;
     border: tall $primary;
     background: #000000;
+}
+Label {
+    margin-bottom: 1;
 }
 
 /*
