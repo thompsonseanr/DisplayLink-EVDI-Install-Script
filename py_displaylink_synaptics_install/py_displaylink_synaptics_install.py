@@ -26,7 +26,8 @@ from textual.screen import ModalScreen, Screen
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
 from textual.widgets import Placeholder, Static, LoadingIndicator
 
-# Personal Dev Notes: 
+# Personal Dev Notes:
+# Write error catching and file removal scripts on failures
 # Playwright drivers will have to be installed with this ENV:
 # PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
 
