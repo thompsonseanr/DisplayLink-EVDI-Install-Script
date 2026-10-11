@@ -57,6 +57,15 @@ class DispLink:
     displayLinkInstallDir: Path
 
     @staticmethod
+    def runit_test() -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            f"ps -p 1 -o comm=",
+            shell=True,
+            capture_output=True, 
+            text=True
+        )
+
+    @staticmethod
     def displaylink_install_check() -> bool:
         evdiTest: subprocess.CompletedProcess[str] = subprocess.run(
             f'lsmod | grep -Eio "evdi" | head -1', 
@@ -294,6 +303,29 @@ INSTALL_DEC_MESSAGE = """
 
 """
 
+EXIT_MESSAGE = """
+[bold]::: DisplayLink Installer Complete[/bold]
+
+::: You will need to reboot for the EVDI kernel modules to load
+"""
+
+RUNIT_MESSAGE = """
+::: VOID linux/runit -based distro users: Remember to remove the 'down' service file 
+::: and restart the 'displaylink-driver' service:
+::: cd /var/service/displaylink-driver
+::: sudo rm -f down
+::: sudo sv restart displaylink-driver
+"""
+
+SYSTEMD_MESSAGE = """
+::: Systemd -based distro users: Remember to check the status 
+::: of the 'displaylink' service by running:
+::: sudo systemctl status displaylink-driver.service
+::: or
+::: sudo systemctl status displaylink.service
+::: To start the service if not running: 
+::: sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
+"""
 
 # DisplayLink/EVDI Installed Warning Modal
 class InstallModal(ModalScreen[bool]):
@@ -625,18 +657,31 @@ class CleanFilesExitScreen(Screen):
     @work(thread=True)
     def exec_clean_files(self) -> None:
         self.displayLinkCl.clean_files()
-        self.app.call_from_thread(self.app.push_screen, ExitScreen())
+        self.app.call_from_thread(self.app.push_screen, ExitScreen(displayLinkCl=self.displayLinkCl))
 
 
 # Exit Screen - Needs work - Maybe a close button?
 class ExitScreen(Screen):
     CSS_PATH = "styles.tcss"
 
+    def __init__(
+        self,
+        displayLinkCl,
+        **kwargs
+        ) -> None:
+
+        self.displayLinkCl = displayLinkCl
+        self.runitTest = self.displayLinkCl.runit_test()
+        super().__init__(**kwargs)
+
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="unDispDialog"):
-            # Create dynamic exit messages like the bash script
-            # yield Static(EXIT_MESSAGES)
+            yield Static(EXIT_MESSAGE)
+            if self.runitTest.stdout.strip() == "runit":
+                yield Static(RUNIT_MESSAGE)
+            else:
+                yield Static(SYSTEMD_MESSAGE)
             yield Label(">>> Exit the installer?")
             with Grid(id="horizontalInstBtn"):
                 yield Button("Yes", id="yesQuitBtn", classes="dialogInstallbtn")
