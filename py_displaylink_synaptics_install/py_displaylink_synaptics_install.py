@@ -8,6 +8,7 @@ import zipfile
 import re
 import py_playwright_scraper
 import time
+from collections.abc import Iterator
 from contextlib import suppress
 from pathlib import Path
 from typing import List
@@ -68,7 +69,7 @@ class DispLink:
         return isDisplayLinkInstalled
 
     @staticmethod
-    def uninstall_display_link():
+    def uninstall_display_link() -> Iterator[str]:
         with subprocess.Popen(
             ["displaylink-installer", "uninstall"], 
             shell=False, 
@@ -147,7 +148,7 @@ class DispLink:
         cls.localEvdiRepo = git.Repo(cls.evdiGitPath)
         cls.evdiOrigin = cls.localEvdiRepo.remotes.origin
 
-        # Broken -- may return to subprocess because it keeps pulling 1.14.5
+        # Quirky -- may return to subprocess with git commands because it sometimes will list 1.14.5 as the latest version
         evdiList: List[TagReference] = sorted(
             cls.localEvdiRepo.tags, 
             key=lambda t: t.commit.committed_date,
@@ -191,7 +192,7 @@ class DispLink:
             shutil.move(cls.displayLinkFileDir, cls.displayLinkInstallDir)
 
     @classmethod
-    def extract_displaylink_firmware(cls) -> None:
+    def extract_displaylink_firmware(cls) -> Iterator[str]:
 
         cls.unzip_displaylink()
         cls.install_dir_rename()
@@ -231,7 +232,7 @@ class DispLink:
                         ["./displaylink-installer.sh", "noreboot"],
                         shell=False, 
                         stdout=subprocess.PIPE, 
-                        stderr=subprocess.STDOUT, 
+                        stderr=subprocess.STDOUT,
                         text=True, 
                         bufsize=1
                         ) as installProc:
@@ -360,7 +361,6 @@ class UninstallIndicatorScreen(Screen):
         yield Header(id="Header")
         with Container(id="unDispDialog"):
             yield Label(">>> Uninstalling Synaptics DisplayLink Driver and the EVDI software driver.")
-            # yield LoadingIndicator()
             yield RichLog(id="uninstallLog", highlight=True, markup=True)
         yield Footer(id="Footer")
 
