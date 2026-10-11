@@ -158,10 +158,15 @@ class DispLink:
         cls.evdiOrigin = cls.localEvdiRepo.remotes.origin
 
         # Quirky -- may return to subprocess with git commands because it sometimes will list 1.14.5 as the latest version
+        # Keep Original with `reverse=True`
+        # evdiList: List[TagReference] = sorted(
+        #     cls.localEvdiRepo.tags, 
+        #     key=lambda t: t.commit.committed_date,
+        #     reverse=True
+        # )
         evdiList: List[TagReference] = sorted(
             cls.localEvdiRepo.tags, 
-            key=lambda t: t.commit.committed_date,
-            reverse=True
+            key=lambda t: t.commit.committed_date
         )
 
         if not evdiList:
@@ -174,7 +179,7 @@ class DispLink:
     def evdi_pull_tag_util(
         cls,
         evList: List[TagReference],
-        evdiDec: int = 0
+        evdiDec: int = -1
         ) -> None:
 
         evdiGitTag: str = evList[evdiDec]
