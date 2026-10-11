@@ -315,7 +315,8 @@ EXIT_MESSAGE = """
 """
 
 RUNIT_MESSAGE = """
-::: VOID linux/runit -based distro users: Remember to remove the 'down' service file 
+[bold]::: VOID linux/runit -based distro users:[/bold]
+::: Remember to remove the 'down' service file 
 ::: and restart the 'displaylink-driver' service:
 ::: cd /var/service/displaylink-driver
 ::: sudo rm -f down
@@ -323,7 +324,8 @@ RUNIT_MESSAGE = """
 """
 
 SYSTEMD_MESSAGE = """
-::: Systemd -based distro users: Remember to check the status 
+[bold]::: Systemd -based distro users:[/bold]
+::: Remember to check the status 
 ::: of the 'displaylink' service by running:
 ::: sudo systemctl status displaylink-driver.service
 ::: or
@@ -469,7 +471,7 @@ class BeginInstallScreen(Screen):
 
 
 # EVDI Decision Screen
-# Future Release
+# Future Release - Choose between latest tag (default) or main branch with list
 class EvdiDecisionScreen(Screen):
     CSS_PATH = "styles.tcss"
 
@@ -684,9 +686,9 @@ class ExitScreen(Screen):
         with Container(id="unDispDialog"):
             yield Static(EXIT_MESSAGE)
             if self.runitTest.stdout.strip() == "runit":
-                yield Static(RUNIT_MESSAGE)
+                yield Static(RUNIT_MESSAGE, id="finishInstMessage")
             else:
-                yield Static(SYSTEMD_MESSAGE)
+                yield Static(SYSTEMD_MESSAGE, id="finishInstMessage")
             yield Label(">>> Exit the installer?")
             with Grid(id="horizontalInstBtn"):
                 yield Button("Yes", id="yesQuitBtn", classes="dialogInstallbtn")
@@ -696,6 +698,7 @@ class ExitScreen(Screen):
         if event.button.id == "yesQuitBtn":
             self.app.exit()
 
+# To-do: Screen to handle Runit displaylink or Systemd
 
 class DisplayLinkInstaller(App):
     BINDINGS = [

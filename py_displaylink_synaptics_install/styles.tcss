@@ -10,6 +10,7 @@ Footer {
 }
 RichLog {
     height: 1fr;
+    padding: 1 2;
     border: tall $primary;
     background: #000000;
 }
@@ -196,4 +197,8 @@ ExitScreen
 
 ExitScreen {
     align: center middle;
+}
+
+#finishInstMessage {
+    align: top left;
 }
