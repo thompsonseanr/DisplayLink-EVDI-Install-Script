@@ -201,10 +201,11 @@ class DispLink:
         if not evdiDec:
             evdiDec = cls.evdiList[-1] if cls.evdiList else "main"
 
-        evdiGitTag: str = evdiDec
-        cls.evdiOrigin.fetch(tags=True)
-        evdiBranchTag: str = f"{evdiGitTag}"
-        cls.localEvdiRepo.git.checkout("-b", evdiBranchTag, evdiGitTag)
+        if evdiDec != "main":
+            evdiGitTag: str = evdiDec
+            cls.evdiOrigin.fetch(tags=True)
+            evdiBranchTag: str = f"{evdiGitTag}"
+            cls.localEvdiRepo.git.checkout("-b", evdiBranchTag, evdiGitTag)
 
         with tarfile.open(f"{cls.evdiTarPath}/evdi.tar.gz", "w:gz") as tarFile:
             tarFile.add(cls.evdiGitPath, arcname=".")
