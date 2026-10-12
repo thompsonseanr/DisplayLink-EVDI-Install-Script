@@ -460,6 +460,7 @@ class UninstallCompleteScreen(Screen):
         else:
             self.app.exit()
 
+
 # Main Install Dialog Begin Screen
 class BeginInstallScreen(Screen):
     CSS_PATH = "styles.tcss"
@@ -520,6 +521,7 @@ class DownloadEvdiSoftwareScreen(Screen):
         self.app.call_from_thread(self.app.push_screen, EvdiDecisionScreen(
             displayLinkCl=self.displayLinkCl
         ))
+
 
 # To-Do: EVDI List Screen
 class EvdiDecisionScreen(Screen):
