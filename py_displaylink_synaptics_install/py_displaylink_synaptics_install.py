@@ -17,11 +17,11 @@ from git import TagObject
 from git import TagReference
 from git.exc import GitCommandError
 from packaging.version import parse
-from textual import events, work
+from textual import events, on, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding, BindingType
 from textual.containers import Container, Horizontal, VerticalScroll, Grid
-from textual.events import Print
+from textual.events import Print, Key
 from textual.reactive import reactive
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
@@ -51,10 +51,11 @@ class DispLink:
     evdiGitPath: Path = Path("/tmp/evdi")
     evdiTarPath: str = os.path.dirname(evdiGitPath)
     evdiOrigin: git.remote.Remote
+    evdiList: List[TagReference]
     localEvdiRepo: git.repo.base.Repo
-    displayLinkFullNameUp: Path
-    displayLinkFileDir: Path
-    displayLinkInstallDir: Path
+    displayLinkFullNameUp: Path | None = None
+    displayLinkFileDir: Path | None = None
+    displayLinkInstallDir: Path | None = None
 
     @staticmethod
     def runit_test() -> subprocess.CompletedProcess[str]:
@@ -140,19 +141,21 @@ class DispLink:
 
 
     @classmethod
+    def evdi_git_clone(cls) -> None:
+        if cls.evdiGitPath.is_dir():
+            with suppress(FileNotFoundError):
+                shutil.rmtree(cls.evdiGitPath)
+            with suppress(FileNotFoundError):
+                os.remove(f"{cls.initTmpDir}evdi.tar.gz")
+
+        try:   
+            Repo.clone_from(cls.evdiRepo, cls.evdiGitPath)
+        except GitCommandError:
+            cls.clean_files()
+
+
+    @classmethod
     def evdi_git_list_util(cls) -> List[TagReference]:
-
-        # if cls.evdiGitPath.is_dir():
-        #     with suppress(FileNotFoundError):
-        #         shutil.rmtree(cls.evdiGitPath)
-        #     with suppress(FileNotFoundError):
-        #         os.remove(f"{cls.initTmpDir}evdi.tar.gz")
-
-        # try:   
-        Repo.clone_from(cls.evdiRepo, cls.evdiGitPath)
-        # except GitCommandError:
-        #     cls.clean_files()
-
         os.chdir(cls.evdiGitPath)
         cls.localEvdiRepo = git.Repo(cls.evdiGitPath)
         cls.evdiOrigin = cls.localEvdiRepo.remotes.origin
@@ -164,15 +167,15 @@ class DispLink:
         #     key=lambda t: t.commit.committed_date,
         #     reverse=True
         # )
-        evdiList: List[TagReference] = sorted(
+        cls.evdiList = sorted(
             cls.localEvdiRepo.tags, 
             key=lambda t: t.commit.committed_date
         )
 
-        if not evdiList:
+        if not cls.evdiList:
             cls.clean_files()
 
-        return evdiList
+        return cls.evdiList
 
     @classmethod
     def find_git_primary(cls) -> str:
@@ -192,11 +195,13 @@ class DispLink:
     @classmethod
     def evdi_pull_tag_util(
         cls,
-        evList: List[TagReference],
-        evdiDec: int = -1
+        evdiDec: str | None = None 
         ) -> None:
 
-        evdiGitTag: str = evList[evdiDec]
+        if not evdiDec:
+            evdiDec = cls.evdiList[-1] if cls.evdiList else "main"
+
+        evdiGitTag: str = evdiDec
         cls.evdiOrigin.fetch(tags=True)
         evdiBranchTag: str = f"{evdiGitTag}"
         cls.localEvdiRepo.git.checkout("-b", evdiBranchTag, evdiGitTag)
@@ -276,7 +281,6 @@ class DispLink:
 MODAL_MESSAGE = """
 [bold]>>> Warning:[/bold] DisplayLink Firmware is already installed. Proceed?
 
-::: Navigate using `Tab`
 """
 
 
@@ -286,7 +290,6 @@ UNINSTALL_MESSAGE = """
 ::: Select [bold]'Yes'[/bold] to uninstall
 ::: Select [bold]'No'[/bold] to exit the app
 
-
 [bold]Note:[/bold] 
 
 Uninstalling will require a reboot to fully remove the EVDI software driver and this installer will have to be re-run.
@@ -295,7 +298,6 @@ Uninstalling will require a reboot to fully remove the EVDI software driver and 
 BEGIN_MESSAGE = """
 [bold]::: Welcome to the DisplayLink and EVDI installer for linux docking station multi-monitor support.[/bold]
 
-::: Navigate using `Tab`
 
 ::: Select [bold]'Yes'[/bold] to begin installation
 ::: Select [bold]'No'[/bold] to exit the app
@@ -303,19 +305,13 @@ BEGIN_MESSAGE = """
 """
 
 EVDI_DEC_MESSAGE = """
-[bold]::: Would you like to choose a particular EVDI release version to install or go with the latest?[/bold]
-
-::: Navigate using `Tab`
-
-::: Select [bold]'Yes'[/bold] to install with the latest release tag
-::: Select [bold]'No'[/bold] to choose a version of EVDI from a list
+[bold]::: Please choose the EVDI release version to install:[/bold]
 
 """
 
 INSTALL_DEC_MESSAGE = """
 [bold]::: Install DisplayLink and EVDI?[/bold]
 
-::: Navigate using `Tab`
 
 ::: Select [bold]'Yes'[/bold] to install
 ::: Select [bold]'No'[/bold] to delete downloaded files/directories and close the app
@@ -330,23 +326,38 @@ EXIT_MESSAGE = """
 
 RUNIT_MESSAGE = """
 [bold]::: VOID linux/runit -based distro users:[/bold]
-::: Remember to remove the 'down' service file 
-::: and restart the 'displaylink-driver' service:
-::: cd /var/service/displaylink-driver
-::: sudo rm -f down
-::: sudo sv restart displaylink-driver
+
+Remember to remove the 'down' service file 
+and restart the 'displaylink-driver' service:
+> cd /var/service/displaylink-driver
+> sudo rm -f down
+> sudo sv restart displaylink-driver
 """
 
 SYSTEMD_MESSAGE = """
 [bold]::: Systemd -based distro users:[/bold]
-::: Remember to check the status 
-::: of the 'displaylink' service by running:
-::: sudo systemctl status displaylink-driver.service
-::: or
-::: sudo systemctl status displaylink.service
-::: To start the service if not running: 
-::: sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
+
+Remember to check the status 
+of the 'displaylink' service by running:
+> sudo systemctl status displaylink-driver.service
+or
+> sudo systemctl status displaylink.service
+To start the service if not running: 
+> sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
 """
+
+
+class ChoiceButton(Button):
+    """A button that shifts focus on left/right arrow keys."""
+
+    def on_key(self, event: Key) -> None:
+        if event.key == "right":
+            self.screen.focus_next()
+            event.stop()
+        elif event.key == "left":
+            self.screen.focus_previous()
+            event.stop()
+
 
 # DisplayLink/EVDI Installed Warning Modal
 class InstallModal(ModalScreen[bool]):
@@ -356,8 +367,8 @@ class InstallModal(ModalScreen[bool]):
         with Container(id="installDialog"):
             yield Static(MODAL_MESSAGE)
             with Grid(id="horizontalInstBtn"):
-                yield Button("No", id="noBtn", classes="dialogQbtn")
-                yield Button("Yes", id="instBtn", classes="dialogQbtn")
+                yield ChoiceButton("No", id="noBtn", classes="dialogQbtn")
+                yield ChoiceButton("Yes", id="instBtn", classes="dialogQbtn")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "instBtn":
@@ -384,8 +395,8 @@ class UninstallDialogScreen(Screen):
         with Container(id="unDispDialog"):
             yield Static(UNINSTALL_MESSAGE)
             with Grid(id="horizontalInstBtn"):
-                yield Button("Yes", id="yesUnBtn", classes="dialogUnbtn")
-                yield Button("No", id="noUnBtn", classes="dialogUnbtn")
+                yield ChoiceButton("Yes", id="yesUnBtn", classes="dialogUnbtn")
+                yield ChoiceButton("No", id="noUnBtn", classes="dialogUnbtn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -439,8 +450,8 @@ class UninstallCompleteScreen(Screen):
         with Container(id="unDispDialog"):
             yield Label(">>> Uninstall Complete. Restart?")
             with Grid(id="horizontalInstBtn"):
-                yield Button("Yes", id="yesReBtn", classes="dialogUnbtn")
-                yield Button("No", id="noReBtn", classes="dialogUnbtn")
+                yield ChoiceButton("Yes", id="yesReBtn", classes="dialogUnbtn")
+                yield ChoiceButton("No", id="noReBtn", classes="dialogUnbtn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -467,61 +478,21 @@ class BeginInstallScreen(Screen):
         with Container(id="unDispDialog"):
             yield Static(BEGIN_MESSAGE)
             with Grid(id="horizontalInstBtn"):
-                yield Button("Yes", id="yesBeginBtn", classes="dialogBeginbtn")
-                yield Button("No", id="noBeginBtn", classes="dialogBeginbtn")
+                yield ChoiceButton("Yes", id="yesBeginBtn", classes="dialogBeginbtn")
+                yield ChoiceButton("No", id="noBeginBtn", classes="dialogBeginbtn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesBeginBtn":
-            # Future Release
-            # self.app.push_screen(EvdiDecisionScreen(
-            #     displayLinkCl=self.displayLinkCl
-            # ))
-            self.app.push_screen(DownloadEvdiSoftware(
+            self.app.push_screen(DownloadEvdiSoftwareScreen(
                 displayLinkCl=self.displayLinkCl
             ))
         else:
             self.app.exit()
 
 
-# EVDI Decision Screen
-# Future Release - Choose between latest tag (default) or main branch with list
-# class EvdiDecisionScreen(Screen):
-#     CSS_PATH = "styles.tcss"
-
-#     def __init__(
-#         self, 
-#         displayLinkCl,
-#         **kwargs
-#         ) -> None:
-
-#         self.displayLinkCl = displayLinkCl
-#         super().__init__(**kwargs)
-
-#     def compose(self) -> ComposeResult:
-#         yield Header(id="Header")
-#         with Container(id="unDispDialog"):
-#             yield Static(EVDI_DEC_MESSAGE)
-#             with Grid(id="horizontalInstBtn"):
-#                 yield Button("Yes", id="yesBeginBtn", classes="dialogBeginbtn")
-#                 yield Button("No", id="noBeginBtn", classes="dialogBeginbtn")
-#         yield Footer(id="Footer")
-
-#     def on_button_pressed(self, event: Button.Pressed) -> None:
-#         if event.button.id == "yesBeginBtn":
-#             # Push List Screen. To-Do: EVDI List Screen
-#             self.app.push_screen(DownloadEvdiSoftware(
-#                 displayLinkCl=self.displayLinkCl
-#             ))
-#         else:
-#             # Push to Download Indicator
-#             self.app.push_screen(DownloadEvdiSoftware(
-#                 displayLinkCl=self.displayLinkCl
-#             ))
-
-
 # EVDI Software Download Screen
-class DownloadEvdiSoftware(Screen):
+class DownloadEvdiSoftwareScreen(Screen):
     CSS_PATH = "styles.tcss"
 
     def __init__(
@@ -545,12 +516,7 @@ class DownloadEvdiSoftware(Screen):
 
     @work(thread=True)
     def exec_pull_evdi(self) -> None:
-        # Need to refactor evdi_git_list_util() to only clone
-        localEvdiList = self.displayLinkCl.evdi_git_list_util()
-        # self.displayLinkCl.evdi_pull_tag_util(localEvdiList)
-        # self.app.call_from_thread(self.app.push_screen, DisplayLinkDownloadScreen(
-        #     displayLinkCl=self.displayLinkCl
-        # ))
+        self.displayLinkCl.evdi_git_clone()
         self.app.call_from_thread(self.app.push_screen, EvdiDecisionScreen(
             displayLinkCl=self.displayLinkCl
         ))
@@ -566,9 +532,9 @@ class EvdiDecisionScreen(Screen):
         ) -> None:
 
         self.displayLinkCl = displayLinkCl
-        # Need to pass
-        self.evdiGitLatestTag = displayLinkCl.evdi_git_list_util()
+        self.evdiGitTagList = displayLinkCl.evdi_git_list_util()
         self.evdiGitPrimary = displayLinkCl.find_git_primary()
+        self.evdiGitPull = displayLinkCl.evdi_pull_tag_util
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -576,22 +542,24 @@ class EvdiDecisionScreen(Screen):
         with Container(id="unDispDialog"):
             yield Static(EVDI_DEC_MESSAGE)
             yield ListView(
-                *[ListItem(Label(str(item))) for item in self.evdiGitLatestTag],
-                ListItem(Label(f"{self.evdiGitPrimary}")),
+                # Keep for potential list
+                # *[ListItem(Label(str(item))) for item in self.evdiGitTagList],
+                ListItem(Label(f"{self.evdiGitTagList[-1]} [bold]RECOMMENDED[/bold]"), id=f"{self.evdiGitTagList[-1].name.replace(".", "_")}"),
+                ListItem(Label(f"{self.evdiGitPrimary} For Experimental Features. Use at own risk."), id=f"{self.evdiGitPrimary}"),
             )
         yield Footer(id="Footer")
 
-    # def on_button_pressed(self, event: Button.Pressed) -> None:
-    #     if event.button.id == "yesBeginBtn":
-    #         # Push List Screen. To-Do: EVDI List Screen
-    #         self.app.push_screen(DownloadEvdiSoftware(
-    #             displayLinkCl=self.displayLinkCl
-    #         ))
-    #     else:
-    #         # Push to Download Indicator
-    #         self.app.push_screen(DownloadEvdiSoftware(
-    #             displayLinkCl=self.displayLinkCl
-    #         ))
+    @on(ListView.Selected)
+    def handle_selection(self, event: ListView.Selected) -> None:
+        itemId = event.item.id
+        self.process_selected_value(itemId)
+
+    def process_selected_value(self, value: str) -> None:
+        if value:
+            self.evdiGitPull(evdiDec=value.replace("_", "."))
+            self.app.push_screen(DisplayLinkDownloadScreen(
+                displayLinkCl=self.displayLinkCl
+            ))
 
 
 # DisplayLink Software Download Screen
@@ -643,8 +611,8 @@ class BeginDisplayLinkInstallDialogueScreen(Screen):
         with Container(id="unDispDialog"):
             yield Static(INSTALL_DEC_MESSAGE)
             with Grid(id="horizontalInstBtn"):
-                yield Button("Yes", id="yesInstallBtn", classes="dialogInstallbtn")
-                yield Button("No", id="noInstallBtn", classes="dialogInstallbtn")
+                yield ChoiceButton("Yes", id="yesInstallBtn", classes="dialogInstallbtn")
+                yield ChoiceButton("No", id="noInstallBtn", classes="dialogInstallbtn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -746,7 +714,7 @@ class ExitScreen(Screen):
                 yield Static(SYSTEMD_MESSAGE, id="finishInstMessage")
             yield Label(">>> Exit the installer?")
             with Grid(id="horizontalInstBtn"):
-                yield Button("Yes", id="yesQuitBtn", classes="dialogInstallbtn")
+                yield ChoiceButton("Yes", id="yesQuitBtn", classes="dialogInstallbtn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -759,14 +727,11 @@ class DisplayLinkInstaller(App):
     BINDINGS = [
         Binding("enter", "select_cursor", "Select", show=False),
         Binding("up", "cursor_up", "Cursor up", show=False),
-        Binding(
-            "down", "cursor_down", "Cursor down", show=False
-        ),
+        Binding("down", "cursor_down", "Cursor down", show=False),
+        Binding("left", "move_left", "Move Left", show=False),
+        Binding("right", "move_right", "Move Right", show=False),
         Binding(key="q", action="quit", description="Quit the DisplayLink Installer")
     ]
-    # BINDINGS = [
-    #     Binding(key="q", action="quit", description="Quit the DisplayLink Installer")
-    # ]
 
     CSS_PATH = "styles.tcss"
 

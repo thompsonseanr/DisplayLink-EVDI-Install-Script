@@ -17,6 +17,12 @@ RichLog {
 Label {
     margin-bottom: 1;
 }
+ListView {
+    margin: 2;
+}
+ListItem {
+    padding: 1;
+}
 
 /*
 InstallModal
@@ -140,10 +146,10 @@ EvdiDecisionScreen {
 }
 
 /*
-DownloadEvdiSoftware
+DownloadEvdiSoftwareScreen
 */
 
-DownloadEvdiSoftware {
+DownloadEvdiSoftwareScreen {
     align: center middle;
 }
 
