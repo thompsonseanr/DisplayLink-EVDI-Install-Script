@@ -200,5 +200,5 @@ ExitScreen {
 }
 
 #finishInstMessage {
-    align: top left;
+    align: left top;
 }

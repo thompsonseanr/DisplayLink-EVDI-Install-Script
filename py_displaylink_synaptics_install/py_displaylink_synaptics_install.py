@@ -19,13 +19,13 @@ from git.exc import GitCommandError
 from packaging.version import parse
 from textual import events, work
 from textual.app import App, ComposeResult
-from textual.binding import Binding
+from textual.binding import Binding, BindingType
 from textual.containers import Container, Horizontal, VerticalScroll, Grid
 from textual.events import Print
 from textual.reactive import reactive
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
-from textual.widgets import Placeholder, Static, LoadingIndicator
+from textual.widgets import Placeholder, Static, LoadingIndicator, ListView, ListItem
 
 # Personal Dev Notes:
 # Write error catching and file removal scripts on failures
@@ -142,16 +142,16 @@ class DispLink:
     @classmethod
     def evdi_git_list_util(cls) -> List[TagReference]:
 
-        if cls.evdiGitPath.is_dir():
-            with suppress(FileNotFoundError):
-                shutil.rmtree(cls.evdiGitPath)
-            with suppress(FileNotFoundError):
-                os.remove(f"{cls.initTmpDir}evdi.tar.gz")
+        # if cls.evdiGitPath.is_dir():
+        #     with suppress(FileNotFoundError):
+        #         shutil.rmtree(cls.evdiGitPath)
+        #     with suppress(FileNotFoundError):
+        #         os.remove(f"{cls.initTmpDir}evdi.tar.gz")
 
-        try:   
-            Repo.clone_from(cls.evdiRepo, cls.evdiGitPath)
-        except GitCommandError:
-            cls.clean_files()
+        # try:   
+        Repo.clone_from(cls.evdiRepo, cls.evdiGitPath)
+        # except GitCommandError:
+        #     cls.clean_files()
 
         os.chdir(cls.evdiGitPath)
         cls.localEvdiRepo = git.Repo(cls.evdiGitPath)
@@ -173,6 +173,20 @@ class DispLink:
             cls.clean_files()
 
         return evdiList
+
+    @classmethod
+    def find_git_primary(cls) -> str:
+        # https://stackoverflow.com/questions/69651536/how-to-get-master-main-branch-from-gitpython
+        if not cls.localEvdiRepo:
+            cls.localEvdiRepo = git.Repo(cls.evdiGitPath)
+
+        # Run 'git remote show origin'
+        evdiRemoteInfo = cls.localEvdiRepo.git.remote("show", "origin")
+
+        # Use regex to find the line: "HEAD branch: main" or "HEAD branch: master"
+        match = re.search(r"HEAD branch:\s*(\S+)", evdiRemoteInfo)
+        evdiDefaultBranch = match.group(1) if match else "main"
+        return evdiDefaultBranch
 
 
     @classmethod
@@ -472,40 +486,39 @@ class BeginInstallScreen(Screen):
 
 # EVDI Decision Screen
 # Future Release - Choose between latest tag (default) or main branch with list
-class EvdiDecisionScreen(Screen):
-    CSS_PATH = "styles.tcss"
+# class EvdiDecisionScreen(Screen):
+#     CSS_PATH = "styles.tcss"
 
-    def __init__(
-        self, 
-        displayLinkCl,
-        **kwargs
-        ) -> None:
+#     def __init__(
+#         self, 
+#         displayLinkCl,
+#         **kwargs
+#         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
-        super().__init__(**kwargs)
+#         self.displayLinkCl = displayLinkCl
+#         super().__init__(**kwargs)
 
-    def compose(self) -> ComposeResult:
-        yield Header(id="Header")
-        with Container(id="unDispDialog"):
-            yield Static(EVDI_DEC_MESSAGE)
-            with Grid(id="horizontalInstBtn"):
-                yield Button("Yes", id="yesBeginBtn", classes="dialogBeginbtn")
-                yield Button("No", id="noBeginBtn", classes="dialogBeginbtn")
-        yield Footer(id="Footer")
+#     def compose(self) -> ComposeResult:
+#         yield Header(id="Header")
+#         with Container(id="unDispDialog"):
+#             yield Static(EVDI_DEC_MESSAGE)
+#             with Grid(id="horizontalInstBtn"):
+#                 yield Button("Yes", id="yesBeginBtn", classes="dialogBeginbtn")
+#                 yield Button("No", id="noBeginBtn", classes="dialogBeginbtn")
+#         yield Footer(id="Footer")
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "yesBeginBtn":
-            # Push List Screen. To-Do: EVDI List Screen
-            self.app.push_screen(DownloadEvdiSoftware(
-                displayLinkCl=self.displayLinkCl
-            ))
-        else:
-            # Push to Download Indicator
-            self.app.push_screen(DownloadEvdiSoftware(
-                displayLinkCl=self.displayLinkCl
-            ))
+#     def on_button_pressed(self, event: Button.Pressed) -> None:
+#         if event.button.id == "yesBeginBtn":
+#             # Push List Screen. To-Do: EVDI List Screen
+#             self.app.push_screen(DownloadEvdiSoftware(
+#                 displayLinkCl=self.displayLinkCl
+#             ))
+#         else:
+#             # Push to Download Indicator
+#             self.app.push_screen(DownloadEvdiSoftware(
+#                 displayLinkCl=self.displayLinkCl
+#             ))
 
-# To-Do: EVDI List Screen
 
 # EVDI Software Download Screen
 class DownloadEvdiSoftware(Screen):
@@ -532,11 +545,53 @@ class DownloadEvdiSoftware(Screen):
 
     @work(thread=True)
     def exec_pull_evdi(self) -> None:
+        # Need to refactor evdi_git_list_util() to only clone
         localEvdiList = self.displayLinkCl.evdi_git_list_util()
-        self.displayLinkCl.evdi_pull_tag_util(localEvdiList)
-        self.app.call_from_thread(self.app.push_screen, DisplayLinkDownloadScreen(
+        # self.displayLinkCl.evdi_pull_tag_util(localEvdiList)
+        # self.app.call_from_thread(self.app.push_screen, DisplayLinkDownloadScreen(
+        #     displayLinkCl=self.displayLinkCl
+        # ))
+        self.app.call_from_thread(self.app.push_screen, EvdiDecisionScreen(
             displayLinkCl=self.displayLinkCl
         ))
+
+# To-Do: EVDI List Screen
+class EvdiDecisionScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def __init__(
+        self, 
+        displayLinkCl,
+        **kwargs
+        ) -> None:
+
+        self.displayLinkCl = displayLinkCl
+        # Need to pass
+        self.evdiGitLatestTag = displayLinkCl.evdi_git_list_util()
+        self.evdiGitPrimary = displayLinkCl.find_git_primary()
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Static(EVDI_DEC_MESSAGE)
+            yield ListView(
+                *[ListItem(Label(str(item))) for item in self.evdiGitLatestTag],
+                ListItem(Label(f"{self.evdiGitPrimary}")),
+            )
+        yield Footer(id="Footer")
+
+    # def on_button_pressed(self, event: Button.Pressed) -> None:
+    #     if event.button.id == "yesBeginBtn":
+    #         # Push List Screen. To-Do: EVDI List Screen
+    #         self.app.push_screen(DownloadEvdiSoftware(
+    #             displayLinkCl=self.displayLinkCl
+    #         ))
+    #     else:
+    #         # Push to Download Indicator
+    #         self.app.push_screen(DownloadEvdiSoftware(
+    #             displayLinkCl=self.displayLinkCl
+    #         ))
 
 
 # DisplayLink Software Download Screen
@@ -702,8 +757,16 @@ class ExitScreen(Screen):
 
 class DisplayLinkInstaller(App):
     BINDINGS = [
+        Binding("enter", "select_cursor", "Select", show=False),
+        Binding("up", "cursor_up", "Cursor up", show=False),
+        Binding(
+            "down", "cursor_down", "Cursor down", show=False
+        ),
         Binding(key="q", action="quit", description="Quit the DisplayLink Installer")
     ]
+    # BINDINGS = [
+    #     Binding(key="q", action="quit", description="Quit the DisplayLink Installer")
+    # ]
 
     CSS_PATH = "styles.tcss"
 
