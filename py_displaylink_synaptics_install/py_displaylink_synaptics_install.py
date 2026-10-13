@@ -328,7 +328,6 @@ Uninstalling will require a reboot to fully remove the EVDI software driver and 
 BEGIN_MESSAGE = """
 [bold]::: Welcome to the DisplayLink and EVDI installer for linux docking station multi-monitor support.[/bold]
 
-
 ::: Select [bold]'Yes'[/bold] to begin installation
 ::: Select [bold]'No'[/bold] to exit the app
 
@@ -342,7 +341,6 @@ EVDI_DEC_MESSAGE = """
 INSTALL_DEC_MESSAGE = """
 [bold]::: Install DisplayLink and EVDI?[/bold]
 
-
 ::: Select [bold]'Yes'[/bold] to install
 ::: Select [bold]'No'[/bold] to delete downloaded files/directories and close the app
 
@@ -350,7 +348,6 @@ INSTALL_DEC_MESSAGE = """
 
 EXIT_MESSAGE = """
 [bold]::: DisplayLink Installer Complete[/bold]
-
 ::: You will need to reboot for the EVDI kernel modules to load
 """
 
@@ -576,8 +573,8 @@ class EvdiDecisionScreen(Screen):
             yield ListView(
                 # Keep for potential list
                 # *[ListItem(Label(str(item))) for item in self.evdiGitTagList],
-                ListItem(Label(f"{self.evdiGitTagList[-1]} [bold]RECOMMENDED[/bold]"), id=f"{self.evdiGitTagList[-1].name.replace(".", "_")}"),
-                ListItem(Label(f"{self.evdiGitPrimary.capitalize()} For Experimental Features. Use at own risk."), id=f"{self.evdiGitPrimary}"),
+                ListItem(Label(f":: {self.evdiGitTagList[-1]} [bold]RECOMMENDED[/bold]"), id=f"{self.evdiGitTagList[-1].name.replace(".", "_")}"),
+                ListItem(Label(f":: {self.evdiGitPrimary.capitalize()} For Experimental Features. Use at own risk."), id=f"{self.evdiGitPrimary}"),
             )
         yield Footer(id="Footer")
 
@@ -747,8 +744,8 @@ class FinalizeScreen(Screen):
                 yield Static(SYSTEMD_MESSAGE, id="finishInstMessage")
             yield Label(">>> Finishing Actions:")
             with Grid(id="horizontalInstBtn"):
-                yield ChoiceButton("Yes, Enable Service", id="yesEnBtn", classes="dialogInstallbtn")
-                yield ChoiceButton("No, Exit Installer", id="noEnBtn", classes="dialogInstallbtn")
+                yield ChoiceButton("Yes, Enable Service", id="yesEnBtn", classes="exitInstBtn")
+                yield ChoiceButton("No, Exit Installer", id="noEnBtn", classes="exitInstBtn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
