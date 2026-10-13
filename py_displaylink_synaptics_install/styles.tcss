@@ -198,13 +198,33 @@ CleanFilesExitScreen {
 }
 
 /*
-ExitScreen
+FinalizeScreen
 */
 
-ExitScreen {
+FinalizeScreen {
     align: center middle;
 }
 
 #finishInstMessage {
     align: left top;
+}
+
+/*
+FinishExitScreen
+*/
+
+FinishExitScreen {
+    align: center middle;
+}
+
+#horizontalExBtn {
+    layout: grid;
+    grid-size: 1;
+    height: auto;
+    margin-top: 2;
+    align: center middle;
+}
+
+#exitButton {
+    display: none;
 }

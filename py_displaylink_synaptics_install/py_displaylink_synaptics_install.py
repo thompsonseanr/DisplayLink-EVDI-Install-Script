@@ -278,6 +278,35 @@ class DispLink:
                     if installProc.returncode != 0:
                         yield f"[red]DisplayLink installation failed. Exit code: {installProc.returncode}[/]"
 
+    @staticmethod
+    def runit_enable_display() -> None:
+        if Path("/var/service/displaylink-driver/down").is_file():
+            with suppress(FileNotFoundError):
+                os.remove("/var/service/displaylink-driver/down")
+        subprocess.run(
+            "sv restart displaylink-driver",
+            shell=True, 
+            capture_output=True, 
+            text=True
+        )
+
+    @staticmethod
+    def systemd_enable_display() -> None:
+        displayService: subprocess.CompletedProcess[str] = subprocess.run(
+            "systemctl | grep -Ei displaylink",
+            shell=True, 
+            capture_output=True, 
+            text=True
+        )
+        if displayService.stdout.strip():
+            displayServiceUnit: subprocess.CompletedProcess[str] = subprocess.run(
+                f"systemctl enable --now {displayServiceUnit.stdout.strip()}",
+                shell=True, 
+                capture_output=True, 
+                text=True
+            )
+
+
 
 MODAL_MESSAGE = """
 [bold]>>> Warning:[/bold] DisplayLink Firmware is already installed. Proceed?
@@ -326,8 +355,7 @@ EXIT_MESSAGE = """
 """
 
 RUNIT_MESSAGE = """
-[bold]::: VOID linux/runit -based distro users:[/bold]
-
+[bold]VOID linux/runit -based distro users:[/bold]
 Remember to remove the 'down' service file and restart the 'displaylink-driver' service:
 
     > cd /var/service/displaylink-driver
@@ -336,8 +364,7 @@ Remember to remove the 'down' service file and restart the 'displaylink-driver' 
 """
 
 SYSTEMD_MESSAGE = """
-[bold]::: Systemd -based distro users:[/bold]
-
+[bold]Systemd -based distro users:[/bold]
 Remember to check the status of the 'displaylink' service by running:
 
     > sudo systemctl status displaylink-driver.service
@@ -649,6 +676,7 @@ class DisplayLinkInstallationScreen(Screen):
         yield Header(id="Header")
         with Container(id="unDispDialog"):
             yield Label(">>> Now installing Synaptics DisplayLink Driver.")
+            yield Label(">>> Please wait until it finishes...")
             yield RichLog(id="installLog", highlight=True, markup=True)
         yield Footer(id="Footer")
 
@@ -692,11 +720,11 @@ class CleanFilesExitScreen(Screen):
     @work(thread=True)
     def exec_clean_files(self) -> None:
         self.displayLinkCl.clean_files()
-        self.app.call_from_thread(self.app.push_screen, ExitScreen(displayLinkCl=self.displayLinkCl))
+        self.app.call_from_thread(self.app.push_screen, FinalizeScreen(displayLinkCl=self.displayLinkCl))
 
 
-# Exit Screen - Needs work - Maybe a close button?
-class ExitScreen(Screen):
+# Finalize Screen 
+class FinalizeScreen(Screen):
     CSS_PATH = "styles.tcss"
 
     def __init__(
@@ -717,14 +745,62 @@ class ExitScreen(Screen):
                 yield Static(RUNIT_MESSAGE, id="finishInstMessage")
             else:
                 yield Static(SYSTEMD_MESSAGE, id="finishInstMessage")
-            yield Label(">>> Exit the installer?")
+            yield Label(">>> Finishing Actions:")
             with Grid(id="horizontalInstBtn"):
-                yield ChoiceButton("Yes", id="yesQuitBtn", classes="dialogInstallbtn")
+                yield ChoiceButton("Yes, Enable Service", id="yesEnBtn", classes="dialogInstallbtn")
+                yield ChoiceButton("No, Exit Installer", id="noEnBtn", classes="dialogInstallbtn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "yesQuitBtn":
+        if event.button.id == "yesEnBtn":
+            self.app.push_screen(FinishExitScreen(displayLinkCl=self.displayLinkCl))
+        else:
             self.app.exit()
+
+
+# Finish and Exit Screen
+class FinishExitScreen(Screen):
+    CSS_PATH = "styles.tcss"
+
+    def __init__(
+        self,
+        displayLinkCl,
+        **kwargs
+        ) -> None:
+
+        self.displayLinkCl = displayLinkCl
+        self.runitTest = self.displayLinkCl.runit_test()
+        self.runitPrepare = self.displayLinkCl.runit_enable_display
+        self.systemdPrepare = self.displayLinkCl.systemd_enable_display
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="unDispDialog"):
+            yield Label(">>> Preparing your system...")
+            with Grid(id="horizontalExBtn"):
+                yield ChoiceButton("Exit the Installer", id="exitButton", classes="dialogInstallbtn")
+        yield Footer(id="Footer")
+
+    def on_mount(self) -> None:
+        self.prepare_system()
+
+    @work(thread=True)
+    def prepare_system(self) -> None:
+        if self.runitTest.stdout.strip() == "runit":
+            self.runitPrepare()
+        else:
+            self.systemdPrepare()
+        self.app.call_from_thread(self.prepare_complete)
+
+    def prepare_complete(self) -> None:
+        exBtn = self.query_one("#exitButton", Button)
+        exBtn.styles.display = "block"
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "exitButton":
+            self.app.exit()
+
 
 # To-do: Screen to handle Runit displaylink or Systemd
 
