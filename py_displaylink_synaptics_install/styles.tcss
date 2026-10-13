@@ -228,3 +228,9 @@ FinishExitScreen {
 #exitButton {
     display: none;
 }
+
+Button.exitInstBtn:focus, .exitInstBtn:hover {
+    color: #2e3440;
+    background: #88c0d0;
+    text-style: bold;
+}

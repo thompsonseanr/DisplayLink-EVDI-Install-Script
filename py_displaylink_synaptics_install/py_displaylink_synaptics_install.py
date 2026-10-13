@@ -368,7 +368,7 @@ SYSTEMD_MESSAGE = """
 Remember to check the status of the 'displaylink' service by running:
 
     > sudo systemctl status displaylink-driver.service
-or
+    or
     > sudo systemctl status displaylink.service
 
 To start the service if not running: 
@@ -779,7 +779,7 @@ class FinishExitScreen(Screen):
         with Container(id="unDispDialog"):
             yield Label(">>> Preparing your system...")
             with Grid(id="horizontalExBtn"):
-                yield ChoiceButton("Exit the Installer", id="exitButton", classes="dialogInstallbtn")
+                yield ChoiceButton("Exit the Installer", id="exitButton", classes="exitInstBtn")
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
