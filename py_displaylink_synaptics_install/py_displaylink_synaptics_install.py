@@ -550,7 +550,7 @@ class EvdiDecisionScreen(Screen):
                 # Keep for potential list
                 # *[ListItem(Label(str(item))) for item in self.evdiGitTagList],
                 ListItem(Label(f"{self.evdiGitTagList[-1]} [bold]RECOMMENDED[/bold]"), id=f"{self.evdiGitTagList[-1].name.replace(".", "_")}"),
-                ListItem(Label(f"{self.evdiGitPrimary} For Experimental Features. Use at own risk."), id=f"{self.evdiGitPrimary}"),
+                ListItem(Label(f"{self.evdiGitPrimary.capitalize()} For Experimental Features. Use at own risk."), id=f"{self.evdiGitPrimary}"),
             )
         yield Footer(id="Footer")
 
@@ -559,7 +559,7 @@ class EvdiDecisionScreen(Screen):
         itemId = event.item.id
         self.process_selected_value(itemId)
 
-    def process_selected_value(self, value: str) -> None:
+    def process_selected_value(self, value: str | None) -> None:
         if value:
             self.evdiGitPull(evdiDec=value.replace("_", "."))
             self.app.push_screen(DisplayLinkDownloadScreen(
