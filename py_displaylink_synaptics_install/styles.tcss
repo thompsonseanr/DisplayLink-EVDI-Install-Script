@@ -14,9 +14,6 @@ RichLog {
     border: tall $primary;
     background: #000000;
 }
-Label {
-    margin-bottom: 1;
-}
 ListView {
     margin: 2;
 }

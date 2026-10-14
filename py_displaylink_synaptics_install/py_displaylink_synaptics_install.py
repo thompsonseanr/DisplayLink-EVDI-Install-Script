@@ -354,20 +354,20 @@ EXIT_MESSAGE = """
 RUNIT_MESSAGE = """
 [bold]VOID linux/runit -based distro users:[/bold]
 Remember to remove the 'down' service file and restart the 'displaylink-driver' service:
-    > cd /var/service/displaylink-driver
-    > sudo rm -f down
-    > sudo sv restart displaylink-driver
+> cd /var/service/displaylink-driver
+> sudo rm -f down
+> sudo sv restart displaylink-driver
 """
 
 SYSTEMD_MESSAGE = """
 [bold]Systemd -based distro users:[/bold]
 Remember to check the status of the 'displaylink' service by running:
-    > sudo systemctl status displaylink-driver.service
-    or
-    > sudo systemctl status displaylink.service
+> sudo systemctl status displaylink-driver.service
+or
+> sudo systemctl status displaylink.service
 
 To start the service if not running: 
-    > sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
+> sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
 """
 
 
@@ -670,7 +670,7 @@ class DisplayLinkInstallationScreen(Screen):
         yield Header(id="Header")
         with Container(id="unDispDialog"):
             yield Label(">>> Now installing Synaptics DisplayLink Driver.")
-            yield Label(">>> Please wait until it finishes...")
+            yield Label(">>> Please wait until it finishes... (Yeah, be patient)")
             yield RichLog(id="installLog", highlight=True, markup=True)
         yield Footer(id="Footer")
 
@@ -739,7 +739,7 @@ class FinalizeScreen(Screen):
                 yield Static(RUNIT_MESSAGE, id="finishInstMessage")
             else:
                 yield Static(SYSTEMD_MESSAGE, id="finishInstMessage")
-            yield Label(">>> Finishing Actions:")
+            yield Label(">>> Would you like the installer to handle these manual actions for you?")
             with Grid(id="horizontalInstBtn"):
                 yield ChoiceButton("Yes, Enable Service", id="yesEnBtn", classes="exitInstBtn")
                 yield ChoiceButton("No, Exit Installer", id="noEnBtn", classes="exitInstBtn")
