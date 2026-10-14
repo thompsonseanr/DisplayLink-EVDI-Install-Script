@@ -300,7 +300,7 @@ class DispLink:
         )
         if displayService.stdout.strip():
             displayServiceUnit: subprocess.CompletedProcess[str] = subprocess.run(
-                f"systemctl enable --now {displayServiceUnit.stdout.strip()}",
+                f"systemctl enable --now {displayService.stdout.strip()}",
                 shell=True, 
                 capture_output=True, 
                 text=True
