@@ -11,7 +11,7 @@ py_displaylink_synaptics_install/*venv/
 py_displaylink_synaptics_install/dist/
 py_displaylink_synaptics_install/build/
 py_displaylink_synaptics_install/*.spec/
-py_displaylink_synaptics_install.spec/py_displaylink_synaptics_install.spec
+py_displaylink_synaptics_install/py_displaylink_synaptics_install.spec
 
 **/__pycache__/
 **/.mypy_cache/
