@@ -29,8 +29,11 @@ from textual.widgets import Placeholder, Static, LoadingIndicator, ListView, Lis
 
 # Personal Dev Notes:
 # Write error catching and file removal scripts on failures
-# Playwright drivers will have to be installed with this ENV:
+# Write error page for no network connection
+# Playwright drivers will have to be installed with this ENV for pyinstaller:
 # PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
+# Build with:
+# pyinstaller --onefile --add-data "styles.tcss:." py_displaylink_synaptics_install.py
 
 if os.getuid() != 0:
     print("Please run this script with `sudo`. Exiting.")
