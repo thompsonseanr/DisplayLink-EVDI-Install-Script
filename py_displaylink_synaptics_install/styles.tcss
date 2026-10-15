@@ -1,0 +1,233 @@
+Header {
+    height: 1;
+    align: center middle;
+    dock: top;
+}
+Footer {
+    height: 1;
+    align: left middle;
+    dock: bottom;
+}
+RichLog {
+    height: 1fr;
+    padding: 1 2;
+    border: tall $primary;
+    background: #000000;
+}
+ListView {
+    margin: 2;
+}
+ListItem {
+    padding: 1;
+}
+
+/*
+InstallModal
+*/
+
+InstallModal {
+    align: center middle;
+}
+
+#installDialog {
+    align: center middle;
+    width: 80;
+    height: 30;
+    background: $surface;
+    border: tall $primary;
+    padding: 1 2;
+}
+
+#horizontalInstBtn {
+    layout: grid;
+    grid-size: 2;
+    height: auto;
+    margin-top: 2;
+    align: center middle;
+    border: solid #d8dee9;
+}
+
+Button.dialogQbtn {
+    color: #2e3440;
+    background: #5e81ac;
+    text-style: none;
+}
+
+Button.dialogQbtn:focus, .dialogQbtn:hover {
+    color: #d8dee9;
+    background: #bf616a;
+    text-style: bold;
+}
+
+
+/*
+UninstallDialogScreen
+*/
+
+UninstallDialogScreen {
+    align: center middle;
+}
+
+#unDispDialog {
+    align: center middle;
+    width: 80;
+    height: 30;
+    background: $surface;
+    border: tall $primary;
+    padding: 1 2;
+}
+
+Button.dialogUnbtn {
+    color: #2e3440;
+    background: #5e81ac;
+    text-style: none;
+}
+
+Button.dialogUnbtn:focus, .dialogUnbtn:hover {
+    color: #d8dee9;
+    background: #bf616a;
+    text-style: bold;
+}
+
+
+/*
+UninstallIndicatorScreen
+*/
+
+UninstallIndicatorScreen {
+    align: center middle;
+}
+
+/*
+UninstallCompleteScreen
+*/
+
+UninstallCompleteScreen {
+    align: center middle;
+}
+
+/*
+IntroContainer
+*/
+
+IntroContainer {
+    align: center middle;
+}
+
+/*
+BeginInstallScreen
+*/
+
+BeginInstallScreen {
+    align: center middle;
+}
+
+Button.dialogBeginbtn {
+    color: #2e3440;
+    background: #5e81ac;
+    text-style: none;
+}
+
+Button.dialogBeginbtn:focus, .dialogBeginbtn:hover {
+    color: #2e3440;
+    background: #88c0d0;
+    text-style: bold;
+}
+
+/*
+EvdiDecisionScreen
+*/
+
+EvdiDecisionScreen {
+    align: center middle;
+}
+
+/*
+DownloadEvdiSoftwareScreen
+*/
+
+DownloadEvdiSoftwareScreen {
+    align: center middle;
+}
+
+/*
+DisplayLinkDownloadScreen
+*/
+
+DisplayLinkDownloadScreen {
+    align: center middle;
+}
+
+/*
+BeginDisplayLinkInstallDialogueScreen
+*/
+
+BeginDisplayLinkInstallDialogueScreen {
+    align: center middle;
+}
+
+Button.dialogInstallbtn {
+    color: #2e3440;
+    background: #5e81ac;
+    text-style: none;
+}
+
+Button.dialogInstallbtn:focus, .dialogInstallbtn:hover {
+    color: #2e3440;
+    background: #88c0d0;
+    text-style: bold;
+}
+
+/*
+DisplayLinkInstallationScreen
+*/
+
+DisplayLinkInstallationScreen {
+    align: center middle;
+}
+
+/*
+CleanFilesExitScreen
+*/
+
+CleanFilesExitScreen {
+    align: center middle;
+}
+
+/*
+FinalizeScreen
+*/
+
+FinalizeScreen {
+    align: center middle;
+}
+
+#finishInstMessage {
+    align: left top;
+}
+
+/*
+FinishExitScreen
+*/
+
+FinishExitScreen {
+    align: center middle;
+}
+
+#horizontalExBtn {
+    layout: grid;
+    grid-size: 1;
+    height: auto;
+    margin-top: 2;
+    align: center middle;
+}
+
+#exitButton {
+    display: none;
+}
+
+Button.exitInstBtn:focus, .exitInstBtn:hover {
+    color: #2e3440;
+    background: #88c0d0;
+    text-style: bold;
+}

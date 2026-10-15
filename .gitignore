@@ -1,3 +1,17 @@
-playwright_scraper
+# Playwright Scraper
+py_playwright_scraper/*venv/
+py_playwright_scraper/dist/
+py_playwright_scraper/build/
+py_playwright_scraper/*.spec
 py_playwright_scraper/
-py_displaylink_synaptics_install/
+playwright_scraper
+
+# Displaylink Py Installer
+py_displaylink_synaptics_install/*venv/
+py_displaylink_synaptics_install/dist/
+py_displaylink_synaptics_install/build/
+py_displaylink_synaptics_install/*.spec/
+py_displaylink_synaptics_install.spec/py_displaylink_synaptics_install.spec
+
+**/__pycache__/
+**/.mypy_cache/

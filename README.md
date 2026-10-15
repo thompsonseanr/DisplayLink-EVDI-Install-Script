@@ -6,7 +6,9 @@
 >
 > 
 > **References and Attribution:**
+> - [Textual](https://textual.textualize.io/)  
 > - [JBlond - Bash Colors](https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124)  
+> - [Braile-progress-bar-bash](https://github.com/Jul10l1r4/Braile-progress-bar-bash/tree/master)  
 > - [Fix DisplayLink on Kernel 6.0 and up](https://mrk.sh/fix-displaylink-kernel6.0/)  
 > - [Fixing DisplayLink (EVDI) drivers for Linux kernel 6.x](https://code.berrydejager.com/Fix-DisplayLink_drivers-linux-kernel-6/)  
 > - [Porting the DisplayLink Ubuntu driver to other Linux distributions](https://support.displaylink.com/knowledgebase/articles/679060)  
@@ -18,6 +20,9 @@
 > **Bugfixes and Contributions:**  
 > - [edzweistein](https://github.com/edzweistein)  
 
+## Release Update:  
+
+This was re-written as a self-contained python executable written with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`
 
 ## Preface:  
 
@@ -107,4 +112,46 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
 
 ```
 sudo displaylink-installer uninstall
+```
+
+## To build `python` package:  
+
+**Instructions:**  
+
+1) Go into `py_displaylink_synaptics_install/` directory.  
+
+```
+cd py_displaylink_synaptics_install/
+```
+
+2) Install python dependencies:  
+
+```
+pip install -r requirements.txt
+```
+
+3) Install `Playwright` Chromium dependency:  
+
+```
+PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
+```
+
+4) Build package:  
+
+```
+pyinstaller --onefile --add-data "styles.tcss:." py_displaylink_synaptics_install.py
+```
+
+5) Built package will be within the `dist/` sub-directory:  
+
+```
+cd dist/
+```
+
+```
+chmod +x py_displaylink_synaptics_install
+```
+
+```
+sudo ./py_displaylink_synaptics_install
 ```
