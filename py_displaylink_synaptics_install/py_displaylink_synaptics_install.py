@@ -160,13 +160,6 @@ class DispLink:
         cls.localEvdiRepo = git.Repo(cls.evdiGitPath)
         cls.evdiOrigin = cls.localEvdiRepo.remotes.origin
 
-        # Quirky -- may return to subprocess with git commands because it sometimes will list 1.14.5 as the latest version
-        # Keep Original with `reverse=True`
-        # evdiList: List[TagReference] = sorted(
-        #     cls.localEvdiRepo.tags, 
-        #     key=lambda t: t.commit.committed_date,
-        #     reverse=True
-        # )
         cls.evdiList = sorted(
             cls.localEvdiRepo.tags, 
             key=lambda t: t.commit.committed_date
@@ -300,7 +293,7 @@ class DispLink:
         )
         if displayService.stdout.strip():
             displayServiceUnit: subprocess.CompletedProcess[str] = subprocess.run(
-                f"systemctl enable --now {displayServiceUnit.stdout.strip()}",
+                f"systemctl restart {displayServiceUnit.stdout.strip()}",
                 shell=True, 
                 capture_output=True, 
                 text=True
@@ -388,7 +381,7 @@ class ChoiceButton(Button):
 
 # DisplayLink/EVDI Installed Warning Modal
 class InstallModal(ModalScreen[bool]):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def compose(self) -> ComposeResult:
         with Container(id="installDialog"):
@@ -406,7 +399,7 @@ class InstallModal(ModalScreen[bool]):
 
 # Main DisplayLink/EVDI Uninstall Dialog Screen
 class UninstallDialogScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self, 
@@ -437,7 +430,7 @@ class UninstallDialogScreen(Screen):
 
 # DisplayLink Uninstall Screen
 class UninstallIndicatorScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self,
@@ -470,7 +463,7 @@ class UninstallIndicatorScreen(Screen):
 
 # DisplayLink Uninstallation Complete and Reboot Screen
 class UninstallCompleteScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
@@ -490,7 +483,7 @@ class UninstallCompleteScreen(Screen):
 
 # Main Install Dialog Begin Screen
 class BeginInstallScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self,
@@ -521,7 +514,7 @@ class BeginInstallScreen(Screen):
 
 # EVDI Software Download Screen
 class DownloadEvdiSoftwareScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self,
@@ -552,7 +545,7 @@ class DownloadEvdiSoftwareScreen(Screen):
 
 # To-Do: EVDI List Screen
 class EvdiDecisionScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self, 
@@ -593,7 +586,7 @@ class EvdiDecisionScreen(Screen):
 
 # DisplayLink Software Download Screen
 class DisplayLinkDownloadScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self,
@@ -624,7 +617,7 @@ class DisplayLinkDownloadScreen(Screen):
 
 # DisplayLink Software Install Screen
 class BeginDisplayLinkInstallDialogueScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self,
@@ -658,7 +651,7 @@ class BeginDisplayLinkInstallDialogueScreen(Screen):
 
 # DisplayLink Install Functions Screen
 class DisplayLinkInstallationScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self,
@@ -694,7 +687,7 @@ class DisplayLinkInstallationScreen(Screen):
 
 # Clean Files and Exit Screen
 class CleanFilesExitScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self,
@@ -722,7 +715,7 @@ class CleanFilesExitScreen(Screen):
 
 # Finalize Screen 
 class FinalizeScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self,
@@ -757,7 +750,7 @@ class FinalizeScreen(Screen):
 
 # Finish and Exit Screen
 class FinishExitScreen(Screen):
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self,
@@ -811,7 +804,7 @@ class DisplayLinkInstaller(App):
         Binding(key="q", action="quit", description="Quit the DisplayLink Installer")
     ]
 
-    CSS_PATH = "styles.tcss"
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def __init__(
         self,
