@@ -14,9 +14,6 @@ RichLog {
     border: tall $primary;
     background: #000000;
 }
-Label {
-    margin-bottom: 1;
-}
 ListView {
     margin: 2;
 }
@@ -59,7 +56,7 @@ Button.dialogQbtn {
 Button.dialogQbtn:focus, .dialogQbtn:hover {
     color: #d8dee9;
     background: #bf616a;
-    text-style: bold underline;
+    text-style: bold;
 }
 
 
@@ -89,7 +86,7 @@ Button.dialogUnbtn {
 Button.dialogUnbtn:focus, .dialogUnbtn:hover {
     color: #d8dee9;
     background: #bf616a;
-    text-style: bold underline;
+    text-style: bold;
 }
 
 
@@ -134,7 +131,7 @@ Button.dialogBeginbtn {
 Button.dialogBeginbtn:focus, .dialogBeginbtn:hover {
     color: #2e3440;
     background: #88c0d0;
-    text-style: bold underline;
+    text-style: bold;
 }
 
 /*
@@ -178,7 +175,7 @@ Button.dialogInstallbtn {
 Button.dialogInstallbtn:focus, .dialogInstallbtn:hover {
     color: #2e3440;
     background: #88c0d0;
-    text-style: bold underline;
+    text-style: bold;
 }
 
 /*
