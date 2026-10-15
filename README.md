@@ -6,6 +6,7 @@
 >
 > 
 > **References and Attribution:**
+> - [Textual](https://textual.textualize.io/)  
 > - [JBlond - Bash Colors](https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124)  
 > - [Braile-progress-bar-bash](https://github.com/Jul10l1r4/Braile-progress-bar-bash/tree/master)  
 > - [Fix DisplayLink on Kernel 6.0 and up](https://mrk.sh/fix-displaylink-kernel6.0/)  
@@ -15,6 +16,9 @@
 > - [Reddit: DisplayLink Driver](https://www.reddit.com/r/voidlinux/comments/peq1se/displaylink_driver/)
 > - [Alberta Tech - Hilarious Nerd Merch (I am not affiliated, just showing some love)](https://shop.albertatech.co/)  
 
+## Release Update:  
+
+This was re-written as a self-contained python executable written with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`
 
 ## Preface:  
 
@@ -103,4 +107,46 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
 
 ```
 sudo displaylink-installer uninstall
+```
+
+## To build `python` package:  
+
+**Instructions:**  
+
+1) Go into `py_displaylink_synaptics_install/` directory.  
+
+```
+cd py_displaylink_synaptics_install/
+```
+
+2) Install python dependencies:  
+
+```
+pip install -r requirements.txt
+```
+
+3) Install `Playwright` Chromium dependency:  
+
+```
+PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
+```
+
+4) Build package:  
+
+```
+pyinstaller --onefile --add-data "styles.tcss:." py_displaylink_synaptics_install.py
+```
+
+5) Built package will be within the `dist/` sub-directory:  
+
+```
+cd dist/
+```
+
+```
+chmod +x py_displaylink_synaptics_install
+```
+
+```
+sudo ./py_displaylink_synaptics_install
 ```
