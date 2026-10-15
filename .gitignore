@@ -1,5 +1,4 @@
 # Playwright Scraper
-
 py_playwright_scraper/*venv/
 py_playwright_scraper/dist/
 py_playwright_scraper/build/
