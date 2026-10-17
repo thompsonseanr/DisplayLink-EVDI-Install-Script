@@ -1,7 +1,8 @@
 import os
+import socket
+import shutil
 import sys
 import subprocess
-import shutil
 import git
 import tarfile
 import zipfile
@@ -59,6 +60,21 @@ class DispLink:
     displayLinkFullNameUp: Path | None = None
     displayLinkFileDir: Path | None = None
     displayLinkInstallDir: Path | None = None
+
+
+    # https://stackoverflow.com/questions/20913411/test-if-an-internet-connection-is-present-in-python
+    @staticmethod
+    def connection_check(host="1.1.1.1", port=443, timeOut=3) -> boolean:
+        try:
+            socket.setdefaulttimeout(timeOut)
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((host, port))
+            return True
+        except(socket.error, OSError):
+            pass
+
+        return False
+
 
     @staticmethod
     def runit_test() -> subprocess.CompletedProcess[str]:
@@ -303,12 +319,13 @@ class DispLink:
             )
 
 
+CONNECTION_MESSAGE = """
+[bold]>>> Warning:[/bold] Please connect to the internet before proceeding with the DisplayLink installer.
+"""
 
 MODAL_MESSAGE = """
 [bold]>>> Warning:[/bold] DisplayLink Firmware is already installed. Proceed?
-
 """
-
 
 UNINSTALL_MESSAGE = """
 [bold]>>> Uninstall the DisplayLink and EVDI Firmware?[/bold]
@@ -377,6 +394,20 @@ class ChoiceButton(Button):
         elif event.key == "left":
             self.screen.focus_previous()
             event.stop()
+
+
+# DisplayLink/EVDI Installed Warning Modal
+class NoConnectionModal(ModalScreen[bool]):
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
+
+    def compose(self) -> ComposeResult:
+        with Container(id="installDialog"):
+            yield Static(CONNECTION_MESSAGE)
+            with Grid(id="horizontalInstBtn"):
+                yield ChoiceButton("Exit Installer", id="noBtn", classes="dialogQbtn")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.dismiss(False)
 
 
 # DisplayLink/EVDI Installed Warning Modal
@@ -813,6 +844,7 @@ class DisplayLinkInstaller(App):
         ) -> None:
         
         self.displayLinkCl = displayLinkCl
+        self.connectTest = displayLinkCl.connection_check()
         self.displayLinkInstallCheck = displayLinkCl.displaylink_install_check()
         super().__init__(**kwargs)
 
@@ -825,7 +857,10 @@ class DisplayLinkInstaller(App):
         self.push_screen(BeginInstallScreen(
             displayLinkCl=self.displayLinkCl
         ))
-        if self.displayLinkInstallCheck:
+        if not self.connectTest:
+            self.push_screen(NoConnectionModal(), self.handle_modal_result)
+
+        if self.displayLinkInstallCheck and self.connectTest:
             self.push_screen(InstallModal(), self.handle_modal_result)
 
     def handle_modal_result(self, result: bool | None) -> None:
