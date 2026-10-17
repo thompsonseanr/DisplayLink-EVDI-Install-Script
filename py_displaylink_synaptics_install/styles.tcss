@@ -3,22 +3,34 @@ Header {
     align: center middle;
     dock: top;
 }
+
 Footer {
     height: 1;
     align: left middle;
     dock: bottom;
 }
+
 RichLog {
     height: 1fr;
     padding: 1 2;
     border: tall $primary;
     background: #000000;
 }
+
 ListView {
     margin: 2;
 }
+
 ListItem {
     padding: 1;
+}
+
+/*
+NoConnectionModal
+*/
+
+NoConnectionModal {
+    align: center middle;
 }
 
 /*
