@@ -30,7 +30,7 @@ from textual.widgets import Placeholder, Static, LoadingIndicator, ListView, Lis
 
 # Personal Dev Notes:
 # Write error catching and file removal scripts on failures
-# Write error page for no network connection
+# Write error page for no network connection -- DONE
 # Playwright drivers will have to be installed with this ENV for pyinstaller:
 # PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
 # Build with:
@@ -384,9 +384,9 @@ To start the service if not running:
 """
 
 
+# Buttons with right/left arrow key focus
 class ChoiceButton(Button):
-    """A button that shifts focus on left/right arrow keys."""
-
+    
     def on_key(self, event: Key) -> None:
         if event.key == "right":
             self.screen.focus_next()
