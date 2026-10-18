@@ -19,11 +19,7 @@ on:
 jobs:
   release:
     name: Build and Release
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    runs-on: windows-latest
     defaults:
       run:
         working-directory: ./py_displaylink_synaptics_install
@@ -40,12 +36,6 @@ jobs:
       # 1. Checkout the repository code
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      # 2. Simulate generating your file (Replace this with your actual build steps)
-      # - name: Generate Asset File
-      #   run: |
-      #     echo "This is my compiled production build data." > build-artifact.txt
-      #     # If you are zipping a folder, you can do: zip -r asset.zip ./dist
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -65,11 +55,10 @@ jobs:
           pyinstaller --onefile --add-data "styles.tcss:." --windowed ${{ env.MAIN_PY_FILE }}
 
       - name: Create Artifact (Linux)
-        if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: linux-executables
-          path: dist/
+          path: dist/py_displaylink_synaptics_install
 
       # 3. Create GitHub Release and upload the generated file
       - name: Create GitHub Release
