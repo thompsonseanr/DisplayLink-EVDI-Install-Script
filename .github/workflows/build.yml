@@ -47,8 +47,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Install Playwright Chromium
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
         run: | 
-          PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
+          playwright install chromium
 
       - name: Build executable
         run: |
