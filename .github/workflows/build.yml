@@ -1,0 +1,9 @@
+name: DisplayLink Installer Pyinstaller Build
+
+# Merge into 'main'
+on: [merge]
+
+jobs:
+  build-and-test:
+    runs-on: 
+
