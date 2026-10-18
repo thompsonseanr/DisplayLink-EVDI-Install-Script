@@ -1,0 +1,85 @@
+name: DisplayLink Installer Pyinstaller Release Build
+
+# Trigger workflow with creation of 'v' tag
+on:
+  push:
+    tags:
+      - 'v*'
+
+# Playwright drivers will have to be installed with this ENV for pyinstaller:
+# PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
+# Build with:
+# pyinstaller --onefile --add-data "styles.tcss:." py_displaylink_synaptics_install.py
+
+# References:
+# https://batsov.com/articles/2025/02/27/automate-the-creation-of-github-releases/
+# https://cli.github.com/manual/gh_release_create
+# https://github.com/NotCookey/Pyinstaller-Github-Actions
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    defaults:
+      run:
+        working-directory: ./py_displaylink_synaptics_install
+    
+    # Required permissions to create releases and upload assets
+    permissions:
+      contents: write
+
+    # Define the path to your main.py file here
+    env:
+      MAIN_PY_FILE: 'py_displaylink_synaptics_install.py'
+
+    steps:
+      # 1. Checkout the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Simulate generating your file (Replace this with your actual build steps)
+      # - name: Generate Asset File
+      #   run: |
+      #     echo "This is my compiled production build data." > build-artifact.txt
+      #     # If you are zipping a folder, you can do: zip -r asset.zip ./dist
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.14'
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Install Playwright Chromium
+        run: | 
+          PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
+
+      - name: Build executable
+        run: |
+          pyinstaller --onefile --add-data "styles.tcss:." --windowed ${{ env.MAIN_PY_FILE }}
+
+      - name: Create Artifact (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-executables
+          path: dist/
+
+      # 3. Create GitHub Release and upload the generated file
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ github.ref_name }} \
+            ./dist/py_displaylink_synaptics_install \
+            --title "Release ${{ github.ref_name }}" \
+            --generate-notes \
+            --notes-file \
+            ./release-notes.md
+
