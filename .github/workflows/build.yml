@@ -67,6 +67,9 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./py_displaylink_synaptics_install
     steps:
       - name: Checkout repository (for release notes)
         uses: actions/checkout@v4
