@@ -71,7 +71,6 @@ jobs:
       run:
         working-directory: ./py_displaylink_synaptics_install
     steps:
-    steps:
       - name: Checkout repository (for release notes)
         uses: actions/checkout@v4
 
