@@ -20,7 +20,7 @@
 > **Bugfixes and Contributions:**  
 > - [edzweistein](https://github.com/edzweistein)  
 
-## Release Update:  
+<!-- ## Release Update:  
 
 This was re-written as a self-contained python executable with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
 
@@ -30,7 +30,7 @@ The shell script can still be used, but will no longer be actively maintained ou
 
 <br>  
 
-The python executable will still require build dependencies to be installed as noted in the release notes.
+The python executable will still require build dependencies to be installed as noted in the release notes. -->
 
 ## Preface:  
 
