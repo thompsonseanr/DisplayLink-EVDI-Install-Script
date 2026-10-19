@@ -310,7 +310,10 @@ class DispLink:
             capture_output=True, 
             text=True
         )
-        if displayService.stdout.strip():
+
+        displayServiceName = displayService.stdout.strip()
+        
+        if displayServiceName:
             displayServiceUnit: subprocess.CompletedProcess[str] = subprocess.run(
                 f"systemctl restart {displayServiceUnit.stdout.strip()}",
                 shell=True, 
