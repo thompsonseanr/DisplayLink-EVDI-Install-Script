@@ -41,7 +41,11 @@ jobs:
 
       - name: Set up Python in Fedora
         run: |
-          dnf install python3.14 python3-pip python3-devel gcc
+          dnf install -y python3.14 python3.14-devel gcc gcc-c++
+
+      - name: Ensure Pip
+        run: |
+          python3.14 -m ensurepip --default-pip
 
       - name: Install Python dependencies
         run: |
