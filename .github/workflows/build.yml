@@ -56,11 +56,11 @@ jobs:
         run: |
           pyinstaller --onefile --add-data "styles.tcss:." --windowed ${{ env.MAIN_PY_FILE }}
 
-      - name: Create Artifact (Linux)
+      - name: Upload Artifact (Linux)
         uses: actions/upload-artifact@v4
         with:
           name: linux-executables
-          path: ./dist/py_displaylink_synaptics_install
+          path: ${{ github.workspace }}/py_displaylink_synaptics_install/dist/py_displaylink_synaptics_install
 
       # 3. Create GitHub Release and upload the generated file
       - name: Create GitHub Release
