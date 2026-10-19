@@ -20,6 +20,8 @@ jobs:
   release:
     name: Build and Release
     runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
     defaults:
       run:
         working-directory: ./py_displaylink_synaptics_install
@@ -37,10 +39,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.14'
+      - name: Set up Python in Fedora
+        run: |
+          dnf install python3.14 python3.14-pip python3.14-devel gcc
 
       - name: Install Python dependencies
         run: |
