@@ -122,7 +122,7 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
 sudo displaylink-installer uninstall
 ```
 
-## To build `python` package:  
+## To build the `python` package:  
 
 **Instructions:**  
 
