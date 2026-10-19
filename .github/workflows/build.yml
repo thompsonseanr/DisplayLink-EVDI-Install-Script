@@ -64,6 +64,7 @@ jobs:
 
       # 3. Create GitHub Release and upload the generated file
       - name: Create GitHub Release
+        shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
