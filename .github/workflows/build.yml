@@ -19,7 +19,7 @@ on:
 jobs:
   release:
     name: Build and Release
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./py_displaylink_synaptics_install
