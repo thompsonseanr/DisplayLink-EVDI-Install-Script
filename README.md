@@ -1,4 +1,4 @@
-# Linux Multi-Monitor DisplayLink Driver and EVDI Install Utility Shell Script
+# Linux Multi-Monitor DisplayLink Driver and EVDI Install Utility
 
 > **Download Links:**  
 > - [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi)  
@@ -22,8 +22,15 @@
 
 ## Release Update:  
 
-This was re-written as a self-contained python executable written with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
-The executable will still require build dependencies to be installed.
+This was re-written as a self-contained python executable with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
+
+<br>
+
+The shell script can still be used, but will no longer be actively maintained outside of periodically updating the `Synaptics Displaylink Driver` download url.
+
+<br>  
+
+The python executable will still require build dependencies to be installed as noted in the release notes.
 
 ## Preface:  
 
