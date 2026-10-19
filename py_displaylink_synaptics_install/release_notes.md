@@ -2,9 +2,17 @@
 
 **Please Note:** This installer is meant only for Linux.  
 
-1) Install dependencies (if not already installed):  
+1) **Please download:** `py_displaylink_synaptics_install`  
+  
+<br>  
+
+2) Install dependencies (if not already installed):  
+
+<br>
 
 - if any dependencies on these lists are missing, please create a `github issue` and I will update the list for each respective distro.  
+
+<br>
 
 **Void Linux:**  
 
@@ -34,14 +42,18 @@ zypper install -t pattern devel_basis
 ```
 zypper install kernel-devel kernel-source libdrm-devel dkms
 ```
+  
+<br>  
 
-2) Make `py_displaylink_synaptics_install` executable:  
+3) Make `py_displaylink_synaptics_install` executable:  
 
 ```
 chmod +x py_displaylink_synaptics_install
 ```
+  
+<br>  
 
-3) Run installer as `sudo`:  
+4) Run installer as `sudo`:  
 
 ```
 sudo ./py_displaylink_synaptics_install

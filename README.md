@@ -22,7 +22,8 @@
 
 ## Release Update:  
 
-This was re-written as a self-contained python executable written with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`
+This was re-written as a self-contained python executable written with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
+The executable will still require build dependencies to be installed.
 
 ## Preface:  
 

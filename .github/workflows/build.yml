@@ -19,11 +19,7 @@ on:
 jobs:
   release:
     name: Build and Release
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./py_displaylink_synaptics_install
@@ -41,12 +37,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. Simulate generating your file (Replace this with your actual build steps)
-      # - name: Generate Asset File
-      #   run: |
-      #     echo "This is my compiled production build data." > build-artifact.txt
-      #     # If you are zipping a folder, you can do: zip -r asset.zip ./dist
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -57,29 +47,26 @@ jobs:
           pip install -r requirements.txt
 
       - name: Install Playwright Chromium
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
         run: | 
-          PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
+          playwright install chromium
 
       - name: Build executable
         run: |
           pyinstaller --onefile --add-data "styles.tcss:." --windowed ${{ env.MAIN_PY_FILE }}
 
-      - name: Create Artifact (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v3
+      - name: Upload Artifact (Linux)
+        uses: actions/upload-artifact@v4
         with:
           name: linux-executables
-          path: dist/
+          path: ${{ github.workspace }}/py_displaylink_synaptics_install/dist/py_displaylink_synaptics_install
 
       # 3. Create GitHub Release and upload the generated file
       - name: Create GitHub Release
+        shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ github.ref_name }} \
-            ./dist/py_displaylink_synaptics_install \
-            --title "Release ${{ github.ref_name }}" \
-            --generate-notes \
-            --notes-file \
-            ./release-notes.md
+          gh release create ${{ github.ref_name }} ${{ github.workspace }}/py_displaylink_synaptics_install/dist/py_displaylink_synaptics_install --title "Release ${{ github.ref_name }}" --generate-notes --notes-file release_notes.md
 
