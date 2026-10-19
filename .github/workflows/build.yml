@@ -68,5 +68,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ github.ref_name }} ./dist/py_displaylink_synaptics_install --title "Release ${{ github.ref_name }}" --generate-notes --notes-file release_notes.md
+          gh release create ${{ github.ref_name }} ${{ github.workspace }}/py_displaylink_synaptics_install/dist/py_displaylink_synaptics_install --title "Release ${{ github.ref_name }}" --generate-notes --notes-file release_notes.md
 
