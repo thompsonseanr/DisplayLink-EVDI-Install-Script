@@ -20,6 +20,8 @@ jobs:
   release:
     name: Build and Release
     runs-on: ubuntu-latest
+    container:
+      image: fedora-latest
     defaults:
       run:
         working-directory: ./py_displaylink_synaptics_install
