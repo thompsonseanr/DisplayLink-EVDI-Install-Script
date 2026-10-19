@@ -16,9 +16,12 @@ on:
 # https://cli.github.com/manual/gh_release_create
 # https://github.com/NotCookey/Pyinstaller-Github-Actions
 
+# Required permissions to create releases and upload assets
+permissions:
+  contents: write
+
 jobs:
-  release:
-    name: Build and Release
+  build:
     runs-on: ubuntu-latest
     container:
       image: fedora:latest
@@ -26,22 +29,16 @@ jobs:
       run:
         working-directory: ./py_displaylink_synaptics_install
     
-    # Required permissions to create releases and upload assets
-    permissions:
-      contents: write
-
-    # Define the path to your main.py file here
     env:
       MAIN_PY_FILE: 'py_displaylink_synaptics_install.py'
 
     steps:
-      # 1. Checkout the repository code
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up Python in Fedora
         run: |
-          dnf install -y python3.14 python3.14-devel gcc gcc-c++ gh
+          dnf install -y python3.14 python3.14-devel gcc gcc-c++
 
       - name: Ensure Pip
         run: |
@@ -65,16 +62,31 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-executables
-          path: ${{ github.workspace }}/py_displaylink_synaptics_install/dist/py_displaylink_synaptics_install
+          path: py_displaylink_synaptics_install/dist/py_displaylink_synaptics_install
 
-      # 3. Create GitHub Release and upload the generated file
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./py_displaylink_synaptics_install
+    steps:
+      - name: Checkout repository (for release notes)
+        uses: actions/checkout@v4
+
+      - name: Download Built Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-executables
+          path: ${{ github.workspace }}/release_files/
+
       - name: Create Release
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create ${{ github.ref_name }} \
-            "${{ github.workspace }}/py_displaylink_synaptics_install/dist/"* \
+            "${{ github.workspace }}/release_files/py_displaylink_synaptics_install" \
             --title "Release ${{ github.ref_name }}" \
             --generate-notes \
             --notes-file release_notes.md
-
