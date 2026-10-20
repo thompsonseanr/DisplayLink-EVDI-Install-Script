@@ -315,7 +315,7 @@ class DispLink:
         
         if displayServiceName:
             displayServiceUnit: subprocess.CompletedProcess[str] = subprocess.run(
-                f"systemctl restart {displayServiceUnit.stdout.strip()}",
+                f"systemctl restart {displayServiceName}",
                 shell=True, 
                 capture_output=True, 
                 text=True
