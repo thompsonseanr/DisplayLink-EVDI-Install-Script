@@ -46,8 +46,8 @@ jobs:
       # Void Container
       - name: Set up Python in Void
         run: |
-          xbps-install -Syu || true
-          xbps-install -y python3 python3-devel base-devel
+          xbps-install -Syu && \
+          xbps-install -y python3 python3-devel base-devel bash binutils
 
       # Fedora Latest Container
       # - name: Ensure Pip
