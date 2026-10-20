@@ -23,8 +23,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # container:
-    #   image: fedora:latest
     container:
       image: ghcr.io/void-linux/void-glibc-full:latest
     defaults:
