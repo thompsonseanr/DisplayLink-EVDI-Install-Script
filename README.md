@@ -15,6 +15,7 @@
 > - [Synaptics DisplayLink with evdi DKMS Module - Works!](https://voidforums.com/viewtopic.php?t=1781)  
 > - [Reddit: DisplayLink Driver](https://www.reddit.com/r/voidlinux/comments/peq1se/displaylink_driver/)
 > - [Alberta Tech - Hilarious Nerd Merch (I am not affiliated, just showing some love)](https://shop.albertatech.co/)  
+> - [Buddhist Quotes About Patience in Difficult Times - Buddhist monks of Kōyasan Kongō Sanmai-in](https://gassho.info/blog-page/buddhist-quotes-patience-difficult-times/)  
 >
 >
 > **Bugfixes and Contributions:**  

@@ -64,7 +64,7 @@ class DispLink:
 
     # https://stackoverflow.com/questions/20913411/test-if-an-internet-connection-is-present-in-python
     @staticmethod
-    def connection_check(host="1.1.1.1", port=443, timeOut=3) -> boolean:
+    def connection_check(host="1.1.1.1", port=443, timeOut=3) -> bool:
         try:
             socket.setdefaulttimeout(timeOut)
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -341,6 +341,13 @@ UNINSTALL_MESSAGE = """
 Uninstalling will require a reboot to fully remove the EVDI software driver and this installer will have to be re-run.
 """
 
+UNINSTALLATION_LOG_MESSAGE = """
+>>> Uninstalling Synaptics DisplayLink Driver and the EVDI software driver.
+
+>>> Please be patient as it completes... ("A gentle mind is a protected mind.")
+
+"""
+
 BEGIN_MESSAGE = """
 [bold]::: Welcome to the DisplayLink and EVDI installer for linux docking station multi-monitor support.[/bold]
 
@@ -359,6 +366,12 @@ INSTALL_DEC_MESSAGE = """
 
 ::: Select [bold]'Yes'[/bold] to install
 ::: Select [bold]'No'[/bold] to delete downloaded files/directories and close the app
+
+"""
+
+INSTALLATION_LOG_MESSAGE = """
+>>> Now installing Synaptics DisplayLink Driver.
+>>> Please wait until it finishes... ("Hatred is not ended by hatred, but by non-hatred.")
 
 """
 
@@ -478,7 +491,7 @@ class UninstallIndicatorScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="unDispDialog"):
-            yield Label(">>> Uninstalling Synaptics DisplayLink Driver and the EVDI software driver.")
+            yield Static(UNINSTALLATION_LOG_MESSAGE)
             yield RichLog(id="uninstallLog", highlight=True, markup=True)
         yield Footer(id="Footer")
 
@@ -699,8 +712,7 @@ class DisplayLinkInstallationScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="unDispDialog"):
-            yield Label(">>> Now installing Synaptics DisplayLink Driver.")
-            yield Label(">>> Please wait until it finishes... (Yeah, be patient)")
+            yield Static(INSTALLATION_LOG_MESSAGE)
             yield RichLog(id="installLog", highlight=True, markup=True)
         yield Footer(id="Footer")
 

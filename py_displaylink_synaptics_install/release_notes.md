@@ -1,4 +1,11 @@
-# Quickstart:  
+## Quickstart:  
+
+**Release Notes for v1.1.3:**  
+- Updated massages  
+- Fixed minor type issue    
+
+<br>
+
 
 **Please Note:** This installer is meant only for Linux.  
 
@@ -14,13 +21,13 @@
 
 <br>
 
-**Void Linux:**  
+Void Linux:  
 
 ```
 xbps-install -S xbps-install -S dkms libdrm libdrm-devel zstd pkg-config wget zip unzip
 ```
 
-**Fedora:**  
+Fedora:  
 
 ```
 dnf install dkms libdrm libdrm-devel kernel-devel kernel-headers wget zstd
@@ -30,12 +37,12 @@ dnf install dkms libdrm libdrm-devel kernel-devel kernel-headers wget zstd
 dnf group install development-tools
 ```  
 
-**Arch:**    
+Arch:    
 ```
 pacman -S --needed base-devel linux-headers wget zstd libdrm dkms zip unzip
 ```
 
-**openSUSE Tumbleweed:**  
+openSUSE Tumbleweed:  
 ```
 zypper install -t pattern devel_basis
 ```
