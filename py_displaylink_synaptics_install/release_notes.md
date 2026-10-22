@@ -1,10 +1,5 @@
 ## Quickstart:  
 
-**Release Notes for v1.1.4:**  
-- Updated massages  
-
-<br>
-
 
 **Please Note:** This installer is meant only for Linux.  
 
