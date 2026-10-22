@@ -344,7 +344,7 @@ Uninstalling will require a reboot to fully remove the EVDI software driver and 
 UNINSTALLATION_LOG_MESSAGE = """
 >>> Uninstalling Synaptics DisplayLink Driver and the EVDI software driver.
 
->>> Please be patient as it completes... (Please be patient as it uninstalls)
+>>> Please be patient as it completes...
 
 """
 
@@ -371,7 +371,7 @@ INSTALL_DEC_MESSAGE = """
 
 INSTALLATION_LOG_MESSAGE = """
 >>> Now installing Synaptics DisplayLink Driver.
->>> Please wait until it finishes... (Please be patient; building the EVDI DKMS takes time)
+>>> Please wait until it finishes... (Building the EVDI DKMS takes time)
 
 """
 
