@@ -21,7 +21,7 @@
 
 ## Release Update:  
 
-This was re-written as a self-contained python ELF executable with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
+This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
 
 <br>
 
@@ -29,7 +29,7 @@ The shell script can still be used, but will no longer be actively maintained ou
 
 <br>  
 
-The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section [Build the python ELF executable locally with pyinstaller](#build-the-python-elf-executable-locally-with-pyinstaller).
+The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section: [Build the python ELF binary locally with pyinstaller](#build-the-python-elf-binary-locally-with-pyinstaller).
 
 ## Preface:  
 
@@ -121,7 +121,7 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
 sudo displaylink-installer uninstall
 ```
 
-## Build the python ELF executable locally with pyinstaller:  
+## Build the python ELF binary locally with pyinstaller:  
 
 **Instructions:**  
 
