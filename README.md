@@ -30,7 +30,7 @@ The shell script can still be used, but will no longer be actively maintained ou
 
 <br>  
 
-The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section [To build the `python` ELF executable locally with pyinstaller](#to-build-the-python-elf-executable-locally-with-pyinstaller).
+The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section [Build the python ELF executable locally with pyinstaller](#build-the-python-elf-executable-locally-with-pyinstaller).
 
 ## Preface:  
 
@@ -122,7 +122,7 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
 sudo displaylink-installer uninstall
 ```
 
-## To build the `python` ELF executable locally with pyinstaller:  
+## Build the python ELF executable locally with pyinstaller:  
 
 **Instructions:**  
 
