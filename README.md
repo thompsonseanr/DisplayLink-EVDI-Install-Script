@@ -15,7 +15,6 @@
 > - [Synaptics DisplayLink with evdi DKMS Module - Works!](https://voidforums.com/viewtopic.php?t=1781)  
 > - [Reddit: DisplayLink Driver](https://www.reddit.com/r/voidlinux/comments/peq1se/displaylink_driver/)
 > - [Alberta Tech - Hilarious Nerd Merch (I am not affiliated, just showing some love)](https://shop.albertatech.co/)  
-> - [Buddhist Quotes About Patience in Difficult Times - Buddhist monks of Kōyasan Kongō Sanmai-in](https://gassho.info/blog-page/buddhist-quotes-patience-difficult-times/)  
 >
 >
 > **Bugfixes and Contributions:**  
@@ -23,7 +22,7 @@
 
 ## Release Update:  
 
-This was re-written as a self-contained python executable with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
+This was re-written as a self-contained python ELF executable with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
 
 <br>
 
@@ -31,7 +30,7 @@ The shell script can still be used, but will no longer be actively maintained ou
 
 <br>  
 
-The python executable will still require build dependencies to be installed as noted in the release notes.
+The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section [To build the `python` ELF executable locally with pyinstaller](#to-build-the-python-elf-executable-locally-with-pyinstaller).
 
 ## Preface:  
 
@@ -123,7 +122,7 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
 sudo displaylink-installer uninstall
 ```
 
-## To build the `python` package:  
+## To build the `python` ELF executable locally with pyinstaller:  
 
 **Instructions:**  
 

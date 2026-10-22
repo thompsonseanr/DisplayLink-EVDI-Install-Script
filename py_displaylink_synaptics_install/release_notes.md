@@ -1,15 +1,14 @@
 ## Quickstart:  
 
-**Release Notes for v1.1.3:**  
+**Release Notes for v1.1.4:**  
 - Updated massages  
-- Fixed minor type issue    
 
 <br>
 
 
 **Please Note:** This installer is meant only for Linux.  
 
-1) **Please download:** `py_displaylink_synaptics_install`  
+1) **Please download the ELF executable:** `py_displaylink_synaptics_install`  
   
 <br>  
 
