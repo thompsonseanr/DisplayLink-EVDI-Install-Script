@@ -8,14 +8,12 @@
 > **References and Attribution:**
 > - [Textual](https://textual.textualize.io/)  
 > - [JBlond - Bash Colors](https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124)  
-> - [Braile-progress-bar-bash](https://github.com/Jul10l1r4/Braile-progress-bar-bash/tree/master)  
 > - [Fix DisplayLink on Kernel 6.0 and up](https://mrk.sh/fix-displaylink-kernel6.0/)  
 > - [Fixing DisplayLink (EVDI) drivers for Linux kernel 6.x](https://code.berrydejager.com/Fix-DisplayLink_drivers-linux-kernel-6/)  
 > - [Porting the DisplayLink Ubuntu driver to other Linux distributions](https://support.displaylink.com/knowledgebase/articles/679060)  
 > - [Synaptics DisplayLink with evdi DKMS Module - Works!](https://voidforums.com/viewtopic.php?t=1781)  
 > - [Reddit: DisplayLink Driver](https://www.reddit.com/r/voidlinux/comments/peq1se/displaylink_driver/)
 > - [Alberta Tech - Hilarious Nerd Merch (I am not affiliated, just showing some love)](https://shop.albertatech.co/)  
-> - [Buddhist Quotes About Patience in Difficult Times - Buddhist monks of Kōyasan Kongō Sanmai-in](https://gassho.info/blog-page/buddhist-quotes-patience-difficult-times/)  
 >
 >
 > **Bugfixes and Contributions:**  
@@ -23,7 +21,7 @@
 
 ## Release Update:  
 
-This was re-written as a self-contained python executable with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
+This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
 
 <br>
 
@@ -31,7 +29,7 @@ The shell script can still be used, but will no longer be actively maintained ou
 
 <br>  
 
-The python executable will still require build dependencies to be installed as noted in the release notes.
+The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section: [Build the python ELF binary locally with pyinstaller](#build-the-python-elf-binary-locally-with-pyinstaller).
 
 ## Preface:  
 
@@ -123,7 +121,7 @@ The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere 
 sudo displaylink-installer uninstall
 ```
 
-## To build the `python` package:  
+## Build the python ELF binary locally with pyinstaller:  
 
 **Instructions:**  
 
