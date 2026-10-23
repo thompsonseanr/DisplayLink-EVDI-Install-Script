@@ -41,7 +41,7 @@ InstallModal {
     align: center middle;
 }
 
-#installDialog {
+#install-dialog {
     align: center middle;
     width: 80;
     height: 30;
@@ -50,7 +50,7 @@ InstallModal {
     padding: 1 2;
 }
 
-#horizontalInstBtn {
+#horizontal-inst-btn {
     layout: grid;
     grid-size: 2;
     height: auto;
@@ -59,13 +59,13 @@ InstallModal {
     border: solid #d8dee9;
 }
 
-Button.dialogQbtn {
+Button.dialog-q-btn {
     color: #2e3440;
     background: #5e81ac;
     text-style: none;
 }
 
-Button.dialogQbtn:focus, .dialogQbtn:hover {
+Button.dialog-q-btn:focus, .dialog-q-btn:hover {
     color: #d8dee9;
     background: #bf616a;
     text-style: bold;
@@ -80,7 +80,7 @@ UninstallDialogScreen {
     align: center middle;
 }
 
-#unDispDialog {
+#undisp-dialog {
     align: center middle;
     width: 80;
     height: 30;
@@ -89,13 +89,13 @@ UninstallDialogScreen {
     padding: 1 2;
 }
 
-Button.dialogUnbtn {
+Button.dialog-un-btn {
     color: #2e3440;
     background: #5e81ac;
     text-style: none;
 }
 
-Button.dialogUnbtn:focus, .dialogUnbtn:hover {
+Button.dialog-un-btn:focus, .dialog-un-btn:hover {
     color: #d8dee9;
     background: #bf616a;
     text-style: bold;
@@ -134,13 +134,13 @@ BeginInstallScreen {
     align: center middle;
 }
 
-Button.dialogBeginbtn {
+Button.dialog-begin-btn {
     color: #2e3440;
     background: #5e81ac;
     text-style: none;
 }
 
-Button.dialogBeginbtn:focus, .dialogBeginbtn:hover {
+Button.dialog-begin-btn:focus, .dialog-begin-btn:hover {
     color: #2e3440;
     background: #88c0d0;
     text-style: bold;
@@ -178,13 +178,13 @@ BeginDisplayLinkInstallDialogueScreen {
     align: center middle;
 }
 
-Button.dialogInstallbtn {
+Button.dialog-install-btn {
     color: #2e3440;
     background: #5e81ac;
     text-style: none;
 }
 
-Button.dialogInstallbtn:focus, .dialogInstallbtn:hover {
+Button.dialog-install-btn:focus, .dialog-install-btn:hover {
     color: #2e3440;
     background: #88c0d0;
     text-style: bold;
@@ -214,7 +214,7 @@ FinalizeScreen {
     align: center middle;
 }
 
-#finishInstMessage {
+#finish-inst-message {
     align: left top;
 }
 
@@ -226,7 +226,7 @@ FinishExitScreen {
     align: center middle;
 }
 
-#horizontalExBtn {
+#horizontal-ex-btn {
     layout: grid;
     grid-size: 1;
     height: auto;
@@ -234,11 +234,11 @@ FinishExitScreen {
     align: center middle;
 }
 
-#exitButton {
+#exit-button {
     display: none;
 }
 
-Button.exitInstBtn:focus, .exitInstBtn:hover {
+Button.exit-inst-btn:focus, .exit-inst-btn:hover {
     color: #2e3440;
     background: #88c0d0;
     text-style: bold;
