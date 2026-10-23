@@ -29,7 +29,7 @@ The shell script can still be used, but will no longer be actively maintained ou
 
 <br>  
 
-The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section: [Build the python ELF binary locally with pyinstaller](#build-the-python-elf-binary-locally-with-pyinstaller).
+The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section: [Build the python ELF binary locally with pyinstaller](#build-the-python-elf-binary-locally-with-pyinstaller).  
 
 ## Preface:  
 

@@ -30,7 +30,7 @@ from textual.widgets import Placeholder, Static, LoadingIndicator, ListView, Lis
 
 # Personal Dev Notes:
 # Write error catching and file removal scripts on failures
-# Write error page for no network connection -- DONE
+# DisplayLink installer was created with `makeself`
 # Playwright drivers will have to be installed with this ENV for pyinstaller:
 # PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
 # Build with:
@@ -41,25 +41,25 @@ if os.getuid() != 0:
     sys.exit(1)
 
 
-def dir_find(initSearchDir: Path, targetObj: str) -> list[Path]:
-    return [d for d in Path(initSearchDir).rglob(targetObj) if d.is_dir()]
+def dir_find(init_search_dir: Path, target_obj: str) -> list[Path]:
+    return [d for d in Path(init_search_dir).rglob(target_obj) if d.is_dir()]
 
-def file_find(initSearchDir: Path, targetObj: str) -> list[Path]:
-    return [f for f in Path(initSearchDir).rglob(targetObj) if f.is_file()]
+def file_find(init_search_dir: Path, target_obj: str) -> list[Path]:
+    return [f for f in Path(init_search_dir).rglob(target_obj) if f.is_file()]
 
 
 class DispLink:
 
-    initTmpDir: Path = Path("/tmp/")
-    evdiRepo: str = "https://github.com/DisplayLink/evdi.git"
-    evdiGitPath: Path = Path("/tmp/evdi")
-    evdiTarPath: str = os.path.dirname(evdiGitPath)
-    evdiOrigin: git.remote.Remote
-    evdiList: List[TagReference]
-    localEvdiRepo: git.repo.base.Repo
-    displayLinkFullNameUp: Path | None = None
-    displayLinkFileDir: Path | None = None
-    displayLinkInstallDir: Path | None = None
+    init_tmp_dir: Path = Path("/tmp/")
+    evdi_repo: str = "https://github.com/DisplayLink/evdi.git"
+    evdi_git_path: Path = Path("/tmp/evdi")
+    evdi_tar_path: str = os.path.dirname(evdi_git_path)
+    evdi_origin: git.remote.Remote
+    evdi_list: List[TagReference]
+    local_evdi_repo: git.repo.base.Repo
+    displaylink_full_name_up: Path | None = None
+    displaylink_file_dir: Path | None = None
+    displaylink_install_dir: Path | None = None
 
 
     # https://stackoverflow.com/questions/20913411/test-if-an-internet-connection-is-present-in-python
@@ -87,15 +87,15 @@ class DispLink:
 
     @staticmethod
     def displaylink_install_check() -> bool:
-        evdiTest: subprocess.CompletedProcess[str] = subprocess.run(
+        evdi_test: subprocess.CompletedProcess[str] = subprocess.run(
             f'lsmod | grep -Eio "evdi" | head -1', 
             shell=True, 
             capture_output=True, 
             text=True
         )
-        displayInstallerTest: Path = Path("/usr/bin/displaylink-installer")
-        isDisplayLinkInstalled: bool = True if (evdiTest.stdout and displayInstallerTest.is_file()) else False
-        return isDisplayLinkInstalled
+        display_installer_test: Path = Path("/usr/bin/displaylink-installer")
+        is_displaylink_installed: bool = True if (evdi_test.stdout and display_installer_test.is_file()) else False
+        return is_displaylink_installed
 
     @staticmethod
     def uninstall_display_link() -> Iterator[str]:
@@ -117,125 +117,125 @@ class DispLink:
 
     @classmethod
     def download_displaylink(cls) -> None:
-        displayLinkFullNameFindArt: list[Path] = file_find(cls.initTmpDir, "DisplayLink*.zip")
-        if displayLinkFullNameFindArt:
-            for fd in displayLinkFullNameFindArt:
+        displaylink_fullname_find_art: list[Path] = file_find(cls.init_tmp_dir, "DisplayLink*.zip")
+        if displaylink_fullname_find_art:
+            for fd in displaylink_fullname_find_art:
                 if fd and fd.is_file():
                     os.remove(fd)
 
         py_playwright_scraper.py_scraper()
 
-        displayLinkFullNameFind: list[Path] = file_find(cls.initTmpDir, "DisplayLink*.zip")
-        displayLinkFullName: Path | None = displayLinkFullNameFind[0] if displayLinkFullNameFind else None
-        if not displayLinkFullName:
+        displaylink_fullname_find: list[Path] = file_find(cls.init_tmp_dir, "DisplayLink*.zip")
+        displaylink_fullname: Path | None = displaylink_fullname_find[0] if displaylink_fullname_find else None
+        if not displaylink_fullname:
             sys.exit(1)
         else:
-            displayLinkPath: Path = displayLinkFullName.parent
-            displayLinkName: str = displayLinkFullName.name
-            displayLinkNameFix: Path = displayLinkFullName.parent / displayLinkFullName.name.replace(" ", "_")
-            shutil.move(str(displayLinkFullName), str(displayLinkNameFix))
-            cls.displayLinkFullNameUp = displayLinkNameFix
-            displayLinkVer: List[str] = re.findall(r"\d+\.\d+", cls.displayLinkFullNameUp.name)
-            displayLinkTarget: str = f"displaylink_{displayLinkVer[0]}"
-            cls.displayLinkFileDir = displayLinkFullName.parent / displayLinkTarget
-            cls.displayLinkInstallDir = Path(f"/opt/{displayLinkTarget}")
+            displaylink_path: Path = displaylink_fullname.parent
+            displaylink_name: str = displaylink_fullname.name
+            displaylink_name_fix: Path = displaylink_fullname.parent / displaylink_fullname.name.replace(" ", "_")
+            shutil.move(str(displaylink_fullname), str(displaylink_name_fix))
+            cls.displaylink_full_name_up = displaylink_name_fix
+            displaylink_ver: List[str] = re.findall(r"\d+\.\d+", cls.displaylink_full_name_up.name)
+            displayLinkTarget: str = f"displaylink_{displaylink_ver[0]}"
+            cls.displaylink_file_dir = displaylink_fullname.parent / displayLinkTarget
+            cls.displaylink_install_dir = Path(f"/opt/{displayLinkTarget}")
 
 
     @classmethod
     def clean_files(cls) -> None:
 
-        if Path(f"{cls.evdiTarPath}/evdi.tar.gz").is_file():
+        if Path(f"{cls.evdi_tar_path}/evdi.tar.gz").is_file():
             with suppress(FileNotFoundError):
-                os.remove(f"{cls.evdiTarPath}/evdi.tar.gz")
-        if cls.evdiGitPath:
+                os.remove(f"{cls.evdi_tar_path}/evdi.tar.gz")
+        if cls.evdi_git_path:
             with suppress(FileNotFoundError):
-                shutil.rmtree(cls.evdiGitPath)
-        if cls.displayLinkFullNameUp and Path(cls.displayLinkFullNameUp).is_file():
+                shutil.rmtree(cls.evdi_git_path)
+        if cls.displaylink_full_name_up and Path(cls.displaylink_full_name_up).is_file():
             with suppress(FileNotFoundError):
-                os.remove(cls.displayLinkFullNameUp)
-        if cls.displayLinkInstallDir and cls.displayLinkInstallDir.is_dir():
+                os.remove(cls.displaylink_full_name_up)
+        if cls.displaylink_install_dir and cls.displaylink_install_dir.is_dir():
             with suppress(FileNotFoundError):
-                shutil.rmtree(cls.displayLinkInstallDir)
+                shutil.rmtree(cls.displaylink_install_dir)
         return
 
 
     @classmethod
     def evdi_git_clone(cls) -> None:
-        if cls.evdiGitPath.is_dir():
+        if cls.evdi_git_path.is_dir():
             with suppress(FileNotFoundError):
-                shutil.rmtree(cls.evdiGitPath)
+                shutil.rmtree(cls.evdi_git_path)
             with suppress(FileNotFoundError):
-                os.remove(f"{cls.initTmpDir}evdi.tar.gz")
+                os.remove(f"{cls.init_tmp_dir}evdi.tar.gz")
 
         try:   
-            Repo.clone_from(cls.evdiRepo, cls.evdiGitPath)
+            Repo.clone_from(cls.evdi_repo, cls.evdi_git_path)
         except GitCommandError:
             cls.clean_files()
 
 
     @classmethod
     def evdi_git_list_util(cls) -> List[TagReference]:
-        os.chdir(cls.evdiGitPath)
-        cls.localEvdiRepo = git.Repo(cls.evdiGitPath)
-        cls.evdiOrigin = cls.localEvdiRepo.remotes.origin
+        os.chdir(cls.evdi_git_path)
+        cls.local_evdi_repo = git.Repo(cls.evdi_git_path)
+        cls.evdi_origin = cls.local_evdi_repo.remotes.origin
 
-        cls.evdiList = sorted(
-            cls.localEvdiRepo.tags, 
+        cls.evdi_list = sorted(
+            cls.local_evdi_repo.tags, 
             key=lambda t: t.commit.committed_date
         )
 
-        if not cls.evdiList:
+        if not cls.evdi_list:
             cls.clean_files()
 
-        return cls.evdiList
+        return cls.evdi_list
 
     @classmethod
     def find_git_primary(cls) -> str:
         # https://stackoverflow.com/questions/69651536/how-to-get-master-main-branch-from-gitpython
-        if not cls.localEvdiRepo:
-            cls.localEvdiRepo = git.Repo(cls.evdiGitPath)
+        if not cls.local_evdi_repo:
+            cls.local_evdi_repo = git.Repo(cls.evdi_git_path)
 
         # Run 'git remote show origin'
-        evdiRemoteInfo = cls.localEvdiRepo.git.remote("show", "origin")
+        evdi_remote_info = cls.local_evdi_repo.git.remote("show", "origin")
 
         # Use regex to find the line: "HEAD branch: main" or "HEAD branch: master"
-        match = re.search(r"HEAD branch:\s*(\S+)", evdiRemoteInfo)
-        evdiDefaultBranch = match.group(1) if match else "main"
-        return evdiDefaultBranch
+        match = re.search(r"HEAD branch:\s*(\S+)", evdi_remote_info)
+        evdi_default_branch = match.group(1) if match else "main"
+        return evdi_default_branch
 
 
     @classmethod
     def evdi_pull_tag_util(
         cls,
-        evdiDec: str | None = None 
+        evdi_dec: str | None = None 
         ) -> None:
 
-        if not evdiDec:
-            evdiDec = cls.evdiList[-1] if cls.evdiList else "main"
+        if not evdi_dec:
+            evdi_dec = cls.evdi_list[-1] if cls.evdi_list else "main"
 
-        if evdiDec != "main":
-            evdiGitTag: str = evdiDec
-            cls.evdiOrigin.fetch(tags=True)
-            evdiBranchTag: str = f"{evdiGitTag}"
-            cls.localEvdiRepo.git.checkout("-b", evdiBranchTag, evdiGitTag)
+        if evdi_dec != "main":
+            evdi_git_tag: str = evdi_dec
+            cls.evdi_origin.fetch(tags=True)
+            evdiBranchTag: str = f"{evdi_git_tag}"
+            cls.local_evdi_repo.git.checkout("-b", evdiBranchTag, evdi_git_tag)
 
-        with tarfile.open(f"{cls.evdiTarPath}/evdi.tar.gz", "w:gz") as tarFile:
-            tarFile.add(cls.evdiGitPath, arcname=".")
+        with tarfile.open(f"{cls.evdi_tar_path}/evdi.tar.gz", "w:gz") as tar_file:
+            tar_file.add(cls.evdi_git_path, arcname=".")
 
 
     @classmethod
     def unzip_displaylink(cls) -> None:
 
-        if cls.displayLinkFullNameUp and cls.displayLinkFileDir:
-            with zipfile.ZipFile(cls.displayLinkFullNameUp, 'r') as zipRef:
-                zipRef.extractall(cls.displayLinkFileDir)
+        if cls.displaylink_full_name_up and cls.displaylink_file_dir:
+            with zipfile.ZipFile(cls.displaylink_full_name_up, 'r') as zip_ref:
+                zip_ref.extractall(cls.displaylink_file_dir)
 
 
     @classmethod
     def install_dir_rename(cls) -> None:
 
-        if cls.displayLinkFileDir and cls.displayLinkInstallDir:
-            shutil.move(cls.displayLinkFileDir, cls.displayLinkInstallDir)
+        if cls.displaylink_file_dir and cls.displaylink_install_dir:
+            shutil.move(cls.displaylink_file_dir, cls.displaylink_install_dir)
 
     @classmethod
     def extract_displaylink_firmware(cls) -> Iterator[str]:
@@ -243,18 +243,19 @@ class DispLink:
         cls.unzip_displaylink()
         cls.install_dir_rename()
 
-        if not cls.displayLinkInstallDir:
+        if not cls.displaylink_install_dir:
             cls.clean_files()
         else:
-            os.chdir(cls.displayLinkInstallDir)
-            runFileFind: list[Path] = file_find(cls.displayLinkInstallDir, "*.run")
-            runFile: Path | None = runFileFind[0] if runFileFind else None
-            if runFile is None:
+            os.chdir(cls.displaylink_install_dir)
+            run_file_find: list[Path] = file_find(cls.displaylink_install_dir, "*.run")
+            run_file: Path | None = run_file_find[0] if run_file_find else None
+            if run_file is None:
                 cls.clean_files()
             else:
-                subprocess.run(["chmod", "+x", runFile])
-                extractDisplay = subprocess.Popen(
-                    [runFile, "--nox11", "--noprogress", "--noexec", "--keep"],
+                subprocess.run(["chmod", "+x", run_file])
+                # `makeself` commands -- https://makeself.io/
+                extract_display = subprocess.Popen(
+                    [run_file, "--nox11", "--noprogress", "--noexec", "--keep"],
                     shell=False,
                     stdout=subprocess.PIPE, 
                     stderr=subprocess.STDOUT,
@@ -263,17 +264,17 @@ class DispLink:
                     text=True,
                     bufsize=1
                 )
-                extractDisplay.wait()
+                extract_display.wait()
 
-                extractDirFind: list[Path] = dir_find(cls.displayLinkInstallDir, "displaylink-*")
-                extractDir: Path | None = extractDirFind[0] if extractDirFind else None
-                if extractDir is None:
+                extract_dir_find: list[Path] = dir_find(cls.displaylink_install_dir, "displaylink-*")
+                extract_dir: Path | None = extract_dir_find[0] if extract_dir_find else None
+                if extract_dir is None:
                     cls.clean_files()
                 else:
-                    os.chdir(str(extractDir))
+                    os.chdir(str(extract_dir))
                     os.remove("evdi.tar.gz")
-                    shutil.move(Path(f"{cls.evdiTarPath}/evdi.tar.gz"), extractDir)
-                    subprocess.run(["chmod", "+x", f"{extractDir}/displaylink-installer.sh"])
+                    shutil.move(Path(f"{cls.evdi_tar_path}/evdi.tar.gz"), extract_dir)
+                    subprocess.run(["chmod", "+x", f"{extract_dir}/displaylink-installer.sh"])
                     with subprocess.Popen(
                         ["./displaylink-installer.sh", "noreboot"],
                         shell=False, 
@@ -281,14 +282,14 @@ class DispLink:
                         stderr=subprocess.STDOUT,
                         text=True, 
                         bufsize=1
-                        ) as installProc:
-                        assert installProc.stdout is not None
-                        for line in installProc.stdout:
+                        ) as install_proc:
+                        assert install_proc.stdout is not None
+                        for line in install_proc.stdout:
                             yield line.rstrip()
                     
-                    installProc.wait()
-                    if installProc.returncode != 0:
-                        yield f"[red]DisplayLink installation failed. Exit code: {installProc.returncode}[/]"
+                    install_proc.wait()
+                    if install_proc.returncode != 0:
+                        yield f"[red]DisplayLink installation failed. Exit code: {install_proc.returncode}[/]"
 
     @staticmethod
     def runit_enable_display() -> None:
@@ -304,18 +305,18 @@ class DispLink:
 
     @staticmethod
     def systemd_enable_display() -> None:
-        displayService: subprocess.CompletedProcess[str] = subprocess.run(
+        display_service: subprocess.CompletedProcess[str] = subprocess.run(
             "systemctl | grep -Ei displaylink",
             shell=True, 
             capture_output=True, 
             text=True
         )
 
-        displayServiceName = displayService.stdout.strip()
+        display_service_name = display_service.stdout.strip()
         
-        if displayServiceName:
-            displayServiceUnit: subprocess.CompletedProcess[str] = subprocess.run(
-                f"systemctl restart {displayServiceName}",
+        if display_service_name:
+            display_service_unit: subprocess.CompletedProcess[str] = subprocess.run(
+                f"systemctl restart {display_service_name}",
                 shell=True, 
                 capture_output=True, 
                 text=True
@@ -417,10 +418,10 @@ class NoConnectionModal(ModalScreen[bool]):
     CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def compose(self) -> ComposeResult:
-        with Container(id="installDialog"):
+        with Container(id="install-dialog"):
             yield Static(CONNECTION_MESSAGE)
-            with Grid(id="horizontalInstBtn"):
-                yield ChoiceButton("Exit Installer", id="noBtn", classes="dialogQbtn")
+            with Grid(id="horizontal-inst-btn"):
+                yield ChoiceButton("Exit Installer", id="no-btn", classes="dialog-q-btn")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         self.dismiss(False)
@@ -431,14 +432,14 @@ class InstallModal(ModalScreen[bool]):
     CSS_PATH = Path(__file__).parent / "styles.tcss"
 
     def compose(self) -> ComposeResult:
-        with Container(id="installDialog"):
+        with Container(id="install-dialog"):
             yield Static(MODAL_MESSAGE)
-            with Grid(id="horizontalInstBtn"):
-                yield ChoiceButton("No", id="noBtn", classes="dialogQbtn")
-                yield ChoiceButton("Yes", id="instBtn", classes="dialogQbtn")
+            with Grid(id="horizontal-inst-btn"):
+                yield ChoiceButton("No", id="no-btn", classes="dialog-q-btn")
+                yield ChoiceButton("Yes", id="inst-btn", classes="dialog-q-btn")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "instBtn":
+        if event.button.id == "inst-btn":
             self.dismiss(True)
         else:
             self.dismiss(False)
@@ -450,26 +451,26 @@ class UninstallDialogScreen(Screen):
 
     def __init__(
         self, 
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
+        self.displaylink_cl = displaylink_cl
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Static(UNINSTALL_MESSAGE)
-            with Grid(id="horizontalInstBtn"):
-                yield ChoiceButton("Yes", id="yesUnBtn", classes="dialogUnbtn")
-                yield ChoiceButton("No", id="noUnBtn", classes="dialogUnbtn")
+            with Grid(id="horizontal-inst-btn"):
+                yield ChoiceButton("Yes", id="yesUnBtn", classes="dialog-un-btn")
+                yield ChoiceButton("No", id="noUnBtn", classes="dialog-un-btn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "yesUnBtn":
             self.app.push_screen(UninstallIndicatorScreen(
-                displayLinkCl=self.displayLinkCl
+                displaylink_cl=self.displaylink_cl
             ))
         else:
             self.app.exit()
@@ -481,18 +482,18 @@ class UninstallIndicatorScreen(Screen):
 
     def __init__(
         self,
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
+        self.displaylink_cl = displaylink_cl
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Static(UNINSTALLATION_LOG_MESSAGE)
-            yield RichLog(id="uninstallLog", highlight=True, markup=True)
+            yield RichLog(id="uninstall-log", highlight=True, markup=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -500,9 +501,9 @@ class UninstallIndicatorScreen(Screen):
 
     @work(thread=True)
     def exec_uninistallDisplayInd(self) -> None:
-        dispLog = self.query_one("#uninstallLog", RichLog)
+        dispLog = self.query_one("#uninstall-log", RichLog)
 
-        for line in self.displayLinkCl.uninstall_display_link():
+        for line in self.displaylink_cl.uninstall_display_link():
             self.app.call_from_thread(dispLog.write, line)
 
         self.app.call_from_thread(self.app.push_screen, UninstallCompleteScreen())
@@ -514,15 +515,15 @@ class UninstallCompleteScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Label(">>> Uninstall Complete. Restart?")
-            with Grid(id="horizontalInstBtn"):
-                yield ChoiceButton("Yes", id="yesReBtn", classes="dialogUnbtn")
-                yield ChoiceButton("No", id="noReBtn", classes="dialogUnbtn")
+            with Grid(id="horizontal-inst-btn"):
+                yield ChoiceButton("Yes", id="yes-re-btn", classes="dialog-un-btn")
+                yield ChoiceButton("No", id="no-re-btn", classes="dialog-un-btn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "yesReBtn":
+        if event.button.id == "yes-re-btn":
             subprocess.run(["reboot"], text=True)
         else:
             self.app.exit()
@@ -534,26 +535,26 @@ class BeginInstallScreen(Screen):
 
     def __init__(
         self,
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
         
-        self.displayLinkCl = displayLinkCl
+        self.displaylink_cl = displaylink_cl
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Static(BEGIN_MESSAGE)
-            with Grid(id="horizontalInstBtn"):
-                yield ChoiceButton("Yes", id="yesBeginBtn", classes="dialogBeginbtn")
-                yield ChoiceButton("No", id="noBeginBtn", classes="dialogBeginbtn")
+            with Grid(id="horizontal-inst-btn"):
+                yield ChoiceButton("Yes", id="yes-begin-btn", classes="dialog-begin-btn")
+                yield ChoiceButton("No", id="no-begin-btn", classes="dialog-begin-btn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "yesBeginBtn":
+        if event.button.id == "yes-begin-btn":
             self.app.push_screen(DownloadEvdiSoftwareScreen(
-                displayLinkCl=self.displayLinkCl
+                displaylink_cl=self.displaylink_cl
             ))
         else:
             self.app.exit()
@@ -565,16 +566,16 @@ class DownloadEvdiSoftwareScreen(Screen):
 
     def __init__(
         self,
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
+        self.displaylink_cl = displaylink_cl
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Label(">>> Cloning the EVDI software driver.")
             yield LoadingIndicator()
         yield Footer(id="Footer")
@@ -584,9 +585,9 @@ class DownloadEvdiSoftwareScreen(Screen):
 
     @work(thread=True)
     def exec_pull_evdi(self) -> None:
-        self.displayLinkCl.evdi_git_clone()
+        self.displaylink_cl.evdi_git_clone()
         self.app.call_from_thread(self.app.push_screen, EvdiDecisionScreen(
-            displayLinkCl=self.displayLinkCl
+            displaylink_cl=self.displaylink_cl
         ))
 
 
@@ -596,38 +597,38 @@ class EvdiDecisionScreen(Screen):
 
     def __init__(
         self, 
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
-        self.evdiGitTagList = displayLinkCl.evdi_git_list_util()
-        self.evdiGitPrimary = displayLinkCl.find_git_primary()
-        self.evdiGitPull = displayLinkCl.evdi_pull_tag_util
+        self.displaylink_cl = displaylink_cl
+        self.evdi_git_gag_list = displaylink_cl.evdi_git_list_util()
+        self.evdi_git_primary = displaylink_cl.find_git_primary()
+        self.evdi_git_pull = displaylink_cl.evdi_pull_tag_util
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Static(EVDI_DEC_MESSAGE)
             yield ListView(
                 # Keep for potential list
-                # *[ListItem(Label(str(item))) for item in self.evdiGitTagList],
-                ListItem(Label(f":: {self.evdiGitTagList[-1]} [bold]RECOMMENDED[/bold]"), id=f"{self.evdiGitTagList[-1].name.replace(".", "_")}"),
-                ListItem(Label(f":: {self.evdiGitPrimary.capitalize()} For Experimental Features. Use at own risk."), id=f"{self.evdiGitPrimary}"),
+                # *[ListItem(Label(str(item))) for item in self.evdi_git_gag_list],
+                ListItem(Label(f":: {self.evdi_git_gag_list[-1]} [bold]RECOMMENDED[/bold]"), id=f"{self.evdi_git_gag_list[-1].name.replace(".", "_")}"),
+                ListItem(Label(f":: {self.evdi_git_primary.capitalize()} For Experimental Features. Use at own risk."), id=f"{self.evdi_git_primary}"),
             )
         yield Footer(id="Footer")
 
     @on(ListView.Selected)
     def handle_selection(self, event: ListView.Selected) -> None:
-        itemId = event.item.id
-        self.process_selected_value(itemId)
+        item_id = event.item.id
+        self.process_selected_value(item_id)
 
     def process_selected_value(self, value: str | None) -> None:
         if value:
-            self.evdiGitPull(evdiDec=value.replace("_", "."))
+            self.evdi_git_pull(evdi_dec=value.replace("_", "."))
             self.app.push_screen(DisplayLinkDownloadScreen(
-                displayLinkCl=self.displayLinkCl
+                displaylink_cl=self.displaylink_cl
             ))
 
 
@@ -637,16 +638,16 @@ class DisplayLinkDownloadScreen(Screen):
 
     def __init__(
         self,
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
+        self.displaylink_cl = displaylink_cl
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Label(">>> Downloading the latest Synaptics DisplayLink Driver.")
             yield LoadingIndicator()
         yield Footer(id="Footer")
@@ -656,9 +657,9 @@ class DisplayLinkDownloadScreen(Screen):
 
     @work(thread=True)
     def exec_download_display(self) -> None:
-        self.displayLinkCl.download_displaylink()
+        self.displaylink_cl.download_displaylink()
         self.app.call_from_thread(self.app.push_screen, BeginDisplayLinkInstallDialogueScreen(
-            displayLinkCl=self.displayLinkCl
+            displaylink_cl=self.displaylink_cl
         ))
 
 
@@ -668,31 +669,31 @@ class BeginDisplayLinkInstallDialogueScreen(Screen):
 
     def __init__(
         self,
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
+        self.displaylink_cl = displaylink_cl
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Static(INSTALL_DEC_MESSAGE)
-            with Grid(id="horizontalInstBtn"):
-                yield ChoiceButton("Yes", id="yesInstallBtn", classes="dialogInstallbtn")
-                yield ChoiceButton("No", id="noInstallBtn", classes="dialogInstallbtn")
+            with Grid(id="horizontal-inst-btn"):
+                yield ChoiceButton("Yes", id="yes-install-btn", classes="dialog-install-btn")
+                yield ChoiceButton("No", id="no-install-btn", classes="dialog-install-btn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "yesInstallBtn":
+        if event.button.id == "yes-install-btn":
             self.app.push_screen(DisplayLinkInstallationScreen(
-                displayLinkCl=self.displayLinkCl
+                displaylink_cl=self.displaylink_cl
             ))
         else:
             # Push to Clean Screen
             self.app.push_screen(CleanFilesExitScreen(
-                displayLinkCl=self.displayLinkCl
+                displaylink_cl=self.displaylink_cl
             ))
 
 
@@ -702,18 +703,18 @@ class DisplayLinkInstallationScreen(Screen):
 
     def __init__(
         self,
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
+        self.displaylink_cl = displaylink_cl
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Static(INSTALLATION_LOG_MESSAGE)
-            yield RichLog(id="installLog", highlight=True, markup=True)
+            yield RichLog(id="install-log", highlight=True, markup=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -721,13 +722,13 @@ class DisplayLinkInstallationScreen(Screen):
 
     @work(thread=True)
     def exec_display_install(self) -> None:
-        dispLog = self.query_one("#installLog", RichLog)
+        dispLog = self.query_one("#install-log", RichLog)
 
-        for line in self.displayLinkCl.extract_displaylink_firmware():
+        for line in self.displaylink_cl.extract_displaylink_firmware():
             self.app.call_from_thread(dispLog.write, line)
 
         self.app.call_from_thread(self.app.push_screen, CleanFilesExitScreen(
-            displayLinkCl=self.displayLinkCl
+            displaylink_cl=self.displaylink_cl
         ))
 
 
@@ -737,16 +738,16 @@ class CleanFilesExitScreen(Screen):
 
     def __init__(
         self,
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
+        self.displaylink_cl = displaylink_cl
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Label(">>> Now removing all downloaded files and exiting.")
         yield Footer(id="Footer")
 
@@ -755,8 +756,8 @@ class CleanFilesExitScreen(Screen):
 
     @work(thread=True)
     def exec_clean_files(self) -> None:
-        self.displayLinkCl.clean_files()
-        self.app.call_from_thread(self.app.push_screen, FinalizeScreen(displayLinkCl=self.displayLinkCl))
+        self.displaylink_cl.clean_files()
+        self.app.call_from_thread(self.app.push_screen, FinalizeScreen(displaylink_cl=self.displaylink_cl))
 
 
 # Finalize Screen 
@@ -765,31 +766,31 @@ class FinalizeScreen(Screen):
 
     def __init__(
         self,
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
-        self.runitTest = self.displayLinkCl.runit_test()
+        self.displaylink_cl = displaylink_cl
+        self.runit_test = self.displaylink_cl.runit_test()
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Static(EXIT_MESSAGE)
-            if self.runitTest.stdout.strip() == "runit":
-                yield Static(RUNIT_MESSAGE, id="finishInstMessage")
+            if self.runit_test.stdout.strip() == "runit":
+                yield Static(RUNIT_MESSAGE, id="finish-inst-message")
             else:
-                yield Static(SYSTEMD_MESSAGE, id="finishInstMessage")
+                yield Static(SYSTEMD_MESSAGE, id="finish-inst-message")
             yield Label(">>> Would you like the installer to handle these manual actions for you?")
-            with Grid(id="horizontalInstBtn"):
-                yield ChoiceButton("Yes, Enable Service", id="yesEnBtn", classes="exitInstBtn")
-                yield ChoiceButton("No, Exit Installer", id="noEnBtn", classes="exitInstBtn")
+            with Grid(id="horizontal-inst-btn"):
+                yield ChoiceButton("Yes, Enable Service", id="yes-en-btn", classes="exit-inst-btn")
+                yield ChoiceButton("No, Exit Installer", id="no-en-btn", classes="exit-inst-btn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "yesEnBtn":
-            self.app.push_screen(FinishExitScreen(displayLinkCl=self.displayLinkCl))
+        if event.button.id == "yes-en-btn":
+            self.app.push_screen(FinishExitScreen(displaylink_cl=self.displaylink_cl))
         else:
             self.app.exit()
 
@@ -800,22 +801,22 @@ class FinishExitScreen(Screen):
 
     def __init__(
         self,
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
 
-        self.displayLinkCl = displayLinkCl
-        self.runitTest = self.displayLinkCl.runit_test()
-        self.runitPrepare = self.displayLinkCl.runit_enable_display
-        self.systemdPrepare = self.displayLinkCl.systemd_enable_display
+        self.displaylink_cl = displaylink_cl
+        self.runit_test = self.displaylink_cl.runit_test()
+        self.runit_prepare = self.displaylink_cl.runit_enable_display
+        self.systemd_prepare = self.displaylink_cl.systemd_enable_display
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
-        with Container(id="unDispDialog"):
+        with Container(id="undisp-dialog"):
             yield Label(">>> Preparing your system...")
-            with Grid(id="horizontalExBtn"):
-                yield ChoiceButton("Exit the Installer", id="exitButton", classes="exitInstBtn")
+            with Grid(id="horizontal-ex-btn"):
+                yield ChoiceButton("Exit the Installer", id="exit-button", classes="exit-inst-btn")
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -823,18 +824,18 @@ class FinishExitScreen(Screen):
 
     @work(thread=True)
     def prepare_system(self) -> None:
-        if self.runitTest.stdout.strip() == "runit":
-            self.runitPrepare()
+        if self.runit_test.stdout.strip() == "runit":
+            self.runit_prepare()
         else:
-            self.systemdPrepare()
+            self.systemd_prepare()
         self.app.call_from_thread(self.prepare_complete)
 
     def prepare_complete(self) -> None:
-        exBtn = self.query_one("#exitButton", Button)
+        exBtn = self.query_one("#exit-button", Button)
         exBtn.styles.display = "block"
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "exitButton":
+        if event.button.id == "exit-button":
             self.app.exit()
 
 
@@ -854,13 +855,13 @@ class DisplayLinkInstaller(App):
 
     def __init__(
         self,
-        displayLinkCl,
+        displaylink_cl,
         **kwargs
         ) -> None:
         
-        self.displayLinkCl = displayLinkCl
-        self.connectTest = displayLinkCl.connection_check()
-        self.displayLinkInstallCheck = displayLinkCl.displaylink_install_check()
+        self.displaylink_cl = displaylink_cl
+        self.connect_test = displaylink_cl.connection_check()
+        self.displaylink_install_check = displaylink_cl.displaylink_install_check()
         super().__init__(**kwargs)
 
     modal_result = reactive[bool | None](None)
@@ -870,12 +871,12 @@ class DisplayLinkInstaller(App):
 
     def on_ready(self) -> None:
         self.push_screen(BeginInstallScreen(
-            displayLinkCl=self.displayLinkCl
+            displaylink_cl=self.displaylink_cl
         ))
-        if not self.connectTest:
+        if not self.connect_test:
             self.push_screen(NoConnectionModal(), self.handle_modal_result)
 
-        if self.displayLinkInstallCheck and self.connectTest:
+        if self.displaylink_install_check and self.connect_test:
             self.push_screen(InstallModal(), self.handle_modal_result)
 
     def handle_modal_result(self, result: bool | None) -> None:
@@ -887,10 +888,10 @@ class DisplayLinkInstaller(App):
                 self.exit()
             else:
                 self.push_screen(UninstallDialogScreen(
-                    displayLinkCl=self.displayLinkCl
+                    displaylink_cl=self.displaylink_cl
                 ))
 
 
 if __name__ == "__main__":
-    app = DisplayLinkInstaller(displayLinkCl=DispLink)
+    app = DisplayLinkInstaller(displaylink_cl=DispLink)
     app.run()
