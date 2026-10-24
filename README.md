@@ -52,7 +52,7 @@ This script is a fun, straightforward, and old-school [no vibes&trade;](https://
 
 | Successful Distros | Notes |
 | :--- | :--- |
-| **Void** | Have to remove `down` service file from `/var/service/displaylink-driver/`. Restart the the `displaylink-driver` service. |   
+| **Void** | TUI: Working without user interventions/solutions. Option created to handle required `runit` service interventions. Bash Script: You Will have to remove `down` service file from `/var/service/displaylink-driver/`. Restart the the `displaylink-driver` service. |   
 | **Fedora 44** | Working without user interventions/solutions. |
 | **Arch** |  Working without user interventions/solutions. |
 | **openSUSE Tumbleweed** | May have to run: `systemctl restart displaylink-driver.service` after login or solutions such as manually unplugging and re-plugging in the docking station connection or turning it off/on. Found the issue running `journalctl -p 3 -xb` and it is related to the failed running of the shell script `/opt/displaylink/udev.sh`. Tried making the script executable, but that did not resolve the issue. For research purposes, the `udev` rule is: `/usr/lib/udev/rules.d/99-displaylink.rules`. Reference: [systemctl enable displaylink.service](https://github.com/displaylink-rpm/displaylink-rpm/issues/50) |
