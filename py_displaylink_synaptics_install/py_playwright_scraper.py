@@ -13,15 +13,15 @@ def py_scraper():
             page.goto("https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu")
         except Exception:
             sys.exit(1)
-        downloadLink = page.locator("a.download-link").nth(1)
-        downloadLink.click()
+        download_link = page.locator("a.download-link").nth(1)
+        download_link.click()
 
         for a in range(retry):
             try:
-                with page.expect_download(timeout=60000) as downloadInfo:
+                with page.expect_download(timeout=60000) as download_info:
                     page.locator("a.no-link").click()
 
-                download = downloadInfo.value
+                download = download_info.value
                 dlPath = f"/tmp/{download.suggested_filename}"
                 download.save_as(dlPath)
                 return dlPath
