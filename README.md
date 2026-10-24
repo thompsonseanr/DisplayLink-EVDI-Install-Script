@@ -21,11 +21,11 @@
 
 ## Release Update:  
 
-This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. Please download from `Releases.`  
+This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. Please download from [Releases](https://github.com/thompsonseanr/DisplayLink-EVDI-Install-Script/releases).  
 
 <br>
 
-The shell script can still be used, but will no longer be actively maintained outside of periodically updating the `Synaptics Displaylink Driver` download url.
+The shell script can still be used, but will no longer be actively maintained outside of periodically updating the **Synaptics Displaylink Driver** download url.
 
 <br>  
 
@@ -33,10 +33,11 @@ The python executable will still require build dependencies to be installed as n
 
 ## Preface:  
 
-Due to an issue encountered with an older, incompatible version of `EVDI` and the latest `Linux 7.X.X` kernel, this script was written to decouple the version of the `EVDI` module bundled with the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) installer and give users the option to choose the version of `EVDI` from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) that works for their kernel version.
+Due to an issue encountered with an older, incompatible version of **EVDI** and the latest **Linux 7.X.X** kernel, this script was written to decouple the version of the **EVDI** module bundled with the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) installer and give users the option to choose the version of **EVDI** from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) that works for their kernel version.
 
-You will need to disable `Secure Boot` in your bios.
+You will need to disable **Secure Boot** in your bios.  
 
+If you installed **EVDI** and **DisplayLink** drivers via you package manager, please uninstall them before proceeding.  
 
 I want to give a huge shout-out, thanks, and appreciation for the developers and maintainers of the following repos and packages:  
 | Distros | Repo/Package |
@@ -47,7 +48,7 @@ I want to give a huge shout-out, thanks, and appreciation for the developers and
 | Fedora | [Negativo17](https://negativo17.org/repos/fedora-multimedia) |
 
 
-This script is a fun, straightforward, and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution.  
+This script is a fun, straightforward, and old-school [no vibes&trade;](https://shop.albertatech.co/products/anti-vibe-coder-coder-club-tee) solution.   
 
 | Successful Distros | Notes |
 | :--- | :--- |
@@ -58,74 +59,49 @@ This script is a fun, straightforward, and old-school [no vibes&trade;](https://
 
 | **Features** | |
 | :--- | :--- |
-| Software Downloads: | If you do not have `DisplayLink Driver` or the git `EVDI` repo cloned, this script will download them for you. |
-| EVDI Version Tag Menu: | Menu to choose which version of `EVDI` you want to install. |
-| **Bring Your Own Software** DisplayLink Install Menu: | Menu to choose which local version of `DisplayLink` you want to install if you decided to live the `BYOS` lifestyle. |
+| Software Downloads: | If you do not have **DisplayLink Driver** or the git **EVDI** repo cloned, this script will download them for you. |
+| EVDI Version Tag Menu: | Menu to choose which version of **EVDI** you want to install. |
+| **Bring Your Own Software** DisplayLink Install Menu: | Menu to choose which local version of **DisplayLink** you want to install if you decided to live the **BYOS** lifestyle. |
  
+ <br>  
 
-## Quickstart:  
+# Quickstart:  
 
-The script, by default, will look for `DisplayLink Manager` and `EVDI` anywhere in the `$USER` home directory.
+**First, Please Install Required Synaptics DisplayLink Build Dependencies:**   
 
-1) **[Optional]** Clone: [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi)  
+- if any dependencies on these lists are missing, please create a [github issue](https://github.com/thompsonseanr/DisplayLink-EVDI-Install-Script/issues) and I will update the list for each respective distro.  
+- `wget` is optional and only required for the bash script. It is only kept here as a "good-to-have" now.  
 
-2) **[Optional]** Download: [Synaptics DisplayLink Driver and Manager Downloads - Latest Official Driver - DisplayLink USB Graphics Software for Ubuntu](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu)  
-
-3) Install dependencies:  
-
-    - if any are missing, please create a `github issue` and I will update the list for each respective distro.  
-
-    **Void Linux**: 
-    ```
-    xbps-install -S xbps-install -S dkms libdrm libdrm-devel zstd pkg-config wget zip unzip
-    ```
-    **Fedora 44:**    
-    ```
-    dnf install dkms libdrm libdrm-devel kernel-devel kernel-headers wget zstd
-    ```
-    ```
-    dnf group install development-tools
-    ```
-    **Arch:**  
-    ```
-    pacman -S --needed base-devel linux-headers wget zstd libdrm dkms zip unzip
-    ```
-    **openSUSE Tumbleweed:**
-    ```
-    zypper install -t pattern devel_basis
-    ```
-    ```
-    zypper install kernel-devel kernel-source libdrm-devel dkms
-    ```
-
-### Run the `displaylink_synaptics_install` script:
-
-**Instructions:**
-
-1) Clone the repo.  
-2) Make `displaylink_synaptics_install` executable:  
-    ```
-    chmod +x displaylink_synaptics_install
-    ```
-3) Make sure your build dependencies are installed.  
-
-4) Run:  
-    ```
-    ./displaylink_synaptics_install
-    ```
-
-### To uninstall DisplayLink:
-> This is recommended if you are updating and will have to be done manually.
-
+**Void Linux**: 
 ```
-sudo displaylink-installer uninstall
+xbps-install -S xbps-install -S dkms libdrm libdrm-devel zstd pkg-config zip unzip wget
 ```
+**Fedora 44:**    
+```
+dnf install dkms libdrm libdrm-devel kernel-devel kernel-headers zstd wget
+```
+```
+dnf group install development-tools
+```
+**Arch:**  
+```
+pacman -S --needed base-devel linux-headers zstd libdrm dkms zip unzip wget
+```
+**openSUSE Tumbleweed:**
+```
+zypper install -t pattern devel_basis
+```
+```
+zypper install kernel-devel kernel-source libdrm-devel dkms
+```
+
+<br>
 
 ## Build the python ELF binary locally with pyinstaller:  
 
 **Instructions:**  
 
-1) Go into `py_displaylink_synaptics_install/` directory.  
+1) Go into **py_displaylink_synaptics_install/** directory.  
 
 ```
 cd py_displaylink_synaptics_install/
@@ -137,10 +113,10 @@ cd py_displaylink_synaptics_install/
 pip install -r requirements.txt
 ```
 
-3) Install `Playwright` Chromium dependency:  
+3) Install **Playwright** Chromium dependency:  
 
 ```
-PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
+PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium  
 ```
 
 4) Build package:  
@@ -162,3 +138,41 @@ chmod +x py_displaylink_synaptics_install
 ```
 sudo ./py_displaylink_synaptics_install
 ```
+
+6) **Optional** Add to path for future **EVDI** and/or **Synaptics DisplayLink Driver** updates. This TUI also runs uninstall wrapper scripts:
+
+    - Copy executable to **/opt**    
+
+    - Make symlink in `/usr/local/bin`:  
+    ```
+    sudo ln -s /opt/py_displaylink_synaptics_install /usr/local/bin/py_displaylink_synaptics_install
+    ```
+
+<br>
+
+## Bash Script
+
+The script, by default, will look for **DisplayLink Manager** and **EVDI** anywhere in the **$USER** home directory and download them, if required.
+
+**Instructions:**
+
+1) Clone the repo.  
+2) Make `displaylink_synaptics_install` executable:  
+    ```
+    chmod +x displaylink_synaptics_install
+    ```
+3) Make sure your build dependencies are installed.  
+
+4) Run:  
+    ```
+    ./displaylink_synaptics_install
+    ```
+
+**To uninstall DisplayLink:**
+> This is recommended if you are updating and will have to be done manually.
+
+```
+sudo displaylink-installer uninstall
+```
+
+

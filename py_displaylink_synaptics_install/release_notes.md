@@ -3,15 +3,15 @@
 
 **Please Note:** This installer is meant only for Linux.  
 
-1) **Please download the ELF binary:** `py_displaylink_synaptics_install`  
+1) Please download the ELF binary:  
+**py_displaylink_synaptics_install**  
   
 <br>  
 
 2) Install dependencies (if not already installed):  
 
-<br>
-
-- if any dependencies on these lists are missing, please create a `github issue` and I will update the list for each respective distro.  
+- if any dependencies on these lists are missing, please create a [github issue](https://github.com/thompsonseanr/DisplayLink-EVDI-Install-Script/issues) and I will update the list for each respective distro.  
+- `wget` is optional and only required for the bash script. It is only kept here as a "good-to-have" now.
 
 <br>
 
