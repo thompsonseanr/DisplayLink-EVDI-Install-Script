@@ -60,8 +60,7 @@ This script is a fun, straightforward, and old-school [no vibes&trade;](https://
 | **Features** | |
 | :--- | :--- |
 | Software Downloads: | If you do not have **DisplayLink Driver** or the git **EVDI** repo cloned, this script will download them for you. |
-| EVDI Version Tag Menu: | Menu to choose which version of **EVDI** you want to install. |
-| **Bring Your Own Software** DisplayLink Install Menu: | Menu to choose which local version of **DisplayLink** you want to install if you decided to live the **BYOS** lifestyle. |
+| EVDI Version Tag Menu: | Menu to choose which version of **EVDI** you want to install. |  
  
  <br>  
 
