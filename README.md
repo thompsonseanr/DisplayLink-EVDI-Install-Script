@@ -14,6 +14,7 @@
 > - [Synaptics DisplayLink with evdi DKMS Module - Works!](https://voidforums.com/viewtopic.php?t=1781)  
 > - [Reddit: DisplayLink Driver](https://www.reddit.com/r/voidlinux/comments/peq1se/displaylink_driver/)
 > - [Alberta Tech - Hilarious Nerd Merch (I am not affiliated, just showing some love)](https://shop.albertatech.co/)  
+> - [makeself - Make self-extractable archives on Unix](https://makeself.io/)  
 >
 >
 > **Bugfixes and Contributions:**  
@@ -70,7 +71,7 @@ This script is a fun, straightforward, and old-school [no vibes&trade;](https://
 **First, Please Install Required Synaptics DisplayLink Build Dependencies:**   
 
 - if any dependencies on these lists are missing, please create a [github issue](https://github.com/thompsonseanr/DisplayLink-EVDI-Install-Script/issues) and I will update the list for each respective distro.  
-- `wget` is optional and only required for the bash script. It is only kept here as a "good-to-have" now.  
+- `wget` is optional and only required for the bash script. It is only kept here now as a "good-to-have" now and moved to the end of the list for easy removal.  
 
 **Void Linux**: 
 ```
