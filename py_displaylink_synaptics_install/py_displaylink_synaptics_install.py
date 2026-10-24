@@ -37,7 +37,11 @@ from textual.widgets import Placeholder, Static, LoadingIndicator, ListView, Lis
 # pyinstaller --onefile --add-data "styles.tcss:." py_displaylink_synaptics_install.py
 
 if os.getuid() != 0:
-    print("Please run this script with `sudo`. Exiting.")
+    print("""Please run this script with `sudo`.
+    Elevated permissions are required for operations like changing execution bits
+    and running the extracted DisplayLink displaylink-installer.sh script, 
+    which builds the EVDI DKMS module, etc.
+    Exiting.""")
     sys.exit(1)
 
 
