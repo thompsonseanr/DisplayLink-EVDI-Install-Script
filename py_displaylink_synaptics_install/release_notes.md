@@ -3,7 +3,8 @@
 **Please Note:** This installer is only for Linux.   
 
 1) Please download the ELF binary:  
-**py_displaylink_synaptics_install**  
+
+    **py_displaylink_synaptics_install**  
   
 <br>  
 
