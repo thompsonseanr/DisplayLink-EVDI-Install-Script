@@ -20,18 +20,21 @@
 > **Bugfixes and Contributions:**  
 > - [edzweistein](https://github.com/edzweistein)  
 
+<br>  
+
 ## Release Update:  
 
 This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. Please download from [Releases](https://github.com/thompsonseanr/DisplayLink-EVDI-Install-Script/releases).  
 
 <br>
 
-The shell script can still be used, but will no longer be actively maintained outside of periodically updating the **Synaptics Displaylink Driver** download url.  
+The [shell script](#bash-script) is an option, but will no longer be actively updated with new features outside of periodically updating the **Synaptics Displaylink Driver** download url.  
 
 <br>  
 
 The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section: [Build the python ELF binary locally with pyinstaller](#build-the-python-elf-binary-locally-with-pyinstaller).  
-There are still improvements to be made, so new releases will be coming.  
+  
+There are still improvements to be made (better error handling with associated screens, dependency checks, etc.), so new releases will be coming.  
 
 ## Preface:  
 
