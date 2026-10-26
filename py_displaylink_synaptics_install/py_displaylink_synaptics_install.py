@@ -158,7 +158,6 @@ class DispLink:
         if cls.displaylink_install_dir and cls.displaylink_install_dir.is_dir():
             with suppress(FileNotFoundError):
                 shutil.rmtree(cls.displaylink_install_dir)
-        return
 
 
     @classmethod
@@ -317,7 +316,7 @@ class DispLink:
         display_service_name = display_service.stdout.strip()
         
         if display_service_name:
-            subprocess.CompletedProcess[str] = subprocess.run(
+            subprocess.run(
                 f"systemctl restart {display_service_name}",
                 shell=True, 
                 capture_output=True, 
