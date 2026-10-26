@@ -26,11 +26,12 @@ This was re-written as a self-contained python ELF binary with [Textual](https:/
 
 <br>
 
-The shell script can still be used, but will no longer be actively maintained outside of periodically updating the **Synaptics Displaylink Driver** download url.
+The shell script can still be used, but will no longer be actively maintained outside of periodically updating the **Synaptics Displaylink Driver** download url.  
 
 <br>  
 
 The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section: [Build the python ELF binary locally with pyinstaller](#build-the-python-elf-binary-locally-with-pyinstaller).  
+There are still improvements to be made, so new releases will be coming.  
 
 ## Preface:  
 
@@ -67,10 +68,10 @@ This script is a fun, straightforward, and old-school [no vibes&trade;](https://
 
 # Quickstart:  
 
-**First, Please Install Required Synaptics DisplayLink Build Dependencies:**   
+**First, Please Install the Required Build Dependencies for Synaptics DisplayLink:**   
 
 - if any dependencies on these lists are missing, please create a [github issue](https://github.com/thompsonseanr/DisplayLink-EVDI-Install-Script/issues) and I will update the list for each respective distro.  
-- `wget` is optional and only required for the bash script. It is only kept here now as a "good-to-have" now and moved to the end of the list for easy removal.  
+- `wget` is optional and only required for the [bash script](#bash-script). It is only kept here as a "good-to-have" now and moved to the end of the list for easy removal.  
 
 **Void Linux**: 
 ```
@@ -107,25 +108,35 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
 cd py_displaylink_synaptics_install/
 ```
 
-2) Install python dependencies:  
+2) Create python venv and activate virtual environment:
+
+```
+python -m venv <PYTHON_VENV>
+```
+
+```
+source <PYTHON_VENV>/bin/activate
+```  
+
+3) Install python dependencies:  
 
 ```
 pip install -r requirements.txt
 ```
 
-3) Install **Playwright** Chromium dependency:  
+4) Install **Playwright** Chromium dependency:  
 
 ```
 PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium  
 ```
 
-4) Build package:  
+5) Build package:  
 
 ```
 pyinstaller --onefile --add-data "styles.tcss:." py_displaylink_synaptics_install.py
 ```
 
-5) Built package will be within the `dist/` sub-directory:  
+6) Built package will be within the `dist/` sub-directory:  
 
 ```
 cd dist/
@@ -139,7 +150,7 @@ chmod +x py_displaylink_synaptics_install
 sudo ./py_displaylink_synaptics_install
 ```
 
-6) **Optional** Add to path for future **EVDI** and/or **Synaptics DisplayLink Driver** updates. This TUI also runs uninstall wrapper scripts:
+7) **Optional** Add to path for future **EVDI** and/or **Synaptics DisplayLink Driver** updates. This TUI also runs uninstall wrapper scripts:
 
     - Copy executable to **/opt**    
 
