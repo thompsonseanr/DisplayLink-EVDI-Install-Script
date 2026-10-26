@@ -134,14 +134,12 @@ class DispLink:
         if not displaylink_fullname:
             sys.exit(1)
         else:
-            displaylink_path: Path = displaylink_fullname.parent
-            displaylink_name: str = displaylink_fullname.name
             displaylink_name_fix: Path = displaylink_fullname.parent / displaylink_fullname.name.replace(" ", "_")
             shutil.move(str(displaylink_fullname), str(displaylink_name_fix))
             cls.displaylink_full_name_up = displaylink_name_fix
             displaylink_ver: List[str] = re.findall(r"\d+\.\d+", cls.displaylink_full_name_up.name)
             displayLinkTarget: str = f"displaylink_{displaylink_ver[0]}"
-            cls.displaylink_file_dir = displaylink_fullname.parent / displayLinkTarget
+            cls.displaylink_file_dir = cls.displaylink_full_name_up.parent / displayLinkTarget
             cls.displaylink_install_dir = Path(f"/opt/{displayLinkTarget}")
 
 
@@ -319,7 +317,7 @@ class DispLink:
         display_service_name = display_service.stdout.strip()
         
         if display_service_name:
-            display_service_unit: subprocess.CompletedProcess[str] = subprocess.run(
+            subprocess.CompletedProcess[str] = subprocess.run(
                 f"systemctl restart {display_service_name}",
                 shell=True, 
                 capture_output=True, 
