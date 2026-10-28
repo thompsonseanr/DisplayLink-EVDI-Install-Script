@@ -78,6 +78,9 @@ jobs:
           dnf install -y \
           python3 \
           python3-devel \
+          python3-pip \
+          python3-setuptools \
+          python3-wheel \
           bash \
           binutils \
           && dnf clean all
@@ -86,11 +89,14 @@ jobs:
       - name: Set up Dependencies in openSUSE
         if: matrix.distro == 'registry.opensuse.org/opensuse/tumbleweed:latest'
         run: | 
-          zypper --non-interactive refresh && \
-          zypper install --non-interactive in -y --no-recommends \
+          zypper refresh && \
+          zypper install -y \
           -t pattern devel_basis \
           python3 \
           python3-devel \
+          python3-pip \
+          python3-setuptools \
+          python3-wheel \
           bash \
           binutils \
           && zypper clean -a
