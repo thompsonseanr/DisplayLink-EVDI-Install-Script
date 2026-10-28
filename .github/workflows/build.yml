@@ -66,14 +66,6 @@ jobs:
         run: |
           xbps-install -Syu && \
           xbps-install -y base-devel curl git bash liblzma-devel bzip2-devel gdbm-devel libffi-devel libuuid-devel openssl-devel readline-devel sqlite-devel tk-devel zlib-devel
-          curl -fsSL https://pyenv.run | bash
-          export PYENV_ROOT="/root/.pyenv"
-          export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
-          eval "$(${PYENV_ROOT}/bin/pyenv init -)"
-          echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-          echo 'eval "$(pyenv init --path)"' >> ~/.profile
-          pyenv install 3.14.8
-          pyenv global 3.14.8
 
       # Fedora Container
       - name: Set up Dependencies in Fedora
@@ -83,14 +75,6 @@ jobs:
           dnf install -y git && \
           dnf group install -y development-tools && \
           dnf install -y git openssl-devel bzip2-devel libffi-devel xz-devel zlib-devel gdbm-devel readline-devel sqlite-devel tk-devel uuid-devel libuuid-devel
-          curl -fsSL https://pyenv.run | bash
-          export PYENV_ROOT="/root/.pyenv"
-          export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
-          eval "$(${PYENV_ROOT}/bin/pyenv init -)"
-          echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-          echo 'eval "$(pyenv init --path)"' >> ~/.profile
-          pyenv install 3.14.8
-          pyenv global 3.14.8
 
       # openSUSE Container
       - name: Set up Dependencies in openSUSE
@@ -99,26 +83,22 @@ jobs:
           zypper refresh && \
           zypper install -y -t pattern devel_basis && \
           zypper install -y git bzip2 xz-devel libopenssl-devel readline-devel tk-devel libffi-devel sqlite3-devel libuuid-devel libbz2-devel
+
+      # All Containers
+      - name: Install pyenv
+        run: |
           curl -fsSL https://pyenv.run | bash
           export PYENV_ROOT="/root/.pyenv"
           export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
-          eval "$(${PYENV_ROOT}/bin/pyenv init -)"
-          echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-          echo 'eval "$(pyenv init --path)"' >> ~/.profile
+          eval "$(pyenv init -)"
+          # eval "$(${PYENV_ROOT}/bin/pyenv init -)"
+          # echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+          # echo 'eval "$(pyenv init --path)"' >> ~/.profile
           pyenv install 3.14.8
           pyenv global 3.14.8
-
-      # All Containers
-      # - name: Install pyenv
-      #   run: |
-      #     curl -fsSL https://pyenv.run | bash
-      #     export PYENV_ROOT="/root/.pyenv"
-      #     export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
-      #     eval "$(${PYENV_ROOT}/bin/pyenv init -)"
-      #     echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-      #     echo 'eval "$(pyenv init --path)"' >> ~/.profile
-      #     pyenv install 3.14.8
-      #     pyenv global 3.14.8
+          echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
+          echo "$PYENV_ROOT/shims" >> $GITHUB_PATH
+          echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
 
       # - name: Setup Pyenv Initialization
       #   run: |
