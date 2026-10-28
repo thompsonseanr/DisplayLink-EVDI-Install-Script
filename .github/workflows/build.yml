@@ -144,34 +144,40 @@ jobs:
 
       - name: Ensure Pip
         run: |
+          eval "$(pyenv init -)"
           python -m ensurepip --default-pip
 
       - name: Install Python dependencies
         run: |
+          eval "$(pyenv init -)"
           pip install -r requirements.txt
 
       - name: Install Playwright Chromium
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
         run: | 
+          eval "$(pyenv init -)"
           playwright install chromium
 
       # Void Build
       - name: Build executable Void
         if: matrix.distro == 'ghcr.io/void-linux/void-glibc-full:latest'
         run: |
+          eval "$(pyenv init -)"
           pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_Void ${{ env.MAIN_PY_FILE }}
 
       # Fedora Build
       - name: Build executable Fedora
         if: matrix.distro == 'fedora.latest'
         run: |
+          eval "$(pyenv init -)"
           pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_Fedora ${{ env.MAIN_PY_FILE }}
 
       # openSUSE Build
       - name: Build executable Fedora
         if: matrix.distro == 'fedora.latest'
         run: |
+          eval "$(pyenv init -)"
           pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_openSUSE ${{ env.MAIN_PY_FILE }}
 
       - name: Upload Artifacts
