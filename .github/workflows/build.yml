@@ -73,7 +73,7 @@ jobs:
         run: | 
           dnf upgrade && \
           dnf group install -y development-tools && \
-          dnf install -y openssl-devel bzip2-devel libffi-devel xz-devel zlib-devel gdbm-devel readline-devel sqlite-devel tk-devel uuid-devel libuuid-devel
+          dnf install -y git openssl-devel bzip2-devel libffi-devel xz-devel zlib-devel gdbm-devel readline-devel sqlite-devel tk-devel uuid-devel libuuid-devel
 
       # openSUSE Container
       - name: Set up Dependencies in openSUSE
@@ -87,21 +87,27 @@ jobs:
       - name: Install pyenv
         run: |
           curl -fsSL https://pyenv.run | bash
-
-      - name: Setup Pyenv Initialization
-        run: |
-          export PYENV_ROOT="/root/.pyenv" && \
-          export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}" && \
-          echo 'eval "$(pyenv init -)"' >> ~/.bashrc && \
+          export PYENV_ROOT="/root/.pyenv"
+          export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
+          echo 'eval "$(pyenv init -)"' >> ~/.bashrc
           echo 'eval "$(pyenv init --path)"' >> ~/.profile
-
-      - name: Install Python 3.14.8
-        run: |
           pyenv install 3.14.8
-
-      - name: Set Python 3.14.8
-        run: |
           pyenv global 3.14.8
+
+      # - name: Setup Pyenv Initialization
+      #   run: |
+      #     export PYENV_ROOT="/root/.pyenv" && \
+      #     export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}" && \
+      #     echo 'eval "$(pyenv init -)"' >> ~/.bashrc && \
+      #     echo 'eval "$(pyenv init --path)"' >> ~/.profile
+
+      # - name: Install Python 3.14.8
+      #   run: |
+      #     pyenv install 3.14.8
+
+      # - name: Set Python 3.14.8
+      #   run: |
+      #     pyenv global 3.14.8
 
       - name: Ensure Pip
         run: |
