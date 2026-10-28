@@ -51,7 +51,7 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
 ```
 chmod +x py_displaylink_synaptics_install
 ```
-  
+
 <br>  
 
 4) Run installer as `sudo`:  
