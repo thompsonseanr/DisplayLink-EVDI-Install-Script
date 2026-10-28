@@ -55,6 +55,11 @@ jobs:
 
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: py-conversion
+
       # Void Container
       - name: Set up Dependencies in Void
         if: matrix.distro == 'ghcr.io/void-linux/void-glibc-full:latest'
@@ -67,6 +72,7 @@ jobs:
         if: matrix.distro == 'fedora.latest'
         run: | 
           dnf upgrade && \
+          dnf install -y git && \
           dnf group install -y development-tools && \
           dnf install -y git openssl-devel bzip2-devel libffi-devel xz-devel zlib-devel gdbm-devel readline-devel sqlite-devel tk-devel uuid-devel libuuid-devel
 
@@ -79,11 +85,6 @@ jobs:
           zypper install -y git bzip2 xz-devel libopenssl-devel readline-devel tk-devel libffi-devel sqlite3-devel libuuid-devel libbz2-devel
 
       # All Containers
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          ref: py-conversion
-
       - name: Install pyenv
         run: |
           curl -fsSL https://pyenv.run | bash
