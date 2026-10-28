@@ -23,12 +23,18 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: 
+          - ghcr.io/void-linux/void-glibc-full:latest
+          - fedora:latest
+          - registry.opensuse.org/opensuse/tumbleweed:latest
     container:
-      image: ghcr.io/void-linux/void-glibc-full:latest
+      image: ${{ matrix.distro }}
     defaults:
       run:
         working-directory: ./py_displaylink_synaptics_install
-    
     env:
       MAIN_PY_FILE: 'py_displaylink_synaptics_install.py'
 
@@ -37,10 +43,37 @@ jobs:
         uses: actions/checkout@v4
 
       # Void Container
-      - name: Set up Python in Void
+      - name: Set up Dependencies in Void
         run: |
           xbps-install -Syu && \
-          xbps-install -y python3 python3-devel base-devel bash binutils
+          xbps-install -y base-devel bzip2-devel gdbm-devel libffi-devel libuuid-devel openssl-devel readline-devel sqlite-devel tk-devel xz-devel zlib-devel
+
+      # Fedora Container
+      - name: Set up Dependencies in Fedora
+        run: | 
+          dnf upgrade && \
+          dnf group install -y development-tools && \
+          dnf install -y openssl-devel bzip2-devel libffi-devel xz-devel zlib-devel gdbm-devel readline-devel sqlite-devel tk-devel uuid-devel libuuid-devel
+
+      # openSUSE Container
+      - name: Set up Dependencies in openSUSE
+        run: | 
+          zypper refresh && \
+          zypper install -t pattern devel_basis && \
+          zypper install -y gcc automake bzip2 libbz2-devel xz xz-devel openssl-devel ncurses-devel readline-devel zlib-devel tk-devel libffi-devel sqlite3-devel libgdbm-devel make findutils patch libuuid-devel
+
+      # All Containers
+      - name: Install pyenv
+        run: |
+          curl -fsSL https://pyenv.run | bash
+
+      - name: Install Python 3.14.8
+        run: |
+          pyenv install 3.14.8
+
+      - name: Set Python 3.14.8
+        run: |
+          pyenv local 3.14.8
 
       - name: Ensure Pip
         run: |
