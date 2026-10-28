@@ -73,7 +73,7 @@ jobs:
       - name: Set up Dependencies in Fedora
         if: matrix.distro == 'fedora.latest'
         run: | 
-          dnf upgrade && \
+          dnf upgrade -y && \
           dnf group install -y development-tools && \
           dnf install -y \
           python3 \
@@ -89,15 +89,14 @@ jobs:
       - name: Set up Dependencies in openSUSE
         if: matrix.distro == 'registry.opensuse.org/opensuse/tumbleweed:latest'
         run: | 
-          zypper refresh && \
-          zypper install -y \
+          zypper --non-interactive refresh && \
+          zypper --non-interactive in -y --no-recommends \
           -t pattern devel_basis \
           python3 \
           python3-devel \
           python3-pip \
           python3-setuptools \
           python3-wheel \
-          bash \
           binutils \
           && zypper clean -a
 
