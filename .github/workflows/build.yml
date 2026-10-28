@@ -5,10 +5,23 @@ name: DisplayLink Installer Pyinstaller Release Build
 # Build with:
 # pyinstaller --onefile --add-data "styles.tcss:." py_displaylink_synaptics_install.py
 
+# https://github.com/pyenv/pyenv/issues/1911
+# Pyenv Dockerfile ENV/Paths
+# Set the root directory for pyenv
+# ENV PYENV_ROOT="/root/.pyenv"
+
+# Add pyenv binaries and shims to PATH
+# ENV PATH="$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
+
+# Automatically initialize pyenv in bash/sh sessions
+# RUN echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+# RUN echo 'eval "$(pyenv init --path)"' >> ~/.profile
+
 # References:
 # https://batsov.com/articles/2025/02/27/automate-the-creation-of-github-releases/
 # https://cli.github.com/manual/gh_release_create
 # https://github.com/NotCookey/Pyinstaller-Github-Actions
+# https://github.com/pyenv/pyenv/issues/1911
 
 # Trigger workflow with creation of 'v' tag
 on:
@@ -37,6 +50,9 @@ jobs:
         working-directory: ./py_displaylink_synaptics_install
     env:
       MAIN_PY_FILE: 'py_displaylink_synaptics_install.py'
+      PYENV_ROOT: '/root/.pyenv'
+      PATH: "${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
+
 
     steps:
       - name: Checkout Code
@@ -44,12 +60,14 @@ jobs:
 
       # Void Container
       - name: Set up Dependencies in Void
+        if: matrix.distro == 'ghcr.io/void-linux/void-glibc-full:latest'
         run: |
           xbps-install -Syu && \
-          xbps-install -y base-devel bzip2-devel gdbm-devel libffi-devel libuuid-devel openssl-devel readline-devel sqlite-devel tk-devel xz-devel zlib-devel
+          xbps-install -y base-devel curl git bash liblzma-devel bzip2-devel gdbm-devel libffi-devel libuuid-devel openssl-devel readline-devel sqlite-devel tk-devel zlib-devel
 
       # Fedora Container
       - name: Set up Dependencies in Fedora
+        if: matrix.distro == 'fedora.latest'
         run: | 
           dnf upgrade && \
           dnf group install -y development-tools && \
@@ -57,15 +75,23 @@ jobs:
 
       # openSUSE Container
       - name: Set up Dependencies in openSUSE
+        if: matrix.distro == 'registry.opensuse.org/opensuse/tumbleweed:latest'
         run: | 
           zypper refresh && \
-          zypper install -t pattern devel_basis && \
-          zypper install -y gcc automake bzip2 libbz2-devel xz xz-devel openssl-devel ncurses-devel readline-devel zlib-devel tk-devel libffi-devel sqlite3-devel libgdbm-devel make findutils patch libuuid-devel
+          zypper install -y -t pattern devel_basis && \
+          zypper install -y git bzip2 xz-devel libopenssl-devel readline-devel tk-devel libffi-devel sqlite3-devel libuuid-devel libbz2-devel
 
       # All Containers
       - name: Install pyenv
         run: |
           curl -fsSL https://pyenv.run | bash
+
+      - name: Setup Pyenv Initialization
+        run: |
+          PYENV_ROOT="${{ env.PYENV_ROOT }}" && \
+          PATH="${{ env.PATH }}" && \
+          echo 'eval "$(pyenv init -)"' >> ~/.bashrc && \
+          echo 'eval "$(pyenv init --path)"' >> ~/.profile
 
       - name: Install Python 3.14.8
         run: |
@@ -73,7 +99,7 @@ jobs:
 
       - name: Set Python 3.14.8
         run: |
-          pyenv local 3.14.8
+          pyenv global 3.14.8
 
       - name: Ensure Pip
         run: |
@@ -89,15 +115,29 @@ jobs:
         run: | 
           playwright install chromium
 
-      - name: Build executable
+      # Void Build
+      - name: Build executable Void
+        if: matrix.distro == 'ghcr.io/void-linux/void-glibc-full:latest'
         run: |
-          pyinstaller --onefile --add-data "styles.tcss:." --windowed ${{ env.MAIN_PY_FILE }}
+          pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_Void ${{ env.MAIN_PY_FILE }}
 
-      - name: Upload Artifact (Linux)
+      # Fedora Build
+      - name: Build executable Fedora
+        if: matrix.distro == 'fedora.latest'
+        run: |
+          pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_Fedora ${{ env.MAIN_PY_FILE }}
+
+      # openSUSE Build
+      - name: Build executable Fedora
+        if: matrix.distro == 'fedora.latest'
+        run: |
+          pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_openSUSE ${{ env.MAIN_PY_FILE }}
+
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-executables
-          path: py_displaylink_synaptics_install/dist/py_displaylink_synaptics_install
+          path: py_displaylink_synaptics_install/dist/*
 
   release:
     needs: build
@@ -121,7 +161,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create ${{ github.ref_name }} \
-            "${{ github.workspace }}/release_files/py_displaylink_synaptics_install" \
+            "${{ github.workspace }}/release_files/*" \
             --title "Release ${{ github.ref_name }}" \
             --generate-notes \
             --notes-file release_notes.md
