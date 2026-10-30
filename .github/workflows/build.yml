@@ -133,14 +133,17 @@ jobs:
       #     pyenv global 3.14.8
 
       - name: Ensure Pip
+        shell: bash
         run: |
           python3 -m ensurepip --default-pip
 
       - name: Install Python dependencies
+        shell: bash
         run: |
           python3 -m pip install -r requirements.txt
 
       - name: Install Playwright Chromium
+        shell: bash
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
         run: | 
@@ -149,18 +152,21 @@ jobs:
       # Void Build
       - name: Build executable Void
         if: matrix.distro == 'ghcr.io/void-linux/void-glibc-full:latest'
+        shell: bash
         run: |
           pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_Void ${{ env.MAIN_PY_FILE }}
 
       # Fedora Build
       - name: Build executable Fedora
         if: matrix.distro == 'fedora.latest'
+        shell: bash
         run: |
           pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_Fedora ${{ env.MAIN_PY_FILE }}
 
       # openSUSE Build
       - name: Build executable Fedora
         if: matrix.distro == 'fedora.latest'
+        shell: bash
         run: |
           pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_openSUSE ${{ env.MAIN_PY_FILE }}
 
