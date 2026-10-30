@@ -59,7 +59,7 @@ jobs:
 
       - name: Set Github Action Vars
         run: |
-          echo "PYENV_ROOT=\"/root/.pyenv\"" >> $GITHUB_ENV
+          echo "PYENV_ROOT=/root/.pyenv" >> $GITHUB_ENV
           echo "$PYENV_ROOT/shims" >> $GITHUB_PATH
           echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
 
