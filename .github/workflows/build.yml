@@ -59,9 +59,9 @@ jobs:
 
       - name: Set Github Action Vars
         run: |
-          echo "PYENV_ROOT=/root/.pyenv" >> $GITHUB_ENV
-          echo "$PYENV_ROOT/shims" >> $GITHUB_PATH
-          echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
+          echo "PYENV_ROOT=$HOME/.pyenv" >> $GITHUB_ENV
+          echo "$HOME/.pyenv/bin" >> $GITHUB_PATH
+          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
 
       # Void Container
       - name: Set up Dependencies in Void
@@ -171,7 +171,6 @@ jobs:
       - name: Ensure Pip
         shell: bash
         run: |
-          eval "$(${PYENV_ROOT}/bin/pyenv init -)"
           python -m ensurepip --default-pip
 
       - name: Install Python dependencies
