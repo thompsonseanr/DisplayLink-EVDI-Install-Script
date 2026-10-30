@@ -135,12 +135,12 @@ jobs:
       - name: Ensure Pip
         shell: bash
         run: |
-          python3 -m ensurepip --default-pip
+          python -m ensurepip --default-pip
 
       - name: Install Python dependencies
         shell: bash
         run: |
-          python3 -m pip install -r requirements.txt
+          python -m pip install -r requirements.txt
 
       - name: Install Playwright Chromium
         shell: bash
