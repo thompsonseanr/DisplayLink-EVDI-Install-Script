@@ -57,12 +57,6 @@ jobs:
         with:
           ref: py-conversion
 
-      - name: Set Github Action Vars
-        run: |
-          echo "PYENV_ROOT=$HOME/.pyenv" >> $GITHUB_ENV
-          echo "$HOME/.pyenv/bin" >> $GITHUB_PATH
-          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
-
       # Void Container
       - name: Set up Dependencies in Void
         if: matrix.distro == 'ghcr.io/void-linux/void-glibc-full:latest'
@@ -136,6 +130,11 @@ jobs:
           pyenv install 3.14.8
           pyenv global 3.14.8
             
+      - name: Set Github Action Vars
+        run: |
+          echo "PYENV_ROOT=$HOME/.pyenv" >> $GITHUB_ENV
+          echo "$HOME/.pyenv/bin" >> $GITHUB_PATH
+          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
 
       # All Containers
       # - name: Install pyenv
@@ -171,6 +170,7 @@ jobs:
       - name: Ensure Pip
         shell: bash
         run: |
+          eval "$(pyenv init -)"
           python -m ensurepip --default-pip
 
       - name: Install Python dependencies
