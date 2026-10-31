@@ -2,9 +2,9 @@
 
 **Please Note:** This installer is only for Linux.   
 
-1) Please download the ELF binary:  
+1) Please download the ELF binary for your Linux Distro:  
 
-    **py_displaylink_synaptics_install**  
+    **PyDisplaylinkSynapticsInstall_<DISTRO>**  
   
 <br>  
 
@@ -46,10 +46,10 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
   
 <br>  
 
-3) Make `py_displaylink_synaptics_install` executable:  
+3) Make `PyDisplaylinkSynapticsInstall_<DISTRO>` executable:  
 
 ```
-chmod +x py_displaylink_synaptics_install
+chmod +x PyDisplaylinkSynapticsInstall_<DISTRO>
 ```
 
 <br>  
@@ -57,7 +57,7 @@ chmod +x py_displaylink_synaptics_install
 4) Run installer as `sudo`:  
 
 ```
-sudo ./py_displaylink_synaptics_install
+sudo ./PyDisplaylinkSynapticsInstall_<DISTRO>
 ```
 
 <br>
@@ -68,5 +68,5 @@ sudo ./py_displaylink_synaptics_install
 
     - Make symlink in `/usr/local/bin`:  
     ```
-    sudo ln -s /opt/py_displaylink_synaptics_install /usr/local/bin/py_displaylink_synaptics_install
+    sudo ln -s /opt/PyDisplaylinkSynapticsInstall_<DISTRO> /usr/local/bin/PyDisplaylinkSynapticsInstall_<DISTRO>
     ```
