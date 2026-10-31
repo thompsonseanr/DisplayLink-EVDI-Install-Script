@@ -1,22 +1,5 @@
 name: DisplayLink Installer Pyinstaller Release Build
 
-# Playwright drivers will have to be installed with this ENV for pyinstaller:
-# PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
-# Build with:
-# pyinstaller --onefile --add-data "styles.tcss:." py_displaylink_synaptics_install.py
-
-# https://github.com/pyenv/pyenv/issues/1911
-# Pyenv Dockerfile ENV/Paths
-# Set the root directory for pyenv
-# ENV PYENV_ROOT="/root/.pyenv"
-
-# Add pyenv binaries and shims to PATH
-# ENV PATH="$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
-
-# Automatically initialize pyenv in bash/sh sessions
-# RUN echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-# RUN echo 'eval "$(pyenv init --path)"' >> ~/.profile
-
 # References:
 # https://batsov.com/articles/2025/02/27/automate-the-creation-of-github-releases/
 # https://cli.github.com/manual/gh_release_create
@@ -111,10 +94,10 @@ jobs:
         with:
           ref: py-conversion
 
-      - name: Download Built Binary
+      - name: Download Built Binaries
         uses: actions/download-artifact@v4
         with:
-          name: linux-executables-*
+          pattern: linux-executables-*
           path: ${{ github.workspace }}/release_files/
           merge-multiple: true
 
