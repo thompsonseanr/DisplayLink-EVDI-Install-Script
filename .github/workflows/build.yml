@@ -39,12 +39,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        distro: 
-          - ghcr.io/void-linux/void-glibc-full:latest
-          - fedora:latest
-          - registry.opensuse.org/opensuse/tumbleweed:latest
-    container:
-      image: ${{ matrix.distro }}
+        include:
+          - distro: void
+            dockerfile: docker/Dockerfile.void
+            binary_name: PyDisplaylinkSynapticsInstall_Void
+          - distro: arch
+            dockerfile: docker/Dockerfile.arch
+            binary_name: PyDisplaylinkSynapticsInstall_Arch
+          - distro: fedora
+            dockerfile: docker/Dockerfile.fedora
+            binary_name: PyDisplaylinkSynapticsInstall_Fedora
+          - distro: opensuse
+            dockerfile: docker/Dockerfile.opensuse
+            binary_name: PyDisplaylinkSynapticsInstall_Opensuse
     defaults:
       run:
         working-directory: ./py_displaylink_synaptics_install
@@ -57,123 +64,19 @@ jobs:
         with:
           ref: py-conversion
 
-      # Void Container
-      - name: Set up Dependencies in Void
-        if: matrix.distro == 'ghcr.io/void-linux/void-glibc-full:latest'
+      - name: Build Containers
         run: |
-          xbps-install -Syu && \
-          xbps-install -y \
-          python3 \
-          python3-devel \
-          base-devel \
-          bash \
-          binutils
+          docker build -f ${{ matrix.dockerfile }} -t pyenv-${{ matrix.distro }}:latest .
 
-      # Fedora Container
-      - name: Set up Dependencies in Fedora
-        if: matrix.distro == 'fedora.latest'
-        run: | 
-          dnf upgrade -y && \
-          dnf install -y \
-          git \
-          make \
-          gcc \
-          zlib-devel \
-          bzip2 \
-          bzip2-devel \
-          readline-devel \
-          sqlite \
-          sqlite-devel \
-          openssl-devel \
-          tk-devel \
-          libffi-devel \
-          xz-devel \
-          findutils \
-          && dnf clean all
-          export PYENV_ROOT="/root/.pyenv"
-          export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
-          curl -fsSL https://pyenv.run | bash
-          eval "$(${PYENV_ROOT}/bin/pyenv init -)"
-          pyenv install 3.14.8
-          pyenv global 3.14.8
-
-      # openSUSE Container
-      - name: Set up Dependencies in openSUSE
-        if: matrix.distro == 'registry.opensuse.org/opensuse/tumbleweed:latest'
-        run: | 
-          zypper refresh && zypper install -y \
-          gcc \
-          automake \
-          bzip2 \
-          libbz2-devel \
-          xz \
-          xz-devel \
-          openssl-devel \
-          ncurses-devel \
-          readline-devel \
-          zlib-devel \
-          tk-devel \
-          libffi-devel \
-          sqlite3-devel \
-          gdbm-devel \
-          make \
-          findutils \
-          patch \
-          git \
-          tar \
-          bash \
-          && zypper clean -a
-          export PYENV_ROOT="/root/.pyenv"
-          export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
-          curl -fsSL https://pyenv.run | bash
-          eval "$(${PYENV_ROOT}/bin/pyenv init -)"
-          pyenv install 3.14.8
-          pyenv global 3.14.8
-            
-      - name: Set Github Action Vars
+      - name: Run Docker image
         run: |
-          echo "PYENV_ROOT=$HOME/.pyenv" >> $GITHUB_ENV
-          echo "$HOME/.pyenv/bin" >> $GITHUB_PATH
-          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
+          docker run --rm \
+          -v ${PWD}:/workspace \
+          -w /workspace \
+          pyenv-${{ matrix.distro }}:latest \
+          /bin/bash
 
-      # All Containers
-      # - name: Install pyenv
-      #   run: |
-      #     curl -fsSL https://pyenv.run | bash
-      #     export PYENV_ROOT="/root/.pyenv"
-      #     export PATH="${PYENV_ROOT}/bin:${PYENV_ROOT}/shims:${PATH}"
-      #     eval "$(pyenv init -)"
-      #     # eval "$(${PYENV_ROOT}/bin/pyenv init -)"
-      #     # echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-      #     # echo 'eval "$(pyenv init --path)"' >> ~/.profile
-      #     pyenv install 3.14.8
-      #     pyenv global 3.14.8
-      #     echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
-      #     echo "$PYENV_ROOT/shims" >> $GITHUB_PATH
-      #     echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
-
-      # - name: Setup Pyenv Initialization
-      #   run: |
-      #     export PYENV_ROOT="/root/.pyenv" && \
-      #     export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}" && \
-      #     echo 'eval "$(pyenv init -)"' >> ~/.bashrc && \
-      #     echo 'eval "$(pyenv init --path)"' >> ~/.profile
-
-      # - name: Install Python 3.14.8
-      #   run: |
-      #     pyenv install 3.14.8
-
-      # - name: Set Python 3.14.8
-      #   run: |
-      #     pyenv global 3.14.8
-
-      - name: Ensure Pip
-        shell: bash
-        run: |
-          eval "$(pyenv init -)"
-          python -m ensurepip --default-pip
-
-      - name: Install Python dependencies
+      - name: Install Python Dependencies
         shell: bash
         run: |
           python -m pip install -r requirements.txt
@@ -185,32 +88,16 @@ jobs:
         run: | 
           playwright install chromium
 
-      # Void Build
-      - name: Build executable Void
-        if: matrix.distro == 'ghcr.io/void-linux/void-glibc-full:latest'
+      - name: Build Pyinstaller Executable
         shell: bash
         run: |
-          pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_Void ${{ env.MAIN_PY_FILE }}
-
-      # Fedora Build
-      - name: Build executable Fedora
-        if: matrix.distro == 'fedora.latest'
-        shell: bash
-        run: |
-          pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_Fedora ${{ env.MAIN_PY_FILE }}
-
-      # openSUSE Build
-      - name: Build executable Fedora
-        if: matrix.distro == 'fedora.latest'
-        shell: bash
-        run: |
-          pyinstaller --onefile --add-data "styles.tcss:." --windowed -n PyDisplaylinkSynapticsInstall_openSUSE ${{ env.MAIN_PY_FILE }}
+          pyinstaller --onefile --add-data "styles.tcss:." --windowed -n ${{ matrix.binary_name }} ${{ env.MAIN_PY_FILE }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-executables
-          path: py_displaylink_synaptics_install/dist/*
+          path: py_displaylink_synaptics_install/dist/${{ matrix.binary_name }}
 
   release:
     needs: build
