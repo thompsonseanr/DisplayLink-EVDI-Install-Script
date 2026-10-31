@@ -96,7 +96,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-executables
+          name: linux-executables-${{ matrix.distro }}
           path: py_displaylink_synaptics_install/dist/${{ matrix.binary_name }}
 
   release:
@@ -114,8 +114,9 @@ jobs:
       - name: Download Built Binary
         uses: actions/download-artifact@v4
         with:
-          name: linux-executables
+          name: linux-executables-*
           path: ${{ github.workspace }}/release_files/
+          merge-multiple: true
 
       - name: Create Release
         shell: bash
