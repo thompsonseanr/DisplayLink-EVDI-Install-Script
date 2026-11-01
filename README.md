@@ -24,11 +24,11 @@
 
 ## Release Update:  
 
-This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. Please download from [Releases](https://github.com/thompsonseanr/DisplayLink-EVDI-Install-Script/releases).  
+This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. <!-- Please download from [Releases](https://github.com/thompsonseanr/DisplayLink-EVDI-Install-Script/releases).  -->
 
 <br>
 
-The [shell script](#bash-script) is an option, but will no longer be actively updated with new features outside of periodically updating the **Synaptics Displaylink Driver** download url.  
+The [shell script](#bash-script) is how the project originally started and I will continue to periodically update the **Synaptics Displaylink Driver** download URL.  
 
 <br>  
 
