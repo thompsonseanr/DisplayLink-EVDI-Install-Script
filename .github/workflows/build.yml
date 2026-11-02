@@ -19,68 +19,33 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - distro: void
-            dockerfile: docker/Dockerfile.void
-            binary_name: PyDisplaylinkSynapticsInstall_Void
-          - distro: arch
-            dockerfile: docker/Dockerfile.arch
-            binary_name: PyDisplaylinkSynapticsInstall_Arch
-          - distro: fedora
-            dockerfile: docker/Dockerfile.fedora
-            binary_name: PyDisplaylinkSynapticsInstall_Fedora
-          - distro: opensuse
-            dockerfile: docker/Dockerfile.opensuse
-            binary_name: PyDisplaylinkSynapticsInstall_Opensuse
     defaults:
       run:
         working-directory: ./py_displaylink_synaptics_install
-    env:
-      MAIN_PY_FILE: 'py_displaylink_synaptics_install.py'
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          ref: py-conversion
+          ref: py-pip
 
-      - name: Build Containers
-        run: |
-          docker build -f ${{ matrix.dockerfile }} -t pyenv-${{ matrix.distro }}:latest .
+      - name: Install Poetry
+        run: pipx install poetry
 
-      - name: Run Docker image
-        run: |
-          docker run --rm \
-          -v ${PWD}:/workspace \
-          -w /workspace \
-          pyenv-${{ matrix.distro }}:latest \
-          /bin/bash
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: 'poetry'
 
-      - name: Install Python Dependencies
-        shell: bash
-        run: |
-          python -m pip install -r requirements.txt
+      - name: Build Wheel and Source Dist
+        run: poetry build
 
-      - name: Install Playwright Chromium
-        shell: bash
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: 0
-        run: | 
-          playwright install chromium
-
-      - name: Build Pyinstaller Executable
-        shell: bash
-        run: |
-          pyinstaller --onefile --add-data "styles.tcss:." --windowed -n ${{ matrix.binary_name }} ${{ env.MAIN_PY_FILE }}
-
-      - name: Upload Artifacts
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-executables-${{ matrix.distro }}
-          path: py_displaylink_synaptics_install/dist/${{ matrix.binary_name }}
+          name: python-package-distributions
+          path: dist/
 
   release:
     needs: build
@@ -92,14 +57,13 @@ jobs:
       - name: Checkout repository (for release notes)
         uses: actions/checkout@v4
         with:
-          ref: py-conversion
+          ref: py-pip
 
-      - name: Download Built Binaries
+      - name: Download Built Wheel
         uses: actions/download-artifact@v4
         with:
-          pattern: linux-executables-*
+          pattern: python-package-distributions
           path: ${{ github.workspace }}/release_files/
-          merge-multiple: true
 
       - name: Create Release
         shell: bash

@@ -1,0 +1,2 @@
+[console_scripts]
+py_displaylink_synaptics_install = src.main:main

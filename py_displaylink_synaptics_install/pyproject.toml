@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "py_displaylink_synaptics_install"
+version = "1.1.4"
+description = "Textual TUI for installing Synaptics DisplayLink and EVDI firmware for Linux."
+readme = "README.md"
+requires-python = ">=3.9"
+
+# Dynamic dependencies
+dynamic = ["dependencies"]
+
+# Use requirements.txt
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+py_displaylink_synaptics_install = "src.main:main"
+
+[tool.poetry.scripts]
+py_displaylink_synaptics_install = "src.main:main"

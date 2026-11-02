@@ -2,9 +2,9 @@
 
 **Please Note:** This installer is only for Linux.   
 
-1) Please download the ELF binary for your Linux Distro:  
+1) Please download the python wheel:  
 
-    **PyDisplaylinkSynapticsInstall_<DISTRO>**  
+    **py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl**  
   
 <br>  
 
@@ -46,27 +46,23 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
   
 <br>  
 
-3) Make `PyDisplaylinkSynapticsInstall_<DISTRO>` executable:  
+3) Install created wheel from **/dist**:  
 
 ```
-chmod +x PyDisplaylinkSynapticsInstall_<DISTRO>
+pip install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
 ```
 
-<br>  
+4) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
+  
 
-4) Run installer as `sudo`:  
+> **Disclaimer Message:**     
+> Please run this script with `sudo`.  
+> Elevated permissions are required for running the extracted DisplayLink displaylink-installer.sh script,  
+> which builds the EVDI DKMS module, etc.  
+> Exiting.
 
+  
+  
 ```
-sudo ./PyDisplaylinkSynapticsInstall_<DISTRO>
+sudo py_displaylink_synaptics_install
 ```
-
-<br>
-
-5) **Optional** Add to path for future **EVDI** and/or **Synaptics DisplayLink Driver** updates. This TUI also runs uninstall wrapper scripts:
-
-    - Copy executable to **/opt**    
-
-    - Make symlink in `/usr/local/bin`:  
-    ```
-    sudo ln -s /opt/PyDisplaylinkSynapticsInstall_<DISTRO> /usr/local/bin/PyDisplaylinkSynapticsInstall_<DISTRO>
-    ```
