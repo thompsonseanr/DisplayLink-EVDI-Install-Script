@@ -384,7 +384,9 @@ EXIT_MESSAGE = """
 
 RUNIT_MESSAGE = """
 [bold]VOID linux/runit -based distro users:[/bold]
+
 Remember to remove the 'down' service file and restart the 'displaylink-driver' service:
+
 > cd /var/service/displaylink-driver
 > sudo rm -f down
 > sudo sv restart displaylink-driver
@@ -392,12 +394,15 @@ Remember to remove the 'down' service file and restart the 'displaylink-driver' 
 
 SYSTEMD_MESSAGE = """
 [bold]Systemd -based distro users:[/bold]
+
 Remember to check the status of the 'displaylink' service by running:
+
 > sudo systemctl status displaylink-driver.service
 or
 > sudo systemctl status displaylink.service
 
 To start the service if not running: 
+
 > sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
 """
 
