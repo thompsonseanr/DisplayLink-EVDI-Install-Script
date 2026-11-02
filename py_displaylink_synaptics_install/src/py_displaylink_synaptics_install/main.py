@@ -7,7 +7,7 @@ import git
 import tarfile
 import zipfile
 import re
-import py_playwright_scraper
+from py_displaylink_synaptics_install import py_playwright_scraper
 import time
 from collections.abc import Iterator
 from contextlib import suppress
