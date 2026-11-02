@@ -19,6 +19,13 @@ dependencies = { file = ["requirements.txt"] }
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools]
+include-package-data = true
+
+# Textual .tcss
+[tool.setuptools.package-data]
+"*" = ["*.tcss"]
+
 [project.scripts]
 py_displaylink_synaptics_install = "py_displaylink_synaptics_install.main:main"
 
