@@ -33,15 +33,13 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          cache-dependency-glob: "py_displaylink_synaptics_install/uv.lock"
+          cache-dependency-glob: "uv.lock"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+      - name: Set up Python via uv
+        run: uv python install 3.14
 
       - name: Install Dependencies
-        run: uv sync
+        run: uv sync --frozen
 
       - name: Install Playwright Chrome Browser
         run: uv run playwright install chrome
