@@ -61,3 +61,8 @@ py_displaylink_synaptics_install = "py_displaylink_synaptics_install.main:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/py_displaylink_synaptics_install"]
 artifacts = ["src/py_displaylink_synaptics_install/*.tcss"]
+
+[tool.uv.workspace]
+members = [
+    "py_displaylink_synaptics_install",
+]

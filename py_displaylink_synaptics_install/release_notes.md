@@ -46,13 +46,20 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
   
 <br>  
 
-3) Install created wheel from **/dist**:  
+3) Install [uv](https://docs.astral.sh/uv/getting-started/installation/):
+
+```
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+<br>  
+
+4) Install downloaded **.whl**:  
 
 ```
 uv tool install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl --global
 ```
 
-4) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
+5) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
   
 
 > **Disclaimer Message:**     
@@ -61,7 +68,6 @@ uv tool install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl --gl
 > which builds the EVDI DKMS module, etc.  
 > Exiting.
 
-  
   
 ```
 sudo /usr/local/bin/py_displaylink_synaptics_install

@@ -897,7 +897,9 @@ class DisplayLinkInstaller(App):
                     displaylink_cl=self.displaylink_cl
                 ))
 
-
-if __name__ == "__main__":
+def main():
     app = DisplayLinkInstaller(displaylink_cl=DispLink)
     app.run()
+
+if __name__ == "__main__":
+    main()
