@@ -49,7 +49,7 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
 3) Install created wheel from **/dist**:  
 
 ```
-pip install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
+uv tool install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl --global
 ```
 
 4) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
@@ -64,5 +64,5 @@ pip install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
   
   
 ```
-sudo py_displaylink_synaptics_install
+sudo /usr/local/bin/py_displaylink_synaptics_install
 ```
