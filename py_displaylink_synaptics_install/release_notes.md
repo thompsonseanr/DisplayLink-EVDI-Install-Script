@@ -72,3 +72,9 @@ uv tool install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl --gl
 ```
 sudo /usr/local/bin/py_displaylink_synaptics_install
 ```
+
+or
+
+```
+sudo env "PATH=$PATH" py_displaylink_synaptics_install 
+```

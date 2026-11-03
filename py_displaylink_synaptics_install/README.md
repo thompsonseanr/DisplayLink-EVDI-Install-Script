@@ -84,21 +84,35 @@ zypper install -t pattern devel_basis
 zypper install kernel-devel kernel-source libdrm-devel dkms
 ```
   
-## Building and Installing Python Wheel Locally with Pip
+## Building and Installing Python Wheel Locally with **uv**
 
-1) Build wheel:  
-
-```
-python -m build
-```
-
-2) Install created wheel from **/dist**:  
+1) Install [uv](https://docs.astral.sh/uv/getting-started/installation/):  
 
 ```
-pip install dist/py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-3) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
+2) Build **.whl**:  
+
+- Go into **py_displaylink_synaptics_install/** directory:  
+
+```
+cd py_displaylink_synaptics_install/
+```  
+
+ - Run:  
+
+```
+uv build
+```
+
+3) Install created wheel from **/dist**:  
+
+```
+uv tool install dist/py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
+```
+
+4) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
   
 
 > **Disclaimer Message:**     
@@ -108,5 +122,11 @@ pip install dist/py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
 > Exiting.
 
 ```
-sudo py_displaylink_synaptics_install
+sudo /usr/local/bin/py_displaylink_synaptics_install
+```
+
+or  
+
+```
+sudo env "PATH=$PATH" py_displaylink_synaptics_install 
 ```
