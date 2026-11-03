@@ -40,6 +40,12 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install Dependencies
+        run: uv sync
+
+      - name: Install Playwright Chrome Browser
+        run: uv run playwright install chrome
+
       - name: Build Wheel and Source Dist
         run: uv build
 

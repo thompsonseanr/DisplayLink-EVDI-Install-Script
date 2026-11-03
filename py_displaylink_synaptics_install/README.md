@@ -122,7 +122,7 @@ uv tool install dist/py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
 > Exiting.
 
 ```
-sudo /usr/local/bin/py_displaylink_synaptics_install
+sudo /home/<USER>/.local/bin/py_displaylink_synaptics_install
 ```
 
 or  

@@ -56,7 +56,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 4) Install downloaded **.whl**:  
 
 ```
-uv tool install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl --global
+uv tool install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
 ```
 
 5) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
@@ -70,7 +70,7 @@ uv tool install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl --gl
 
   
 ```
-sudo /usr/local/bin/py_displaylink_synaptics_install
+sudo /home/<USER>/.local/bin/py_displaylink_synaptics_install
 ```
 
 or
