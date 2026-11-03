@@ -39,7 +39,7 @@ jobs:
         run: uv python install 3.12
 
       - name: Install Dependencies
-        run: uv sync --frozen
+        run: uv sync
 
       - name: Install Playwright Chrome Browser
         run: uv run playwright install chrome
