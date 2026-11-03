@@ -29,18 +29,19 @@ jobs:
         with:
           ref: py-pip
 
-      - name: Install Poetry
-        run: pipx install poetry
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: ./py_displaylink_synaptics_install/uv.lock
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-          cache: 'poetry'
-          cache-dependency-path: ./py_displaylink_synaptics_install/pyproject.toml
 
       - name: Build Wheel and Source Dist
-        run: poetry build
+        run: uv build
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
