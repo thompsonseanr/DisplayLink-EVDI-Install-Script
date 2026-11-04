@@ -93,36 +93,49 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 <br>  
 
-2) Build **.whl**:  
-
-- Go into **py_displaylink_synaptics_install/** directory:  
+2) Enter **python** module:  
 
 ```
 cd py_displaylink_synaptics_install/
 ```  
+<br>  
 
- - Run:  
+3) Create **venv**:
 
 ```
-uv build
+uv venv
 ```
 <br>  
 
-3) Install **Chromium** for **Playwright**:
+4) Activate **venv**:
+
+```
+source .venv/bin/activate
+```
+<br>  
+
+5) Install **Chromium** for **Playwright** for elevated user:
 
 ```
 sudo env "PATH=$PATH" playwright install chromium
 ```
 <br>  
 
-4) Install created wheel from **/dist**:  
+6) Build **.whl**:
+
+```
+uv build --wheel
+```
+<br>  
+
+7) Install created wheel from **/dist**:  
 
 ```
 uv tool install dist/py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
 ```
 <br>  
 
-5) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
+8) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
   
 
 > **Disclaimer Message:**     
