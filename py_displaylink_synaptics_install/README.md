@@ -91,6 +91,7 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
 ```
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+<br>  
 
 2) Build **.whl**:  
 
@@ -105,14 +106,23 @@ cd py_displaylink_synaptics_install/
 ```
 uv build
 ```
+<br>  
 
-3) Install created wheel from **/dist**:  
+3) Install **Chromium** for **Playwright**:
+
+```
+sudo env "PATH=$PATH" playwright install chromium
+```
+<br>  
+
+4) Install created wheel from **/dist**:  
 
 ```
 uv tool install dist/py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
 ```
+<br>  
 
-4) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
+5) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
   
 
 > **Disclaimer Message:**     
@@ -122,11 +132,11 @@ uv tool install dist/py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
 > Exiting.
 
 ```
-sudo /home/<USER>/.local/bin/py_displaylink_synaptics_install
+sudo env "PATH=$PATH" py_displaylink_synaptics_install 
 ```
 
 or  
 
 ```
-sudo env "PATH=$PATH" py_displaylink_synaptics_install 
+sudo /home/<USER>/.local/bin/py_displaylink_synaptics_install
 ```
