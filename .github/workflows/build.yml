@@ -36,14 +36,11 @@ jobs:
           cache-dependency-glob: "**/uv.lock"
 
       - name: Set up Python via uv
-        run: uv python install 3.12
+        run: uv python install 3.14.8 --default
 
       - name: Install Dependencies
         run: uv sync --package py_displaylink_synaptics_install
 
-      - name: Install Playwright Chrome Browser
-        run: uv run --package py_displaylink_synaptics_install playwright install chrome
-        
       - name: Build Wheel and Source Dist
         run: uv build --package py_displaylink_synaptics_install
 
