@@ -22,6 +22,7 @@ mdit-py-plugins
 mdurl
 msgpack
 multidict
+mypy
 packaging
 pathspec
 platformdirs

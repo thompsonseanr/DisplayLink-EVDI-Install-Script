@@ -155,6 +155,13 @@ EvdiDecisionScreen {
 }
 
 /*
+ChromiumDownloadScreen
+*/
+ChromiumDownloadScreen {
+    align: center middle;
+}
+
+/*
 DownloadEvdiSoftwareScreen
 */
 

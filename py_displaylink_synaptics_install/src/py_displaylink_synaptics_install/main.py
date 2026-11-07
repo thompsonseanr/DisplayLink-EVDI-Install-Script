@@ -26,7 +26,7 @@ from textual.events import Print, Key
 from textual.reactive import reactive
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
-from textual.widgets import Placeholder, Static, LoadingIndicator, ListView, ListItem
+from textual.widgets import Static, LoadingIndicator, ListView, ListItem
 
 # Personal Dev Notes:
 # Write error catching and file removal scripts on failures
@@ -64,6 +64,8 @@ class DispLink:
     displaylink_full_name_up: Path | None = None
     displaylink_file_dir: Path | None = None
     displaylink_install_dir: Path | None = None
+    playwright_chromium_dir: str = "/root/.cache/ms-playwright"
+    playwright_chromium_web: str = "chrome"
 
 
     # https://stackoverflow.com/questions/20913411/test-if-an-internet-connection-is-present-in-python
@@ -74,16 +76,31 @@ class DispLink:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect((host, port))
             return True
-        except(socket.error, OSError):
+        except OSError:
             pass
 
         return False
 
+    @classmethod
+    def check_for_playwright_chromium(cls) -> bool:
+
+        chromium_path = Path(cls.playwright_chromium_dir)
+
+        if not chromium_path.is_dir():
+            return False
+
+        for chromium_bin_path in chromium_path.rglob(cls.playwright_chromium_web):
+            chromium_elf = chromium_bin_path.resolve()
+            
+            if chromium_elf.is_file() and os.access(chromium_elf, os.X_OK):
+                return True
+
+        return False
 
     @staticmethod
     def runit_test() -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            f"ps -p 1 -o comm=",
+            "ps -p 1 -o comm=",
             shell=True,
             capture_output=True, 
             text=True
@@ -92,13 +109,13 @@ class DispLink:
     @staticmethod
     def displaylink_install_check() -> bool:
         evdi_test: subprocess.CompletedProcess[str] = subprocess.run(
-            f'lsmod | grep -Eio "evdi" | head -1', 
+            'lsmod | grep -Eio "evdi" | head -1', 
             shell=True, 
             capture_output=True, 
             text=True
         )
         display_installer_test: Path = Path("/usr/bin/displaylink-installer")
-        is_displaylink_installed: bool = True if (evdi_test.stdout and display_installer_test.is_file()) else False
+        is_displaylink_installed: bool = bool(evdi_test.stdout and display_installer_test.is_file())
         return is_displaylink_installed
 
     @staticmethod
@@ -118,6 +135,15 @@ class DispLink:
         unProc.wait()
         if unProc.returncode != 0:
             yield f"[red]DisplayLink uninstallation failed. Exit code: {unProc.returncode}[/]"
+
+    @staticmethod
+    def download_chromium() -> None:
+        subprocess.run(
+            'env "PATH=$PATH" playwright install chromium',
+            shell=True, 
+            capture_output=True, 
+            text=True
+        )
 
     @classmethod
     def download_displaylink(cls) -> None:
@@ -287,10 +313,12 @@ class DispLink:
                         assert install_proc.stdout is not None
                         for line in install_proc.stdout:
                             yield line.rstrip()
-                    
-                    install_proc.wait()
-                    if install_proc.returncode != 0:
-                        yield f"[red]DisplayLink installation failed. Exit code: {install_proc.returncode}[/]"
+                        
+                        time.sleep(5)
+                        install_ret = install_proc.wait()
+                        if install_ret != 0:
+                            yield f"[red]DisplayLink installation failed. Exit code: {install_proc.returncode}[/]"
+                            time.sleep(5)
 
     @staticmethod
     def runit_enable_display() -> None:
@@ -361,6 +389,7 @@ BEGIN_MESSAGE = """
 EVDI_DEC_MESSAGE = """
 [bold]::: Please choose the EVDI release version to install:[/bold]
 
+It is recommended to install the latest Tag version.
 """
 
 INSTALL_DEC_MESSAGE = """
@@ -383,27 +412,27 @@ EXIT_MESSAGE = """
 """
 
 RUNIT_MESSAGE = """
-[bold]VOID linux/runit -based distro users:[/bold]
+[bold]VOID linux/runit-based distro users:[/bold]
 
 Remember to remove the 'down' service file and restart the 'displaylink-driver' service:
 
-> cd /var/service/displaylink-driver
-> sudo rm -f down
-> sudo sv restart displaylink-driver
+    > cd /var/service/displaylink-driver
+    > sudo rm -f down
+    > sudo sv restart displaylink-driver
 """
 
 SYSTEMD_MESSAGE = """
-[bold]Systemd -based distro users:[/bold]
+[bold]Systemd-based distro users:[/bold]
 
 Remember to check the status of the 'displaylink' service by running:
 
-> sudo systemctl status displaylink-driver.service
-or
-> sudo systemctl status displaylink.service
+    > sudo systemctl status displaylink-driver.service
+    or
+    > sudo systemctl status displaylink.service
 
 To start the service if not running: 
 
-> sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
+    > sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
 """
 
 
@@ -419,7 +448,7 @@ class ChoiceButton(Button):
             event.stop()
 
 
-# DisplayLink/EVDI Installed Warning Modal
+# No Connection Modal
 class NoConnectionModal(ModalScreen[bool]):
     CSS_PATH = Path(__file__).parent / "styles.tcss"
 
@@ -499,7 +528,7 @@ class UninstallIndicatorScreen(Screen):
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
             yield Static(UNINSTALLATION_LOG_MESSAGE)
-            yield RichLog(id="uninstall-log", highlight=True, markup=True)
+            yield RichLog(id="uninstall-log", highlight=True, markup=True, wrap=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -597,7 +626,7 @@ class DownloadEvdiSoftwareScreen(Screen):
         ))
 
 
-# To-Do: EVDI List Screen
+# EVDI List Screen
 class EvdiDecisionScreen(Screen):
     CSS_PATH = Path(__file__).parent / "styles.tcss"
 
@@ -608,9 +637,10 @@ class EvdiDecisionScreen(Screen):
         ) -> None:
 
         self.displaylink_cl = displaylink_cl
-        self.evdi_git_gag_list = displaylink_cl.evdi_git_list_util()
-        self.evdi_git_primary = displaylink_cl.find_git_primary()
+        self.evdi_git_tag_list = displaylink_cl.evdi_git_list_util()
+        # self.evdi_git_primary = displaylink_cl.find_git_primary()
         self.evdi_git_pull = displaylink_cl.evdi_pull_tag_util
+        self.playwright_chromium = displaylink_cl.check_for_playwright_chromium()
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -618,10 +648,7 @@ class EvdiDecisionScreen(Screen):
         with Container(id="undisp-dialog"):
             yield Static(EVDI_DEC_MESSAGE)
             yield ListView(
-                # Keep for potential list
-                # *[ListItem(Label(str(item))) for item in self.evdi_git_gag_list],
-                ListItem(Label(f":: {self.evdi_git_gag_list[-1]} [bold]RECOMMENDED[/bold]"), id=f"{self.evdi_git_gag_list[-1].name.replace(".", "_")}"),
-                ListItem(Label(f":: {self.evdi_git_primary.capitalize()} For Experimental Features. Use at own risk."), id=f"{self.evdi_git_primary}"),
+                *[ListItem(Label(f":: {item!s}"), id=f"{item.name.replace('.', '_')}") for item in reversed(self.evdi_git_tag_list)]
             )
         yield Footer(id="Footer")
 
@@ -633,9 +660,46 @@ class EvdiDecisionScreen(Screen):
     def process_selected_value(self, value: str | None) -> None:
         if value:
             self.evdi_git_pull(evdi_dec=value.replace("_", "."))
+        
+        if self.playwright_chromium:
             self.app.push_screen(DisplayLinkDownloadScreen(
                 displaylink_cl=self.displaylink_cl
             ))
+        else:
+            self.app.push_screen(ChromiumDownloadScreen(
+                displaylink_cl=self.displaylink_cl
+            ))
+
+
+# Playwright Chromium Download Screen
+class ChromiumDownloadScreen(Screen):
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
+
+    def __init__(
+        self,
+        displaylink_cl,
+        **kwargs
+        ) -> None:
+
+        self.displaylink_cl = displaylink_cl
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="undisp-dialog"):
+            yield Label(">>> Downloading Playwright Chromium.")
+            yield LoadingIndicator()
+        yield Footer(id="Footer")
+
+    def on_mount(self) -> None:
+        self.exec_download_chromium()
+
+    @work(thread=True)
+    def exec_download_chromium(self) -> None:
+        self.displaylink_cl.download_chromium()
+        self.app.call_from_thread(self.app.push_screen, DisplayLinkDownloadScreen(
+            displaylink_cl=self.displaylink_cl
+        ))
 
 
 # DisplayLink Software Download Screen
@@ -720,7 +784,7 @@ class DisplayLinkInstallationScreen(Screen):
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
             yield Static(INSTALLATION_LOG_MESSAGE)
-            yield RichLog(id="install-log", highlight=True, markup=True)
+            yield RichLog(id="install-log", highlight=True, markup=True, wrap=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -733,7 +797,7 @@ class DisplayLinkInstallationScreen(Screen):
         for line in self.displaylink_cl.extract_displaylink_firmware():
             self.app.call_from_thread(dispLog.write, line)
 
-        self.app.call_from_thread(self.app.push_screen, CleanFilesExitScreen(
+        self.app.call_from_thread(self.app.push_screen, FinalizeScreen(
             displaylink_cl=self.displaylink_cl
         ))
 
@@ -763,7 +827,9 @@ class CleanFilesExitScreen(Screen):
     @work(thread=True)
     def exec_clean_files(self) -> None:
         self.displaylink_cl.clean_files()
-        self.app.call_from_thread(self.app.push_screen, FinalizeScreen(displaylink_cl=self.displaylink_cl))
+        time.sleep(3)
+        self.app.call_from_thread(self.app.exit())
+        # self.app.call_from_thread(self.app.push_screen, FinalizeScreen(displaylink_cl=self.displaylink_cl))
 
 
 # Finalize Screen 
@@ -795,6 +861,7 @@ class FinalizeScreen(Screen):
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.displaylink_cl.clean_files()
         if event.button.id == "yes-en-btn":
             self.app.push_screen(FinishExitScreen(displaylink_cl=self.displaylink_cl))
         else:
