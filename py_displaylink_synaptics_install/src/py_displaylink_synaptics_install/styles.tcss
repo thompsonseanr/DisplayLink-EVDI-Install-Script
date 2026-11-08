@@ -214,6 +214,14 @@ CleanFilesExitScreen {
 }
 
 /*
+FailedInstallExitScreen
+*/
+
+FailedInstallExitScreen {
+    align: center middle;
+}
+
+/*
 FinalizeScreen
 */
 

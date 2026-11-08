@@ -66,6 +66,9 @@ class DispLink:
     displaylink_install_dir: Path | None = None
     playwright_chromium_dir: str = "/root/.cache/ms-playwright"
     playwright_chromium_web: str = "chrome"
+    # Look in displaylink driver install shell scripts/ EVDI for more errors
+    failed_install: str = "failed to install evdi to the kernel tree"
+    failed_dkms: str = "evdi_dkms_install: command not found"
 
 
     # https://stackoverflow.com/questions/20913411/test-if-an-internet-connection-is-present-in-python
@@ -92,7 +95,7 @@ class DispLink:
         for chromium_bin_path in chromium_path.rglob(cls.playwright_chromium_web):
             chromium_elf = chromium_bin_path.resolve()
             
-            if chromium_elf.is_file() and os.access(chromium_elf, os.X_OK):
+            if chromium_elf.is_file():
                 return True
 
         return False
@@ -276,6 +279,7 @@ class DispLink:
             os.chdir(cls.displaylink_install_dir)
             run_file_find: list[Path] = file_find(cls.displaylink_install_dir, "*.run")
             run_file: Path | None = run_file_find[0] if run_file_find else None
+            # Failure could be improved. May need to refactor logic for better failure and push to a screen.
             if run_file is None:
                 cls.clean_files()
             else:
@@ -312,13 +316,19 @@ class DispLink:
                         ) as install_proc:
                         assert install_proc.stdout is not None
                         for line in install_proc.stdout:
-                            yield line.rstrip()
-                        
-                        time.sleep(5)
+                            proc_out = line.rstrip()
+                            yield proc_out
+
+                            if cls.failed_install in proc_out.lower() or cls.failed_dkms in proc_out.lower():
+                                yield ">>> DisplayLink installation failed. EVDI version is incompatible with the current Linux kernel version."
+                                
                         install_ret = install_proc.wait()
+                        
                         if install_ret != 0:
-                            yield f"[red]DisplayLink installation failed. Exit code: {install_proc.returncode}[/]"
-                            time.sleep(5)
+                            yield f">>> DisplayLink installation failed. Exit code: {install_proc.returncode}"
+
+                    time.sleep(2)
+
 
     @staticmethod
     def runit_enable_display() -> None:
@@ -332,6 +342,7 @@ class DispLink:
             text=True
         )
 
+    # To-do: improve and test if displaylink service is already enabled
     @staticmethod
     def systemd_enable_display() -> None:
         display_service: subprocess.CompletedProcess[str] = subprocess.run(
@@ -401,8 +412,16 @@ INSTALL_DEC_MESSAGE = """
 """
 
 INSTALLATION_LOG_MESSAGE = """
->>> Now installing Synaptics DisplayLink Driver.
->>> Please wait until it finishes... (Building the EVDI DKMS kernel module takes time)
+[bold]::: Now installing Synaptics DisplayLink Driver./bold]
+::: Please wait until it completes... 
+(Building the EVDI DKMS kernel module takes time)
+
+"""
+
+FAILED_INSTALLATION_LOG_MESSAGE = """
+>>> Selected EVDI version is incompatible with your Linux version. 
+
+Please re-run the installer and select a compatible EVDI version.
 
 """
 
@@ -416,9 +435,9 @@ RUNIT_MESSAGE = """
 
 Remember to remove the 'down' service file and restart the 'displaylink-driver' service:
 
-    > cd /var/service/displaylink-driver
-    > sudo rm -f down
-    > sudo sv restart displaylink-driver
+    $ cd /var/service/displaylink-driver
+    $ sudo rm -f down
+    $ sudo sv restart displaylink-driver
 """
 
 SYSTEMD_MESSAGE = """
@@ -426,13 +445,14 @@ SYSTEMD_MESSAGE = """
 
 Remember to check the status of the 'displaylink' service by running:
 
-    > sudo systemctl status displaylink-driver.service
-    or
-    > sudo systemctl status displaylink.service
+    $ sudo systemctl status displaylink-driver.service
+    --or--
+    $ sudo systemctl status displaylink.service
 
 To start the service if not running: 
 
-    > sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
+    $ sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
+
 """
 
 
@@ -528,7 +548,7 @@ class UninstallIndicatorScreen(Screen):
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
             yield Static(UNINSTALLATION_LOG_MESSAGE)
-            yield RichLog(id="uninstall-log", highlight=True, markup=True, wrap=True)
+            yield RichLog(id="uninstall-log", highlight=True, wrap=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -761,7 +781,6 @@ class BeginDisplayLinkInstallDialogueScreen(Screen):
                 displaylink_cl=self.displaylink_cl
             ))
         else:
-            # Push to Clean Screen
             self.app.push_screen(CleanFilesExitScreen(
                 displaylink_cl=self.displaylink_cl
             ))
@@ -778,13 +797,14 @@ class DisplayLinkInstallationScreen(Screen):
         ) -> None:
 
         self.displaylink_cl = displaylink_cl
+        self.install_fail: bool = False
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
             yield Static(INSTALLATION_LOG_MESSAGE)
-            yield RichLog(id="install-log", highlight=True, markup=True, wrap=True)
+            yield RichLog(id="install-log", highlight=True, wrap=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -797,9 +817,54 @@ class DisplayLinkInstallationScreen(Screen):
         for line in self.displaylink_cl.extract_displaylink_firmware():
             self.app.call_from_thread(dispLog.write, line)
 
-        self.app.call_from_thread(self.app.push_screen, FinalizeScreen(
-            displaylink_cl=self.displaylink_cl
-        ))
+            if self.displaylink_cl.failed_install in line.lower() or self.displaylink_cl.failed_dkms in line.lower():
+                self.install_fail = True
+        
+        # self.app.call_from_thread(self.app.push_screen, FinalizeScreen(
+        #     displaylink_cl=self.displaylink_cl
+        # ))
+        self.app.call_from_thread(self.eval_install)
+
+    def eval_install(self) -> None:
+        if not self.install_fail:
+            self.app.push_screen(FinalizeScreen(
+                displaylink_cl=self.displaylink_cl
+            ))
+        else:
+            self.app.push_screen(FailedInstallExitScreen(
+                displaylink_cl=self.displaylink_cl
+            ))
+
+# Failed Install and Exit Screen
+class FailedInstallExitScreen(Screen):
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
+
+    def __init__(
+        self,
+        displaylink_cl,
+        **kwargs
+        ) -> None:
+
+        self.displaylink_cl = displaylink_cl
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="undisp-dialog"):
+            yield Static(FAILED_INSTALLATION_LOG_MESSAGE)
+            with Grid(id="horizontal-ex-btn"):
+                yield ChoiceButton("Exit the Installer", id="failed-exit-button", classes="exit-inst-btn")
+        yield Footer(id="Footer")
+
+    def on_mount(self) -> None:
+        self.exec_clean_files()
+
+    def exec_clean_files(self) -> None:
+        self.displaylink_cl.clean_files()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "failed-exit-button":
+            self.app.exit()
 
 
 # Clean Files and Exit Screen
