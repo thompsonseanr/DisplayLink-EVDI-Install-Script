@@ -424,7 +424,7 @@ INSTALLATION_LOG_MESSAGE = """
 """
 
 FAILED_INSTALLATION_LOG_MESSAGE = """
->>> Selected EVDI version is incompatible with your Linux version. 
+>>> Selected EVDI version is incompatible with your Linux kernel version. 
 
 Please re-run the installer and select a compatible EVDI version.
 
@@ -575,7 +575,7 @@ class UninstallCompleteScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Uninstall Complete. Restart?")
+            yield Label("::: Uninstall Complete. Restart?")
             with Grid(id="horizontal-inst-btn"):
                 yield ChoiceButton("Yes", id="yes-re-btn", classes="dialog-un-btn")
                 yield ChoiceButton("No", id="no-re-btn", classes="dialog-un-btn")
@@ -635,7 +635,7 @@ class DownloadEvdiSoftwareScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Cloning the EVDI software driver.")
+            yield Label("::: Cloning the EVDI software driver.")
             yield LoadingIndicator()
         yield Footer(id="Footer")
 
@@ -742,7 +742,7 @@ class DisplayLinkDownloadScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Downloading the latest Synaptics DisplayLink Driver.")
+            yield Label("::: Downloading the latest Synaptics DisplayLink Driver.")
             yield LoadingIndicator()
         yield Footer(id="Footer")
 
@@ -887,7 +887,7 @@ class CleanFilesExitScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Now removing all downloaded files and exiting.")
+            yield Label("::: Now removing all downloaded files and exiting.")
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -923,7 +923,7 @@ class FinalizeScreen(Screen):
                 yield Static(RUNIT_MESSAGE, id="finish-inst-message")
             else:
                 yield Static(SYSTEMD_MESSAGE, id="finish-inst-message")
-            yield Label(">>> Would you like the installer to handle these manual actions for you?")
+            yield Label("::: Would you like the installer to handle these manual actions for you?")
             with Grid(id="horizontal-inst-btn"):
                 yield ChoiceButton("Yes, Enable Service", id="yes-en-btn", classes="exit-inst-btn")
                 yield ChoiceButton("No, Exit Installer", id="no-en-btn", classes="exit-inst-btn")
@@ -956,7 +956,7 @@ class FinishExitScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Preparing your system...")
+            yield Label("::: Preparing your system...")
             with Grid(id="horizontal-ex-btn"):
                 yield ChoiceButton("Exit the Installer", id="exit-button", classes="exit-inst-btn")
         yield Footer(id="Footer")
