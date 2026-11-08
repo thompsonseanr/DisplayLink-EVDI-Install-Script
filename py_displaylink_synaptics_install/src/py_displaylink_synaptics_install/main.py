@@ -403,6 +403,11 @@ EVDI_DEC_MESSAGE = """
 It is recommended to install the latest Tag version.
 """
 
+PLAYWRIGHT_DOWNLOAD_MESSAGE = """
+::: Downloading Playwright Chromium binary.
+
+"""
+
 INSTALL_DEC_MESSAGE = """
 [bold]::: Install DisplayLink and EVDI?[/bold]
 
@@ -452,7 +457,6 @@ Remember to check the status of the 'displaylink' service by running:
 To start the service if not running: 
 
     $ sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
-
 """
 
 
@@ -707,7 +711,7 @@ class ChromiumDownloadScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Downloading Playwright Chromium.")
+            yield Static(PLAYWRIGHT_DOWNLOAD_MESSAGE)
             yield LoadingIndicator()
         yield Footer(id="Footer")
 
