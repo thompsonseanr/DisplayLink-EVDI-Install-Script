@@ -1,32 +1,42 @@
 import os
-import socket
-import shutil
-import sys
-import subprocess
-import git
-import tarfile
-import zipfile
 import re
-from py_displaylink_synaptics_install import py_playwright_scraper
+import shutil
+import socket
+import subprocess
+import sys
+import tarfile
 import time
+import zipfile
 from collections.abc import Iterator
 from contextlib import suppress
 from pathlib import Path
 from typing import List
-from git import Repo
-from git import TagObject
-from git import TagReference
+
+import git
+from git import Repo, TagObject, TagReference
 from git.exc import GitCommandError
 from packaging.version import parse
 from textual import events, on, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding, BindingType
-from textual.containers import Container, Horizontal, VerticalScroll, Grid
-from textual.events import Print, Key
+from textual.containers import Container, Grid, Horizontal, VerticalScroll
+from textual.events import Key, Print
 from textual.reactive import reactive
 from textual.screen import ModalScreen, Screen
-from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
-from textual.widgets import Static, LoadingIndicator, ListView, ListItem
+from textual.widgets import (
+    Button,
+    Footer,
+    Header,
+    Label,
+    ListItem,
+    ListView,
+    LoadingIndicator,
+    RichLog,
+    Static,
+    Welcome,
+)
+
+from py_displaylink_synaptics_install import py_playwright_scraper
 
 # Personal Dev Notes:
 # Write error catching and file removal scripts on failures

@@ -114,7 +114,8 @@ source .venv/bin/activate
 ```
 <br>  
 
-5) Install **Chromium** for **Playwright** for elevated user:
+5) **OPTIONAL** Install **Chromium** for **Playwright** for elevated user:
+- There is now an option in the installer to install the Chromium driver, but will only work in an active virtual environment (fix coming soon).
 
 ```
 sudo env "PATH=$PATH" playwright install chromium
@@ -135,7 +136,8 @@ uv tool install dist/py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
 ```
 <br>  
 
-8) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
+8) Run the installed wheel:  
+- **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message.  
   
 
 > **Disclaimer Message:**     
