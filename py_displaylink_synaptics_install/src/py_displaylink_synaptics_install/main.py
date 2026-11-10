@@ -1,32 +1,42 @@
 import os
-import socket
-import shutil
-import sys
-import subprocess
-import git
-import tarfile
-import zipfile
 import re
-import py_playwright_scraper
+import shutil
+import socket
+import subprocess
+import sys
+import tarfile
 import time
+import zipfile
 from collections.abc import Iterator
 from contextlib import suppress
 from pathlib import Path
 from typing import List
-from git import Repo
-from git import TagObject
-from git import TagReference
+
+import git
+from git import Repo, TagObject, TagReference
 from git.exc import GitCommandError
 from packaging.version import parse
 from textual import events, on, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding, BindingType
-from textual.containers import Container, Horizontal, VerticalScroll, Grid
-from textual.events import Print, Key
+from textual.containers import Container, Grid, Horizontal, VerticalScroll
+from textual.events import Key, Print
 from textual.reactive import reactive
 from textual.screen import ModalScreen, Screen
-from textual.widgets import Header, Footer, RichLog, Welcome, Label, Button
-from textual.widgets import Placeholder, Static, LoadingIndicator, ListView, ListItem
+from textual.widgets import (
+    Button,
+    Footer,
+    Header,
+    Label,
+    ListItem,
+    ListView,
+    LoadingIndicator,
+    RichLog,
+    Static,
+    Welcome,
+)
+
+from py_displaylink_synaptics_install import py_playwright_scraper
 
 # Personal Dev Notes:
 # Write error catching and file removal scripts on failures
@@ -64,6 +74,11 @@ class DispLink:
     displaylink_full_name_up: Path | None = None
     displaylink_file_dir: Path | None = None
     displaylink_install_dir: Path | None = None
+    playwright_chromium_dir: str = "/root/.cache/ms-playwright"
+    playwright_chromium_web: str = "chrome"
+    # Look in displaylink driver install shell scripts/ EVDI for more errors
+    failed_install: str = "failed to install evdi to the kernel tree"
+    failed_dkms: str = "evdi_dkms_install: command not found"
 
 
     # https://stackoverflow.com/questions/20913411/test-if-an-internet-connection-is-present-in-python
@@ -74,16 +89,31 @@ class DispLink:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect((host, port))
             return True
-        except(socket.error, OSError):
+        except OSError:
             pass
 
         return False
 
+    @classmethod
+    def check_for_playwright_chromium(cls) -> bool:
+
+        chromium_path = Path(cls.playwright_chromium_dir)
+
+        if not chromium_path.is_dir():
+            return False
+
+        for chromium_bin_path in chromium_path.rglob(cls.playwright_chromium_web):
+            chromium_elf = chromium_bin_path.resolve()
+            
+            if chromium_elf.is_file():
+                return True
+
+        return False
 
     @staticmethod
     def runit_test() -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            f"ps -p 1 -o comm=",
+            "ps -p 1 -o comm=",
             shell=True,
             capture_output=True, 
             text=True
@@ -92,13 +122,13 @@ class DispLink:
     @staticmethod
     def displaylink_install_check() -> bool:
         evdi_test: subprocess.CompletedProcess[str] = subprocess.run(
-            f'lsmod | grep -Eio "evdi" | head -1', 
+            'lsmod | grep -Eio "evdi" | head -1', 
             shell=True, 
             capture_output=True, 
             text=True
         )
         display_installer_test: Path = Path("/usr/bin/displaylink-installer")
-        is_displaylink_installed: bool = True if (evdi_test.stdout and display_installer_test.is_file()) else False
+        is_displaylink_installed: bool = bool(evdi_test.stdout and display_installer_test.is_file())
         return is_displaylink_installed
 
     @staticmethod
@@ -118,6 +148,15 @@ class DispLink:
         unProc.wait()
         if unProc.returncode != 0:
             yield f"[red]DisplayLink uninstallation failed. Exit code: {unProc.returncode}[/]"
+
+    @staticmethod
+    def download_chromium() -> None:
+        subprocess.run(
+            'env "PATH=$PATH" playwright install chromium',
+            shell=True, 
+            capture_output=True, 
+            text=True
+        )
 
     @classmethod
     def download_displaylink(cls) -> None:
@@ -250,6 +289,7 @@ class DispLink:
             os.chdir(cls.displaylink_install_dir)
             run_file_find: list[Path] = file_find(cls.displaylink_install_dir, "*.run")
             run_file: Path | None = run_file_find[0] if run_file_find else None
+            # Failure could be improved. May need to refactor logic for better failure and push to a screen.
             if run_file is None:
                 cls.clean_files()
             else:
@@ -286,11 +326,19 @@ class DispLink:
                         ) as install_proc:
                         assert install_proc.stdout is not None
                         for line in install_proc.stdout:
-                            yield line.rstrip()
-                    
-                    install_proc.wait()
-                    if install_proc.returncode != 0:
-                        yield f"[red]DisplayLink installation failed. Exit code: {install_proc.returncode}[/]"
+                            proc_out = line.rstrip()
+                            yield proc_out
+
+                            if cls.failed_install in proc_out.lower() or cls.failed_dkms in proc_out.lower():
+                                yield ">>> DisplayLink installation failed. EVDI version is incompatible with the current Linux kernel version."
+                                
+                        install_ret = install_proc.wait()
+                        
+                        if install_ret != 0:
+                            yield f">>> DisplayLink installation failed. Exit code: {install_proc.returncode}"
+
+                    time.sleep(2)
+
 
     @staticmethod
     def runit_enable_display() -> None:
@@ -304,6 +352,7 @@ class DispLink:
             text=True
         )
 
+    # To-do: improve and test if displaylink service is already enabled
     @staticmethod
     def systemd_enable_display() -> None:
         display_service: subprocess.CompletedProcess[str] = subprocess.run(
@@ -361,6 +410,12 @@ BEGIN_MESSAGE = """
 EVDI_DEC_MESSAGE = """
 [bold]::: Please choose the EVDI release version to install:[/bold]
 
+It is recommended to install the latest Tag version.
+"""
+
+PLAYWRIGHT_DOWNLOAD_MESSAGE = """
+::: Downloading Playwright Chromium binary.
+
 """
 
 INSTALL_DEC_MESSAGE = """
@@ -372,8 +427,16 @@ INSTALL_DEC_MESSAGE = """
 """
 
 INSTALLATION_LOG_MESSAGE = """
->>> Now installing Synaptics DisplayLink Driver.
->>> Please wait until it finishes... (Building the EVDI DKMS kernel module takes time)
+[bold]::: Now installing Synaptics DisplayLink Driver./bold]
+::: Please wait until it completes... 
+(Building the EVDI DKMS kernel module takes time)
+
+"""
+
+FAILED_INSTALLATION_LOG_MESSAGE = """
+>>> Selected EVDI version is incompatible with your Linux kernel version. 
+
+Please re-run the installer and select a compatible EVDI version.
 
 """
 
@@ -383,22 +446,27 @@ EXIT_MESSAGE = """
 """
 
 RUNIT_MESSAGE = """
-[bold]VOID linux/runit -based distro users:[/bold]
+[bold]VOID linux/runit-based distro users:[/bold]
+
 Remember to remove the 'down' service file and restart the 'displaylink-driver' service:
-> cd /var/service/displaylink-driver
-> sudo rm -f down
-> sudo sv restart displaylink-driver
+
+    $ cd /var/service/displaylink-driver
+    $ sudo rm -f down
+    $ sudo sv restart displaylink-driver
 """
 
 SYSTEMD_MESSAGE = """
-[bold]Systemd -based distro users:[/bold]
+[bold]Systemd-based distro users:[/bold]
+
 Remember to check the status of the 'displaylink' service by running:
-> sudo systemctl status displaylink-driver.service
-or
-> sudo systemctl status displaylink.service
+
+    $ sudo systemctl status displaylink-driver.service
+    --or--
+    $ sudo systemctl status displaylink.service
 
 To start the service if not running: 
-> sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
+
+    $ sudo systemctl enable --now <DISPLAYLINK_SERVICE_NAME>
 """
 
 
@@ -414,7 +482,7 @@ class ChoiceButton(Button):
             event.stop()
 
 
-# DisplayLink/EVDI Installed Warning Modal
+# No Connection Modal
 class NoConnectionModal(ModalScreen[bool]):
     CSS_PATH = Path(__file__).parent / "styles.tcss"
 
@@ -494,7 +562,7 @@ class UninstallIndicatorScreen(Screen):
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
             yield Static(UNINSTALLATION_LOG_MESSAGE)
-            yield RichLog(id="uninstall-log", highlight=True, markup=True)
+            yield RichLog(id="uninstall-log", highlight=True, wrap=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -517,7 +585,7 @@ class UninstallCompleteScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Uninstall Complete. Restart?")
+            yield Label("::: Uninstall Complete. Restart?")
             with Grid(id="horizontal-inst-btn"):
                 yield ChoiceButton("Yes", id="yes-re-btn", classes="dialog-un-btn")
                 yield ChoiceButton("No", id="no-re-btn", classes="dialog-un-btn")
@@ -577,7 +645,7 @@ class DownloadEvdiSoftwareScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Cloning the EVDI software driver.")
+            yield Label("::: Cloning the EVDI software driver.")
             yield LoadingIndicator()
         yield Footer(id="Footer")
 
@@ -592,7 +660,7 @@ class DownloadEvdiSoftwareScreen(Screen):
         ))
 
 
-# To-Do: EVDI List Screen
+# EVDI List Screen
 class EvdiDecisionScreen(Screen):
     CSS_PATH = Path(__file__).parent / "styles.tcss"
 
@@ -603,9 +671,10 @@ class EvdiDecisionScreen(Screen):
         ) -> None:
 
         self.displaylink_cl = displaylink_cl
-        self.evdi_git_gag_list = displaylink_cl.evdi_git_list_util()
-        self.evdi_git_primary = displaylink_cl.find_git_primary()
+        self.evdi_git_tag_list = displaylink_cl.evdi_git_list_util()
+        # self.evdi_git_primary = displaylink_cl.find_git_primary()
         self.evdi_git_pull = displaylink_cl.evdi_pull_tag_util
+        self.playwright_chromium = displaylink_cl.check_for_playwright_chromium()
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
@@ -613,10 +682,7 @@ class EvdiDecisionScreen(Screen):
         with Container(id="undisp-dialog"):
             yield Static(EVDI_DEC_MESSAGE)
             yield ListView(
-                # Keep for potential list
-                # *[ListItem(Label(str(item))) for item in self.evdi_git_gag_list],
-                ListItem(Label(f":: {self.evdi_git_gag_list[-1]} [bold]RECOMMENDED[/bold]"), id=f"{self.evdi_git_gag_list[-1].name.replace(".", "_")}"),
-                ListItem(Label(f":: {self.evdi_git_primary.capitalize()} For Experimental Features. Use at own risk."), id=f"{self.evdi_git_primary}"),
+                *[ListItem(Label(f":: {item!s}"), id=f"{item.name.replace('.', '_')}") for item in reversed(self.evdi_git_tag_list)]
             )
         yield Footer(id="Footer")
 
@@ -628,9 +694,46 @@ class EvdiDecisionScreen(Screen):
     def process_selected_value(self, value: str | None) -> None:
         if value:
             self.evdi_git_pull(evdi_dec=value.replace("_", "."))
+        
+        if self.playwright_chromium:
             self.app.push_screen(DisplayLinkDownloadScreen(
                 displaylink_cl=self.displaylink_cl
             ))
+        else:
+            self.app.push_screen(ChromiumDownloadScreen(
+                displaylink_cl=self.displaylink_cl
+            ))
+
+
+# Playwright Chromium Download Screen
+class ChromiumDownloadScreen(Screen):
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
+
+    def __init__(
+        self,
+        displaylink_cl,
+        **kwargs
+        ) -> None:
+
+        self.displaylink_cl = displaylink_cl
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="undisp-dialog"):
+            yield Static(PLAYWRIGHT_DOWNLOAD_MESSAGE)
+            yield LoadingIndicator()
+        yield Footer(id="Footer")
+
+    def on_mount(self) -> None:
+        self.exec_download_chromium()
+
+    @work(thread=True)
+    def exec_download_chromium(self) -> None:
+        self.displaylink_cl.download_chromium()
+        self.app.call_from_thread(self.app.push_screen, DisplayLinkDownloadScreen(
+            displaylink_cl=self.displaylink_cl
+        ))
 
 
 # DisplayLink Software Download Screen
@@ -649,7 +752,7 @@ class DisplayLinkDownloadScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Downloading the latest Synaptics DisplayLink Driver.")
+            yield Label("::: Downloading the latest Synaptics DisplayLink Driver.")
             yield LoadingIndicator()
         yield Footer(id="Footer")
 
@@ -692,7 +795,6 @@ class BeginDisplayLinkInstallDialogueScreen(Screen):
                 displaylink_cl=self.displaylink_cl
             ))
         else:
-            # Push to Clean Screen
             self.app.push_screen(CleanFilesExitScreen(
                 displaylink_cl=self.displaylink_cl
             ))
@@ -709,13 +811,14 @@ class DisplayLinkInstallationScreen(Screen):
         ) -> None:
 
         self.displaylink_cl = displaylink_cl
+        self.install_fail: bool = False
         super().__init__(**kwargs)
 
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
             yield Static(INSTALLATION_LOG_MESSAGE)
-            yield RichLog(id="install-log", highlight=True, markup=True)
+            yield RichLog(id="install-log", highlight=True, wrap=True)
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -728,9 +831,54 @@ class DisplayLinkInstallationScreen(Screen):
         for line in self.displaylink_cl.extract_displaylink_firmware():
             self.app.call_from_thread(dispLog.write, line)
 
-        self.app.call_from_thread(self.app.push_screen, CleanFilesExitScreen(
-            displaylink_cl=self.displaylink_cl
-        ))
+            if self.displaylink_cl.failed_install in line.lower() or self.displaylink_cl.failed_dkms in line.lower():
+                self.install_fail = True
+        
+        # self.app.call_from_thread(self.app.push_screen, FinalizeScreen(
+        #     displaylink_cl=self.displaylink_cl
+        # ))
+        self.app.call_from_thread(self.eval_install)
+
+    def eval_install(self) -> None:
+        if not self.install_fail:
+            self.app.push_screen(FinalizeScreen(
+                displaylink_cl=self.displaylink_cl
+            ))
+        else:
+            self.app.push_screen(FailedInstallExitScreen(
+                displaylink_cl=self.displaylink_cl
+            ))
+
+# Failed Install and Exit Screen
+class FailedInstallExitScreen(Screen):
+    CSS_PATH = Path(__file__).parent / "styles.tcss"
+
+    def __init__(
+        self,
+        displaylink_cl,
+        **kwargs
+        ) -> None:
+
+        self.displaylink_cl = displaylink_cl
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Header(id="Header")
+        with Container(id="undisp-dialog"):
+            yield Static(FAILED_INSTALLATION_LOG_MESSAGE)
+            with Grid(id="horizontal-ex-btn"):
+                yield ChoiceButton("Exit the Installer", id="failed-exit-button", classes="exit-inst-btn")
+        yield Footer(id="Footer")
+
+    def on_mount(self) -> None:
+        self.exec_clean_files()
+
+    def exec_clean_files(self) -> None:
+        self.displaylink_cl.clean_files()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "failed-exit-button":
+            self.app.exit()
 
 
 # Clean Files and Exit Screen
@@ -749,7 +897,7 @@ class CleanFilesExitScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Now removing all downloaded files and exiting.")
+            yield Label("::: Now removing all downloaded files and exiting.")
         yield Footer(id="Footer")
 
     def on_mount(self) -> None:
@@ -758,7 +906,9 @@ class CleanFilesExitScreen(Screen):
     @work(thread=True)
     def exec_clean_files(self) -> None:
         self.displaylink_cl.clean_files()
-        self.app.call_from_thread(self.app.push_screen, FinalizeScreen(displaylink_cl=self.displaylink_cl))
+        time.sleep(3)
+        self.app.call_from_thread(self.app.exit())
+        # self.app.call_from_thread(self.app.push_screen, FinalizeScreen(displaylink_cl=self.displaylink_cl))
 
 
 # Finalize Screen 
@@ -783,13 +933,14 @@ class FinalizeScreen(Screen):
                 yield Static(RUNIT_MESSAGE, id="finish-inst-message")
             else:
                 yield Static(SYSTEMD_MESSAGE, id="finish-inst-message")
-            yield Label(">>> Would you like the installer to handle these manual actions for you?")
+            yield Label("::: Would you like the installer to handle these manual actions for you?")
             with Grid(id="horizontal-inst-btn"):
                 yield ChoiceButton("Yes, Enable Service", id="yes-en-btn", classes="exit-inst-btn")
                 yield ChoiceButton("No, Exit Installer", id="no-en-btn", classes="exit-inst-btn")
         yield Footer(id="Footer")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.displaylink_cl.clean_files()
         if event.button.id == "yes-en-btn":
             self.app.push_screen(FinishExitScreen(displaylink_cl=self.displaylink_cl))
         else:
@@ -815,7 +966,7 @@ class FinishExitScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header(id="Header")
         with Container(id="undisp-dialog"):
-            yield Label(">>> Preparing your system...")
+            yield Label("::: Preparing your system...")
             with Grid(id="horizontal-ex-btn"):
                 yield ChoiceButton("Exit the Installer", id="exit-button", classes="exit-inst-btn")
         yield Footer(id="Footer")
@@ -892,7 +1043,9 @@ class DisplayLinkInstaller(App):
                     displaylink_cl=self.displaylink_cl
                 ))
 
-
-if __name__ == "__main__":
+def main():
     app = DisplayLinkInstaller(displaylink_cl=DispLink)
     app.run()
+
+if __name__ == "__main__":
+    main()

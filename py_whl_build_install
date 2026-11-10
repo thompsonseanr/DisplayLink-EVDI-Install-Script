@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+
+set -e
+
+USER_ACTION="install"
+
+RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+BLUE='\e[34m'
+WHITE='\e[37m'
+PURPLE='\e[35m'
+BOLD='\e[1m'
+RESET='\e[0m' 
+
+whichUv=$(which uv 2>/dev/null)
+uvDec=""
+whichCurl=$(which curl 2>/dev/null)
+
+PYTHON_VENV=".venv"
+
+clear
+
+install() {
+printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer .whl Builder and Installer ${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+printf "${BLUE}>>>${RESET} ${WHITE}If you would like to uninstall everything, please run: ${RESET}\n"
+printf "${BLUE}>>>${RESET} ${WHITE}$ sudo py_whil_build_install ${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+printf "\n"
+
+if [[ -z $whichUv ]]; then
+    read -p "$(printf "${BLUE}:::${RESET} ${WHITE}Install 'uv' python package manager? [Y/n]: ${RESET}")" uvDec
+    if [[ -z $uvDec ]]; then 
+        uvDec="y"
+    fi
+    firstChar="${uvDec:0:1}"
+    uvDec="${firstChar,}"
+    printf "${BLUE}:::${RESET} ${WHITE}Installation choice: ${uvDec}${RESET}\n"
+fi
+
+if [[ $uvDec == "y" ]]; then
+    if [[ -z $whichCurl ]]; then
+        printf "${RED}>>> Error:${RESET} ${WHITE}Please install ${RESET}${RED}'curl'${RESET}. ${WHITE}Exiting.${RESET}\n" >&2
+        exit 1
+    else
+        printf "${BLUE}:::${RESET} ${WHITE}Downloading and installing 'uv'${RESET}\n"
+        printf "\n"
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+    fi
+fi
+
+cd py_displaylink_synaptics_install/
+
+printf "${BLUE}:::${RESET} ${WHITE}Creating python virtual environment${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+
+uv venv --python 3.14 >/dev/null 2>&1
+
+source "${PYTHON_VENV}/bin/activate"
+
+uv sync >/dev/null 2>&1
+
+uv build --wheel >/dev/null 2>&1
+
+printf "${BLUE}:::${RESET} ${WHITE}Installing Chromium browser dependency for Playwright in: /root/.cache/ms-playwright/ ${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}This may take some time...${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+
+sudo env "PATH=$PWD/.venv/bin:$PATH" .venv/bin/playwright install chromium >/dev/null 2>&1
+
+wheelFile="$(find dist/ -type f -name "py_displaylink_synaptics_install*"  2>/dev/null)"
+
+if [[ -z $wheelFile ]]; then
+    printf "${RED}>>> Error:${RESET} ${WHITE}'py_displaylink_synaptics_install' .whl failed to build. Exiting.${RESET}\n" >&2
+    exit 1
+else
+    printf "${BLUE}:::${RESET} ${WHITE}Installing 'py_displaylink_synaptics_install' .whl${RESET}\n"
+    printf "${BLUE}:::${RESET}\n"
+    uv tool install $wheelFile >/dev/null 2>&1
+fi
+
+
+printf "${BLUE}:::${RESET} ${WHITE}Creating /home/${USER}/.local/bin/displaylink_install_tui${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+
+cat << EOF | tee /home/$USER/.local/bin/displaylink_install_tui > /dev/null
+#!/bin/bash
+
+sudo env "PATH=\$PATH" py_displaylink_synaptics_install
+EOF
+
+chmod +x /home/$USER/.local/bin/displaylink_install_tui
+
+deactivate
+
+printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}Installation complete ${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}Restart your terminal and run: ${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}$ displaylink_install_tui ${RESET}\n"
+printf "${BLUE}:::${RESET}\n"
+printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+}
+
+
+uninstall() {
+    printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+    printf "${BLUE}:::${RESET}\n"
+    printf "${RED}>>>${RESET} ${WHITE}Uninstalling: ${RESET}\n"
+    printf "${RED}>>>${RESET} ${WHITE}py_displaylink_synaptics_install ${RESET}\n"
+    printf "${RED}>>>${RESET} ${WHITE}displaylink_install_tui ${RESET}\n"
+    printf "${BLUE}:::${RESET}\n"
+    printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+    rm -rf ./py_displaylink_synaptics_install/dist/
+    sudo rm -rf ./py_displaylink_synaptics_install/.venv
+    rm -rf /home/stx/.local/bin/displaylink_install_tui
+    sudo rm -rf /root/.cache/ms-playwright/
+    sudo chown -R $USER:$USER /home/stx/.local/share/uv/tools/
+    uv tool uninstall py_displaylink_synaptics_install
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    install)
+      USER_ACTION="install"
+      ;;
+
+    uninstall)
+      USER_ACTION="uninstall"
+      ;;
+
+    *)
+      USER_ACTION="install"
+      ;;
+  esac
+  shift
+done
+
+case "$USER_ACTION" in
+  install)
+    install
+    ;;
+
+  uninstall)
+    uninstall
+    ;;
+esac

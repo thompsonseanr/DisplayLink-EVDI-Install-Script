@@ -2,9 +2,9 @@
 
 **Please Note:** This installer is only for Linux.   
 
-1) Please download the ELF binary:  
+1) Please download the python wheel:  
 
-    **py_displaylink_synaptics_install**  
+    **py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl**  
   
 <br>  
 
@@ -46,27 +46,35 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
   
 <br>  
 
-3) Make `py_displaylink_synaptics_install` executable:  
+3) Install [uv](https://docs.astral.sh/uv/getting-started/installation/):
 
 ```
-chmod +x py_displaylink_synaptics_install
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
-  
 <br>  
 
-4) Run installer as `sudo`:  
+4) Install downloaded **.whl**:  
 
 ```
-sudo ./py_displaylink_synaptics_install
+uv tool install py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
 ```
 
-<br>
+5) Run the installed wheel. **Note:** this will have to run as `sudo` and disclaimer and reasons given in intro message:  
+  
 
-5) **Optional** Add to path for future **EVDI** and/or **Synaptics DisplayLink Driver** updates. This TUI also runs uninstall wrapper scripts:
+> **Disclaimer Message:**     
+> Please run this script with `sudo`.  
+> Elevated permissions are required for running the extracted DisplayLink displaylink-installer.sh script,  
+> which builds the EVDI DKMS module, etc.  
+> Exiting.
 
-    - Copy executable to **/opt**    
+  
+```
+sudo /home/<USER>/.local/bin/py_displaylink_synaptics_install
+```
 
-    - Make symlink in `/usr/local/bin`:  
-    ```
-    sudo ln -s /opt/py_displaylink_synaptics_install /usr/local/bin/py_displaylink_synaptics_install
-    ```
+or
+
+```
+sudo env "PATH=$PATH" py_displaylink_synaptics_install 
+```

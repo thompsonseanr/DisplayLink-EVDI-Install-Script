@@ -1,14 +1,10 @@
 name: DisplayLink Installer Pyinstaller Release Build
 
-# Playwright drivers will have to be installed with this ENV for pyinstaller:
-# PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
-# Build with:
-# pyinstaller --onefile --add-data "styles.tcss:." py_displaylink_synaptics_install.py
-
 # References:
 # https://batsov.com/articles/2025/02/27/automate-the-creation-of-github-releases/
 # https://cli.github.com/manual/gh_release_create
 # https://github.com/NotCookey/Pyinstaller-Github-Actions
+# https://github.com/pyenv/pyenv/issues/1911
 
 # Trigger workflow with creation of 'v' tag
 on:
@@ -23,48 +19,36 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/void-linux/void-glibc-full:latest
     defaults:
       run:
         working-directory: ./py_displaylink_synaptics_install
-    
-    env:
-      MAIN_PY_FILE: 'py_displaylink_synaptics_install.py'
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          ref: py-pip
 
-      # Void Container
-      - name: Set up Python in Void
-        run: |
-          xbps-install -Syu && \
-          xbps-install -y python3 python3-devel base-devel bash binutils
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/uv.lock"
 
-      - name: Ensure Pip
-        run: |
-          python -m ensurepip --default-pip
+      - name: Set up Python via uv
+        run: uv python install 3.14 --default
 
-      - name: Install Python dependencies
-        run: |
-          pip install -r requirements.txt
+      - name: Install Dependencies
+        run: uv sync --package py_displaylink_synaptics_install
 
-      - name: Install Playwright Chromium
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: 0
-        run: | 
-          playwright install chromium
+      - name: Build Wheel and Source Dist
+        run: uv build --package py_displaylink_synaptics_install
 
-      - name: Build executable
-        run: |
-          pyinstaller --onefile --add-data "styles.tcss:." --windowed ${{ env.MAIN_PY_FILE }}
-
-      - name: Upload Artifact (Linux)
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-executables
-          path: py_displaylink_synaptics_install/dist/py_displaylink_synaptics_install
+          name: python-package-distributions
+          path: ./py_displaylink_synaptics_install/dist/
 
   release:
     needs: build
@@ -75,11 +59,13 @@ jobs:
     steps:
       - name: Checkout repository (for release notes)
         uses: actions/checkout@v4
+        with:
+          ref: py-pip
 
-      - name: Download Built Binary
+      - name: Download Built Wheel
         uses: actions/download-artifact@v4
         with:
-          name: linux-executables
+          name: python-package-distributions
           path: ${{ github.workspace }}/release_files/
 
       - name: Create Release
@@ -88,7 +74,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create ${{ github.ref_name }} \
-            "${{ github.workspace }}/release_files/py_displaylink_synaptics_install" \
+            ${{ github.workspace }}/release_files/* \
             --title "Release ${{ github.ref_name }}" \
             --generate-notes \
             --notes-file release_notes.md

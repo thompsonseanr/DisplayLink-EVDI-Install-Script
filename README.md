@@ -7,6 +7,7 @@
 > 
 > **References and Attribution:**
 > - [Textual](https://textual.textualize.io/)  
+> - [uv](https://docs.astral.sh/uv/)  
 > - [JBlond - Bash Colors](https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124)  
 > - [Fix DisplayLink on Kernel 6.0 and up](https://mrk.sh/fix-displaylink-kernel6.0/)  
 > - [Fixing DisplayLink (EVDI) drivers for Linux kernel 6.x](https://code.berrydejager.com/Fix-DisplayLink_drivers-linux-kernel-6/)  
@@ -24,15 +25,19 @@
 
 ## Release Update:  
 
-This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. <!-- Please download from [Releases](https://github.com/thompsonseanr/DisplayLink-EVDI-Install-Script/releases).  -->
+This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. The bash script [py_whl_build_install](#build-and-install-the-python-whl-with-py_whl_build_install) was written to build and install or uninstall the .whl using [uv](https://docs.astral.sh/uv/) python package manager.  
 
 <br>
 
-The [shell script](#bash-script) is how the project originally started and I will continue to periodically update the **Synaptics Displaylink Driver** download URL.  
+**IMPORTANT:** If you used the `py_whl_build_install` to build and install the .whl, the main DisplayLink executable is now: `displaylink_install_tui`
+
+<br>
+
+The [shell script](#bash-script) is an option, but will no longer be actively updated with new features outside of periodically updating the **Synaptics DisplayLink Driver** download url.  
 
 <br>  
 
-The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally are in the section: [Build the python ELF binary locally with pyinstaller](#build-the-python-elf-binary-locally-with-pyinstaller).  
+The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally without using the are in the section: [Build the python ELF binary locally with pyinstaller](#build-the-python-elf-binary-locally-with-pyinstaller).  
   
 There are still improvements to be made (better error handling with associated screens, dependency checks, etc.), so new releases will be coming.  
 
@@ -101,66 +106,50 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
 
 <br>
 
-## Build the python ELF binary locally with pyinstaller:  
+## Build and install the python .whl with **py_whl_build_install**:
 
-**Instructions:**  
+**Install Instructions:**  
 
-1) Go into **py_displaylink_synaptics_install/** directory.  
-
-```
-cd py_displaylink_synaptics_install/
-```
-
-2) Create python venv and activate virtual environment:
+1) Make the `py_whl_build_install` script executable:  
 
 ```
-python -m venv <PYTHON_VENV>
+chmod +x py_whl_build_install
 ```
 
-```
-source <PYTHON_VENV>/bin/activate
-```  
-
-3) Install python dependencies:  
+2) .whl install as uv tool:  
 
 ```
-pip install -r requirements.txt
+./py_whl_build_install
 ```
 
-4) Install **Playwright** Chromium dependency:  
+3) Restart your shell (bash, zsh, etc.):  
+
+Bash:  
 
 ```
-PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium  
+source ~/.bashrc
 ```
 
-5) Build package:  
+Zsh:  
 
 ```
-pyinstaller --onefile --add-data "styles.tcss:." py_displaylink_synaptics_install.py
+source ~/.zshrc
 ```
 
-6) Built package will be within the `dist/` sub-directory:  
+3) Run **displaylink_install_tui** to install the DisplayLink and EVDI module:  
 
 ```
-cd dist/
+displaylink_install_tui
 ```
 
-```
-chmod +x py_displaylink_synaptics_install
-```
+
+**Uninstallation of python .whl:**  
+
+1) Run:  
 
 ```
-sudo ./py_displaylink_synaptics_install
+./py_whl_build_install uninstall
 ```
-
-7) **Optional** Add to path for future **EVDI** and/or **Synaptics DisplayLink Driver** updates. This TUI also runs uninstall wrapper scripts:
-
-    - Copy executable to **/opt**    
-
-    - Make symlink in `/usr/local/bin`:  
-    ```
-    sudo ln -s /opt/py_displaylink_synaptics_install /usr/local/bin/py_displaylink_synaptics_install
-    ```
 
 <br>
 

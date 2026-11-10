@@ -14,3 +14,5 @@ py_displaylink_synaptics_install/*.spec
 
 **/__pycache__/
 **/.mypy_cache/
+
+**/*.egg-info/
