@@ -25,7 +25,7 @@
 
 ## Release Update:  
 
-This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. The bash script [py_whl_build_install](#build-and-install-the-python-whl-with-py_whl_build_install) was written to build and install or uninstall the .whl using [uv](https://docs.astral.sh/uv/) python package manager.  
+This was re-written in python with [Playwright](https://playwright.dev/) and the [Textual](https://textual.textualize.io/) TUI. The bash script [py_whl_build_install](#build-and-install-the-python-whl-with-py_whl_build_install) was written to build and install or uninstall the .whl using [uv](https://docs.astral.sh/uv/) python package manager.  
 
 <br>
 
