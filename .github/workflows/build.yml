@@ -36,7 +36,7 @@ jobs:
           cache-dependency-glob: "**/uv.lock"
 
       - name: Set up Python via uv
-        run: uv python install 3.14.8 --default
+        run: uv python install 3.14 --default
 
       - name: Install Dependencies
         run: uv sync --package py_displaylink_synaptics_install
