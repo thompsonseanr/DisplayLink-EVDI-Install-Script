@@ -112,44 +112,44 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
 
 1) Make the `py_whl_build_install` script executable:  
 
-```
-chmod +x py_whl_build_install
-```
+    ```
+    chmod +x py_whl_build_install
+    ```
 
 2) .whl install as uv tool:  
 
-```
-./py_whl_build_install
-```
+    ```
+    ./py_whl_build_install
+    ```
 
 3) Restart your shell (bash, zsh, etc.):  
 
-Bash:  
+    Bash:  
 
-```
-source ~/.bashrc
-```
+    ```
+    source ~/.bashrc
+    ```
 
-Zsh:  
+    Zsh:  
 
-```
-source ~/.zshrc
-```
+    ```
+    source ~/.zshrc
+    ```
 
 3) Run **displaylink_install_tui** to install the DisplayLink and EVDI module:  
 
-```
-displaylink_install_tui
-```
+    ```
+    displaylink_install_tui
+    ```
 
 
 **Uninstallation of python .whl:**  
 
 1) Run:  
 
-```
-./py_whl_build_install uninstall
-```
+    ```
+    ./py_whl_build_install uninstall
+    ```
 
 <br>
 
