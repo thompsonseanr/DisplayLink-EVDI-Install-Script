@@ -16,21 +16,40 @@ RESET='\e[0m'
 whichUv=$(which uv 2>/dev/null)
 uvDec=""
 whichCurl=$(which curl 2>/dev/null)
+whichWhl=""
+if [[ -n "$whichUv" ]]; then
+  whichWhl="$(uv tool list | grep -Ei 'py_displaylink_synaptics*' | sed 's/^\-\s//g')"
+fi
 
 PYTHON_VENV=".venv"
 
 clear
 
 install() {
+
+if [[ "$whichWhl" == "py_displaylink_synaptics_install" ]]; then 
+  printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+  printf "${BLUE}:::${RESET}\n"
+  printf "${RED}>>>${RESET} ${WHITE}WARNING: ${RESET}${RED}${BOLD}py_displaylink_synaptics_install${RESET}${RESET} ${WHITE}is already installed. Exiting ${RESET}\n"
+  printf "${RED}>>>${RESET}\n"
+  printf "${RED}>>>${RESET} ${WHITE}If you would like to uninstall, please run: ${RESET}\n"
+  printf "${RED}>>>${RESET} ${WHITE}$ py_whl_build_install uninstall${RESET}\n"
+  printf "${BLUE}:::${RESET}\n"
+  printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+  exit 1
+fi
+
 printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 printf "${BLUE}:::${RESET}\n"
 printf "${BLUE}:::${RESET} ${WHITE}DisplayLink Installer .whl Builder and Installer ${RESET}\n"
 printf "${BLUE}:::${RESET}\n"
 printf "${BLUE}>>>${RESET} ${WHITE}If you would like to uninstall everything, please run: ${RESET}\n"
-printf "${BLUE}>>>${RESET} ${WHITE}$ sudo py_whil_build_install ${RESET}\n"
+printf "${BLUE}>>>${RESET} ${WHITE}$ py_whl_build_install uninstall${RESET}\n"
 printf "${BLUE}:::${RESET}\n"
 printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 printf "\n"
+
+
 
 if [[ -z $whichUv ]]; then
     read -p "$(printf "${BLUE}:::${RESET} ${WHITE}Install 'uv' python package manager? [Y/n]: ${RESET}")" uvDec
@@ -116,6 +135,7 @@ uninstall() {
     printf "${RED}>>>${RESET} ${WHITE}displaylink_install_tui ${RESET}\n"
     printf "${BLUE}:::${RESET}\n"
     printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
+
     if [[ -d "./py_displaylink_synaptics_install/dist/" ]]; then
       rm -rf ./py_displaylink_synaptics_install/dist/
     fi
@@ -127,6 +147,8 @@ uninstall() {
     fi
     if [[ -d "/home/${USER}/.local/share/uv/tools" ]]; then
       sudo chown -R $USER:$USER "/home/${USER}/.local/share/uv/tools"
+    fi
+    if [[ "$whichWhl" == "py_displaylink_synaptics_install" ]]; then 
       uv tool uninstall py_displaylink_synaptics_install
     fi
     if [[ -d "/root/.cache/ms-playwright/" ]]; then
