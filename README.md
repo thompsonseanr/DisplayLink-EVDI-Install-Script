@@ -41,7 +41,7 @@ The original [shell script](#bash-script) is an option, but will no longer be ac
 
 <br>  
 
-The python executable will still require build dependencies to be installed. Directions for how to create your own package locally without using the are in the python module: [Linux Multi-Monitor DisplayLink Driver and EVDI Install Utility Local Python Wheel Build Instructions](py_displaylink_synaptics_install/README.md).  
+The python executable will still require build dependencies to be installed. Directions for how to create your own package locally is in the python module: [Linux Multi-Monitor DisplayLink Driver and EVDI Install Utility Local Python Wheel Build Instructions](py_displaylink_synaptics_install/README.md).  
   
 There are still improvements to be made (dependency checks with warnings), so new releases will be coming.  
 
