@@ -116,12 +116,24 @@ uninstall() {
     printf "${RED}>>>${RESET} ${WHITE}displaylink_install_tui ${RESET}\n"
     printf "${BLUE}:::${RESET}\n"
     printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
-    rm -rf ./py_displaylink_synaptics_install/dist/
-    sudo rm -rf ./py_displaylink_synaptics_install/.venv
-    rm -rf /home/stx/.local/bin/displaylink_install_tui
-    sudo rm -rf /root/.cache/ms-playwright/
-    sudo chown -R $USER:$USER /home/stx/.local/share/uv/tools/
-    uv tool uninstall py_displaylink_synaptics_install
+    if [[ -d "./py_displaylink_synaptics_install/dist/" ]]; then
+      rm -rf ./py_displaylink_synaptics_install/dist/
+    fi
+    if [[ -d "./py_displaylink_synaptics_install/.venv" ]]; then
+      sudo rm -rf ./py_displaylink_synaptics_install/.venv
+    fi
+    if [[ -f "/home/${USER}/.local/bin/displaylink_install_tui" ]]; then
+      rm -rf "/home/${USER}/.local/bin/displaylink_install_tui"
+    fi
+    if [[ -d "/home/${USER}/.local/share/uv/tools" ]]; then
+      sudo chown -R $USER:$USER "/home/${USER}/.local/share/uv/tools"
+      uv tool uninstall py_displaylink_synaptics_install
+    fi
+    if [[ -d "/root/.cache/ms-playwright/" ]]; then
+      sudo rm -rf /root/.cache/ms-playwright/
+    fi
+
+
 }
 
 while [[ $# -gt 0 ]]; do
