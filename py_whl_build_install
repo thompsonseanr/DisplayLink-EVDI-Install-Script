@@ -158,6 +158,8 @@ uninstall() {
 
 }
 
+# Borrowed from the official displaylink-installer.sh
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     install)
