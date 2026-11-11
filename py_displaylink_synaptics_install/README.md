@@ -1,14 +1,4 @@
-# Linux Multi-Monitor DisplayLink Driver and EVDI Install Utility Local Build Instructions
-
-<br>
-
-## Release Update:  
-
-This was re-written as a self-contained python ELF binary with [Textual](https://textual.textualize.io/) TUI. The bash script `py_whl_build_install` was written to build and install or uninstall the .whl using [uv](https://docs.astral.sh/uv/) python package manager.  
-
-<br>
-
-**IMPORTANT:** If you used the `py_whl_build_install` to build and install the .whl, the main DisplayLink executable is now: `displaylink_install_tui`
+# Linux Multi-Monitor DisplayLink Driver and EVDI Install Utility Local Python Wheel Build Instructions
 
 <br>
 

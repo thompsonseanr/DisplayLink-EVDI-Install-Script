@@ -29,17 +29,21 @@ This was re-written in python with [Playwright](https://playwright.dev/) and the
 
 <br>
 
-**IMPORTANT:** If you used the `py_whl_build_install` to build and install the .whl, the main DisplayLink executable is now: `displaylink_install_tui`
+**IMPORTANT:** If you used the [py_whl_build_install](#build-and-install-the-python-whl-with-py_whl_build_install) to build and install the .whl, the main DisplayLink executable is now: 
+
+```
+displaylink_install_tui
+```
 
 <br>
 
-The [shell script](#bash-script) is an option, but will no longer be actively updated with new features outside of periodically updating the **Synaptics DisplayLink Driver** download url.  
+The original [shell script](#bash-script) is an option, but will no longer be actively updated with new features outside of periodically updating the **Synaptics DisplayLink Driver** download url.  
 
 <br>  
 
-The python executable will still require build dependencies to be installed as noted in the release notes. Directions for how to create your own package locally without using the are in the section: [Build the python ELF binary locally with pyinstaller](#build-the-python-elf-binary-locally-with-pyinstaller).  
+The python executable will still require build dependencies to be installed. Directions for how to create your own package locally without using the are in the python module: [Linux Multi-Monitor DisplayLink Driver and EVDI Install Utility Local Python Wheel Build Instructions](py_displaylink_synaptics_install/README.md).  
   
-There are still improvements to be made (better error handling with associated screens, dependency checks, etc.), so new releases will be coming.  
+There are still improvements to be made (dependency checks with warnings), so new releases will be coming.  
 
 ## Preface:  
 
