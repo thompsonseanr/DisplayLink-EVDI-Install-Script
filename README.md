@@ -47,11 +47,11 @@ There are still improvements to be made (dependency checks with warnings), so ne
 
 ## Preface:  
 
+If after a kernel update your DisplayLink and EVDI module breaks, you can use this script to update to the latest version of the EVDI driver. If you installed **EVDI** and **DisplayLink** drivers via you package manager, please uninstall them before proceeding.  
+
 Due to an issue encountered with an older, incompatible version of **EVDI** and the latest **Linux 7.X.X** kernel, this script was written to decouple the version of the **EVDI** module bundled with the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) installer and give users the option to choose the version of **EVDI** from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) that works for their kernel version.
 
 You will need to disable **Secure Boot** in your bios.  
-
-If you installed **EVDI** and **DisplayLink** drivers via you package manager, please uninstall them before proceeding.  
 
 I want to give a huge shout-out, thanks, and appreciation for the developers and maintainers of the following repos and packages:  
 | Distros | Repo/Package |
