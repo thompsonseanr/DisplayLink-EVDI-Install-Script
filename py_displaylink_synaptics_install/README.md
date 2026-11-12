@@ -95,10 +95,10 @@ uv tool install dist/py_displaylink_synaptics_install-<VERSION>-py3-none-any.whl
   
 
 > **Disclaimer Message:**     
-> Please run this script with `sudo`.  
+> 
 > Elevated permissions are required for running the extracted DisplayLink displaylink-installer.sh script,  
 > which builds the EVDI DKMS module, etc.  
-> Exiting.
+
 
 ```
 sudo env "PATH=$PATH" py_displaylink_synaptics_install 
