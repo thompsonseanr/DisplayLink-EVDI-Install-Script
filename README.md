@@ -29,7 +29,7 @@ This was re-written in python with [Playwright](https://playwright.dev/) and the
 
 <br>
 
-**IMPORTANT:** If you used the [py_whl_build_install](#build-and-install-the-python-whl-with-py_whl_build_install) to build and install the .whl, the main DisplayLink executable is now: 
+**IMPORTANT:** If you used the [py_whl_build_install](#build-and-install-the-python-whl-with-py_whl_build_install) bash script to build and install the .whl, the main DisplayLink installation executable is now: 
 
 ```
 displaylink_install_tui
@@ -47,11 +47,11 @@ There are still improvements to be made (dependency checks with warnings), so ne
 
 ## Preface:  
 
-If after a kernel update your DisplayLink and EVDI module breaks, you can use this script to update to the latest version of the EVDI driver. Using this script will hopefully keep you from workarounds like kernel version pinning.  
+If the DisplayLink and the EVDI module breaks after a kernel update, this script can be used to update to the latest version of the EVDI driver. Using this script will hopefully keep you from workarounds like kernel version pinning.  
 
 If you installed **EVDI** and **DisplayLink** drivers via your package manager, please uninstall them before proceeding.  
 
-Due to an issue encountered with an older, incompatible version of **EVDI** and the latest **Linux 7.X.X** kernel, this script was written to decouple the version of the **EVDI** module bundled with the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) installer and give users the option to choose the version of **EVDI** from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) that works for their kernel version.
+This started with an issue encountered with an older, incompatible version of **EVDI** and the latest **Linux 7.X.X** kernel. The original bash script was written to decouple the version of the **EVDI** module bundled with the [Synaptics DisplayLink Driver and Manager](https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu) installer and give users the option to choose the release version of **EVDI** from the [DisplayLink EVDI Git Repo](https://github.com/DisplayLink/evdi) that works for their kernel version.
 
 You will need to disable **Secure Boot** in your bios.  
 
