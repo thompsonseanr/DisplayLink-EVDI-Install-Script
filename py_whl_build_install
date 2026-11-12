@@ -31,9 +31,9 @@ if [[ "$whichWhl" == "py_displaylink_synaptics_install" ]]; then
   printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
   printf "${BLUE}:::${RESET}\n"
   printf "${RED}>>>${RESET} ${WHITE}WARNING: ${RESET}${RED}${BOLD}py_displaylink_synaptics_install${RESET}${RESET} ${WHITE}is already installed. Exiting ${RESET}\n"
-  printf "${RED}>>>${RESET}\n"
-  printf "${RED}>>>${RESET} ${WHITE}If you would like to uninstall, please run: ${RESET}\n"
-  printf "${RED}>>>${RESET} ${WHITE}$ py_whl_build_install uninstall${RESET}\n"
+  printf "${BLUE}:::${RESET}\n"
+  printf "${BLUE}:::${RESET} ${WHITE}If you would like to uninstall, please run: ${RESET}\n"
+  printf "${BLUE}:::${RESET} ${WHITE}$ py_whl_build_install uninstall${RESET}\n"
   printf "${BLUE}:::${RESET}\n"
   printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
   exit 1
@@ -106,11 +106,21 @@ fi
 printf "${BLUE}:::${RESET} ${WHITE}Creating /home/${USER}/.local/bin/displaylink_install_tui${RESET}\n"
 printf "${BLUE}:::${RESET}\n"
 
-cat << EOF | tee /home/$USER/.local/bin/displaylink_install_tui > /dev/null
-#!/bin/bash
+cat << 'OUTER_EOF' | tee /home/$USER/.local/bin/displaylink_install_tui > /dev/null
+#!/usr/bin/env bash
 
-sudo env "PATH=\$PATH" py_displaylink_synaptics_install
-EOF
+cat << 'INNER_EOF'
+
+Disclaimer Message:
+
+Elevated permissions are required for running the extracted DisplayLink displaylink-installer.sh script,
+which builds the EVDI DKMS module, etc.
+
+INNER_EOF
+
+
+sudo env "PATH=$PATH" py_displaylink_synaptics_install
+OUTER_EOF
 
 chmod +x /home/$USER/.local/bin/displaylink_install_tui
 
@@ -131,8 +141,8 @@ uninstall() {
     printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
     printf "${BLUE}:::${RESET}\n"
     printf "${RED}>>>${RESET} ${WHITE}Uninstalling: ${RESET}\n"
-    printf "${RED}>>>${RESET} ${WHITE}py_displaylink_synaptics_install ${RESET}\n"
-    printf "${RED}>>>${RESET} ${WHITE}displaylink_install_tui ${RESET}\n"
+    printf "${BLUE}:::${RESET} ${WHITE}py_displaylink_synaptics_install ${RESET}\n"
+    printf "${BLUE}:::${RESET} ${WHITE}displaylink_install_tui ${RESET}\n"
     printf "${BLUE}:::${RESET}\n"
     printf "${BLUE}::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::${RESET}\n"
 
@@ -157,6 +167,8 @@ uninstall() {
 
 
 }
+
+# Borrowed from the official displaylink-installer.sh
 
 while [[ $# -gt 0 ]]; do
   case "$1" in

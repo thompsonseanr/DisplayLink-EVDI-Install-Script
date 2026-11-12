@@ -833,10 +833,7 @@ class DisplayLinkInstallationScreen(Screen):
 
             if self.displaylink_cl.failed_install in line.lower() or self.displaylink_cl.failed_dkms in line.lower():
                 self.install_fail = True
-        
-        # self.app.call_from_thread(self.app.push_screen, FinalizeScreen(
-        #     displaylink_cl=self.displaylink_cl
-        # ))
+
         self.app.call_from_thread(self.eval_install)
 
     def eval_install(self) -> None:
@@ -908,7 +905,6 @@ class CleanFilesExitScreen(Screen):
         self.displaylink_cl.clean_files()
         time.sleep(3)
         self.app.call_from_thread(self.app.exit())
-        # self.app.call_from_thread(self.app.push_screen, FinalizeScreen(displaylink_cl=self.displaylink_cl))
 
 
 # Finalize Screen 
@@ -990,8 +986,6 @@ class FinishExitScreen(Screen):
         if event.button.id == "exit-button":
             self.app.exit()
 
-
-# To-do: Screen to handle Runit displaylink or Systemd
 
 class DisplayLinkInstaller(App):
     BINDINGS = [
