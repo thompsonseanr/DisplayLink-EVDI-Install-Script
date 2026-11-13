@@ -47,7 +47,7 @@ There are still improvements to be made (dependency checks with warnings), so ne
 
 ## Preface:  
 
-If the DisplayLink and the EVDI module breaks after a kernel update, this script can be used to update to the latest version of the EVDI driver. Using this script will hopefully keep you from workarounds like kernel version pinning.  
+If the DisplayLink and the EVDI module breaks after a kernel update, this can be used to update to the latest version of the EVDI driver and will hopefully keep you from workarounds like kernel version pinning.  
 
 If you installed **EVDI** and **DisplayLink** drivers via your package manager, please uninstall them before proceeding.  
 
