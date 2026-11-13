@@ -45,6 +45,14 @@ The python executable will still require build dependencies to be installed. Dir
   
 There are still improvements to be made (dependency checks with warnings), so new releases will be coming.  
 
+<br>  
+
+**Screenshots:**  
+
+<img src="docs/images/evdi_menu.png" alt="EVDI Menu" width="600px">
+
+<img src="docs/images/display_installation.png" alt="Display Install TUI" width="600px">
+
 ## Preface:  
 
 If the DisplayLink and the EVDI module breaks after a kernel update, this can be used to update to the latest version of the EVDI driver and will hopefully keep you from workarounds like kernel version pinning.  
@@ -116,19 +124,21 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
 
 **Install Instructions:**  
 
-1) Make the `py_whl_build_install` script executable:  
+1) Make sure your Distro build dependencies are installed.  
+
+2) Make the `py_whl_build_install` script executable:  
 
     ```
     chmod +x py_whl_build_install
     ```
 
-2) .whl install as uv tool:  
+3) .whl install as uv tool:  
 
     ```
     ./py_whl_build_install
     ```
 
-3) Restart your shell (bash, zsh, etc.):  
+4) Restart your shell (bash, zsh, etc.):  
 
     Bash:  
 
@@ -142,12 +152,11 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
     source ~/.zshrc
     ```
 
-3) Run **displaylink_install_tui** to install the DisplayLink and EVDI module:  
+5) Run **displaylink_install_tui** to install the DisplayLink and EVDI module:  
 
     ```
     displaylink_install_tui
     ```
-
 
 **Uninstallation of python .whl:**  
 
@@ -158,6 +167,10 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
     ```
 
 <br>
+
+**Screenshot:**
+
+<img src="docs/images/whl_install.png" alt="EVDI Menu" width="600px">
 
 ## Bash Script
 
