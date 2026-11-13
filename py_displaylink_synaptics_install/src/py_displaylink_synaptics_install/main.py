@@ -410,7 +410,7 @@ BEGIN_MESSAGE = """
 EVDI_DEC_MESSAGE = """
 [bold]::: Please choose the EVDI release version to install:[/bold]
 
-It is recommended to install the latest Tag version.
+It is recommended to install the latest Release Tag.
 """
 
 PLAYWRIGHT_DOWNLOAD_MESSAGE = """
