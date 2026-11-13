@@ -427,7 +427,7 @@ INSTALL_DEC_MESSAGE = """
 """
 
 INSTALLATION_LOG_MESSAGE = """
-[bold]::: Now installing Synaptics DisplayLink Driver./bold]
+[bold]::: Now installing Synaptics DisplayLink Driver.[/bold]
 ::: Please wait until it completes... 
 (Building the EVDI DKMS kernel module takes time)
 
