@@ -47,11 +47,9 @@ There are still improvements to be made (dependency checks with warnings), so ne
 
 <br>  
 
-**Screenshots:**  
 
-<img src="docs/images/evdi_menu.png" alt="EVDI Menu" width="600px">
+<img src="docs/images/display-install.gif" alt="DisplayLink Install Demo" width="65%">
 
-<img src="docs/images/display_installation.png" alt="Display Install TUI" width="600px">
 
 ## Preface:  
 
@@ -122,6 +120,10 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
 
 ## Build and install the python .whl with **py_whl_build_install**:
 
+<img src="docs/images/display-whl-install.gif" alt="DisplayLink Install Demo" width="65%">
+
+<br>  
+
 **Install Instructions:**  
 
 1) Make sure your Distro build dependencies are installed.  
@@ -168,9 +170,6 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
 
 <br>
 
-**Screenshot:**
-
-<img src="docs/images/whl_install.png" alt="EVDI Menu" width="600px">
 
 ## Bash Script
 

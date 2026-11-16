@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 USER_ACTION="install"
 
 RED='\e[31m'
@@ -68,7 +66,7 @@ if [[ $uvDec == "y" ]]; then
     else
         printf "${BLUE}:::${RESET} ${WHITE}Downloading and installing 'uv'${RESET}\n"
         printf "\n"
-        curl -LsSf https://astral.sh/uv/install.sh | sh
+        curl -LsSf https://astral.sh/uv/install.sh | sh >/dev/null 2>&1
     fi
 fi
 
@@ -103,7 +101,7 @@ else
 fi
 
 
-printf "${BLUE}:::${RESET} ${WHITE}Creating /home/${USER}/.local/bin/displaylink_install_tui${RESET}\n"
+printf "${BLUE}:::${RESET} ${WHITE}Creating /home/LOCAL_USER/.local/bin/displaylink_install_tui${RESET}\n"
 printf "${BLUE}:::${RESET}\n"
 
 cat << 'OUTER_EOF' | tee /home/$USER/.local/bin/displaylink_install_tui > /dev/null
@@ -152,6 +150,9 @@ uninstall() {
     if [[ -d "./py_displaylink_synaptics_install/.venv" ]]; then
       sudo rm -rf ./py_displaylink_synaptics_install/.venv
     fi
+    if [[ -f "./py_displaylink_synaptics_install/uv.lock" ]]; then
+      rm ./py_displaylink_synaptics_install/uv.lock
+    fi
     if [[ -f "/home/${USER}/.local/bin/displaylink_install_tui" ]]; then
       rm -rf "/home/${USER}/.local/bin/displaylink_install_tui"
     fi
@@ -161,9 +162,9 @@ uninstall() {
     if [[ "$whichWhl" == "py_displaylink_synaptics_install" ]]; then 
       uv tool uninstall py_displaylink_synaptics_install
     fi
-    if [[ -d "/root/.cache/ms-playwright/" ]]; then
-      sudo rm -rf /root/.cache/ms-playwright/
-    fi
+
+    sudo rm -rf /root/.cache/ms-playwright/
+
 
 
 }

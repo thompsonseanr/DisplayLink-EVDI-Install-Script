@@ -16,3 +16,5 @@ py_displaylink_synaptics_install/*.spec
 **/.mypy_cache/
 
 **/*.egg-info/
+
+**/uv.lock
