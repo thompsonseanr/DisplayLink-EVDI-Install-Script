@@ -48,7 +48,7 @@ There are still improvements to be made (dependency checks with warnings), so ne
 <br>  
 
 
-<img src="docs/images/display-install.gif" alt="DisplayLink Install Demo" width="65%">
+<img src="docs/images/display-install.gif" alt="DisplayLink Install Demo">
 
 
 ## Preface:  
@@ -120,7 +120,7 @@ zypper install kernel-devel kernel-source libdrm-devel dkms
 
 ## Build and install the python .whl with **py_whl_build_install**:
 
-<img src="docs/images/display-whl-install.gif" alt="DisplayLink Install Demo" width="65%">
+<img src="docs/images/display-whl-install.gif" alt="DisplayLink Install Demo">
 
 <br>  
 
